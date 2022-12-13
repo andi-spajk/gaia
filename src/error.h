@@ -7,6 +7,5 @@
 #define ERROR_SYMBOL_NOT_FOUND          -2
 /*
 ;       ;       ;       ;       ;       ;
-					;
 */
 #endif

@@ -1,15 +1,14 @@
 /** symbol_table.c
 
-Symbol table for the assembler. Symbols consist of a label-value pair,
-with the label acting as the key.
+Symbol table for the assembler. Symbols consist of a label-value pair, with the
+label acting as the key.
 
-Initialize, destroy, and insert symbols into the symbol table. Search for
-symbols using a label string. No function to delete symbol -- assembler doesn't
-need it.
+Initialize and destroy symbol tables, and insert and search symbols. No function
+to delete symbol -- assembler doesn't need it.
 
-This implementation uses djb2 hashing and linear probing. The starting size
-is 17 symbols. Resizing occurs with a load factor is 0.5. The new size is
-the next prime number that is greater than double the previous size.
+This implementation uses djb2 hashing and linear probing. The starting size is
+17 symbols. Resizing occurs with a load factor of 0.5. The new size is the next
+prime number that is greater than double the previous size.
 */
 
 #include <stdlib.h>
