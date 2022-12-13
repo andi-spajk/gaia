@@ -21,7 +21,7 @@ prime number that is greater than double the previous size.
 // initial size of symbol table
 #define BASE_SIZE 17
 
-/** init_symbol_table()
+/* init_symbol_table()
 	@symtab         uninitialized ptr to SymbolTable struct
 
 	@return         ptr to dynamically allocated SymbolTable
@@ -43,7 +43,7 @@ struct SymbolTable *init_symbol_table(void)
 	return symtab;
 }
 
-/** destroy_symbol_table()
+/* destroy_symbol_table()
 	@symtab         ptr to SymbolTable struct
 
 	Frees all the memory used by a SymbolTable and by its symbols
@@ -63,7 +63,7 @@ void destroy_symbol_table(struct SymbolTable *symtab)
 	free(symtab);
 }
 
-/** djb2_hash()
+/* djb2_hash()
 	@label          string containing assembly label
 
 	@return         32-bit hash value of the label
@@ -78,7 +78,7 @@ static unsigned long djb2_hash(const char *label)
 	return hash;
 }
 
-/** resize_symbols()
+/* resize_symbols()
 	@symtab         ptr to SymbolTable struct
 
 	@return         dynamically allocated array of ptrs to Symbol structs,
@@ -119,7 +119,7 @@ static struct Symbol **resize_symbols(struct SymbolTable *symtab)
 	return new_symbols;
 }
 
-/** init_symbol()
+/* init_symbol()
 	@label          string containing assembly label
 	@value          value of the label
 
@@ -143,7 +143,7 @@ static struct Symbol *init_symbol(const char *label, const int value)
 	return sym;
 }
 
-/** insert_symbol()
+/* insert_symbol()
 	@symtab         ptr to SymbolTable struct
 	@label          string containing assembly label
 	@value          value of the label
@@ -182,7 +182,7 @@ int insert_symbol(struct SymbolTable *symtab, const char *label,
 	return 1;
 }
 
-/** search_symbol()
+/* search_symbol()
 	@symtab         ptr to SymbolTable struct
 	@label          string containing assembly label
 
@@ -200,6 +200,6 @@ int search_symbol(const struct SymbolTable *symtab, const char *label)
 		hash = (hash + 1) % symtab->size;
 		curr = symtab->symbols[hash];
 	}
-	// curr is now NULL, meaning the probing ended
+	// curr is now NULL, meaning the probing ended (or never started)
 	return ERROR_SYMBOL_NOT_FOUND;
 }

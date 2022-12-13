@@ -6,7 +6,7 @@ Find and check for prime numbers. Resize symbol tables with these functions.
 
 #include <math.h>
 
-/** is_prime()
+/* is_prime()
 	@x              possible prime to check
 
 	@return         1 if prime, 0 if not
@@ -28,7 +28,7 @@ static int is_prime(const int x)
 	return 1;
 }
 
-/** next_prime()
+/* next_prime()
 	@x              starting number to check for primality
 
 	@return         the next prime number after x
