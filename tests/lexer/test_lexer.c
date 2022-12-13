@@ -20,8 +20,8 @@ void test_init_destroy_lexer(void)
 
 		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[i]->type);
 
-		TEST_ASSERT_NOT_NULL(lexer->sequence[i]->str);
-		TEST_ASSERT_EQUAL_STRING("", lexer->sequence[i]->str);
+		TEST_ASSERT_NULL(lexer->sequence[i]->str);
+		// TEST_ASSERT_EQUAL_STRING("", lexer->sequence[i]->str);
 
 		TEST_ASSERT_EQUAL_INT(0U, lexer->sequence[i]->value);
 	}
@@ -37,7 +37,8 @@ void test_add_token(void)
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
 	tk->type = TOKEN_LABEL;
-	strncpy(tk->str, "CHKEND", 7);
+	TEST_ASSERT_NOT_NULL(init_token_str(tk, "CHKEND"));
+	// strncpy(tk->str, "CHKEND", 7);
 	tk->value = 0x1000U;
 
 	// 1st insertion
@@ -76,6 +77,7 @@ void test_add_token(void)
 		TEST_ASSERT_EQUAL_INT(0x1000U, curr->value);
 	}
 
+	// this insertion should fail and return NULL
 	TEST_ASSERT_NULL(add_token(lexer, tk));
 	TEST_ASSERT_EQUAL_INT(8, lexer->curr);
 

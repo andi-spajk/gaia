@@ -22,20 +22,39 @@ which is always an error.
 	@return         ptr to dynamically allocated Token struct
 
 	Dynamically allocates a Token struct and initializes its members.
-	The Token's str is also dynamically allocated.
 */
 struct Token *init_token(void)
 {
-	struct Token *token = malloc(sizeof(struct Token));
-	if (!token)
+	struct Token *tk = malloc(sizeof(struct Token));
+	if (!tk)
 		return NULL;
 
-	token->type = TOKEN_NULL;
-	token->str = calloc((size_t)MAX_TOKEN_STR_LEN, sizeof(char));
-	if (!token->str)
+	tk->type = TOKEN_NULL;
+	tk->str = NULL;
+	tk->value = 0U;
+	return tk;
+}
+
+/* init_token_str()
+	@tk             ptr to Token struct
+	@str            string to duplicate into @tk. Can be empty string
+
+	@return         ptr to Token if successfully duplicated, or NULL if
+	                fail.
+
+	Dynamically allocates the Token's string member. If @str is not empty
+	then the string will be duplicated into the token.
+*/
+struct Token *init_token_str(struct Token *tk, char *str)
+{
+	tk->str = calloc((size_t)MAX_TOKEN_STR_LEN, sizeof(char));
+	if (!tk->str)
 		return NULL;
-	token->value = 0U;
-	return token;
+
+	if (!str)
+		return tk;
+	strncpy(tk->str, str, strlen(str));
+	return tk;
 }
 
 /* init_sequence()
@@ -111,7 +130,14 @@ void destroy_lexer(struct Lexer *lexer)
 	free(lexer);
 }
 
-struct Token *add_token(struct Lexer *lexer, struct Token *tk)
+/* add_token()
+	@lexer          ptr to Lexer struct
+	@tk             ptr to Token struct with populated members
+
+	@return         ptr to Token in the lexer sequence if success, or NULL
+	                if fail
+*/
+struct Token *add_token(struct Lexer *lexer, const struct Token *tk)
 {
 	// end of sequence array
 	if (lexer->curr == MAX_TOKENS)
@@ -120,7 +146,8 @@ struct Token *add_token(struct Lexer *lexer, struct Token *tk)
 	struct Token *curr = lexer->sequence[lexer->curr];
 	if (curr->type == TOKEN_NULL) {
 		curr->type = tk->type;
-		strncpy(curr->str, tk->str, MAX_TOKEN_STR_LEN);
+		if (!init_token_str(curr, tk->str))
+			return NULL;
 		curr->value = tk->value;
 		lexer->curr++;
 		return curr;
