@@ -13,6 +13,7 @@ which is always an error.
 #include <stdlib.h>
 #include <string.h>
 
+#include "error.h"
 #include "lexer.h"
 
 #define MAX_TOKENS 8
@@ -153,4 +154,86 @@ struct Token *add_token(struct Lexer *lexer, const struct Token *tk)
 		return curr;
 	}
 	return NULL;
+}
+
+static int hex_digit_to_int(const char c)
+{
+	if (c >= 'A' && c <= 'F')
+		return c - 'A' + 10;
+	else if (c >= 'a' && c <= 'f')
+		return c- 'a' + 10;
+	else if (c >= '0' && c <= '9')
+		return c - '0';
+	return ERROR_ILLEGAL_CHAR;
+}
+
+static int bin_digit_to_int(const char c)
+{
+	if (c == '0')
+		return 0;
+	else if (c == '1')
+		return 1;
+	return ERROR_ILLEGAL_CHAR;
+}
+
+static int dec_digit_to_int(const char c)
+{
+	if (c >= '0' && c <= '9')
+		return c - '0';
+	return ERROR_ILLEGAL_CHAR;
+}
+
+/* lex_literal()
+	@tk             ptr to Token in the lexer sequence
+	@line           ptr to first char of the literal token
+
+	@return         number of chars read, or error code
+
+	Lexically analyze a literal token and update @tk to hold the literal's
+	information.
+*/
+int lex_literal(struct Token *tk, char *line)
+{
+	int (*converters[])(char) = {hex_digit_to_int, bin_digit_to_int,
+	                             dec_digit_to_int};
+
+	char *curr = line;
+	int base;
+	int converter_func;  // to index array of function ptrs
+	if (*curr == '$') {
+		base = 16;
+		converter_func = 0;
+		curr++;
+	} else if (*curr == '%') {
+		base = 2;
+		converter_func = 1;
+		curr++;
+	} else if (*curr >= '0' && *curr <= '9') {
+		base = 10;
+		converter_func = 2;
+	} else {
+		return ERROR_ILLEGAL_CHAR;
+	}
+
+	unsigned long total = 0;
+	int num_chars = 0;
+	int char_val;
+	while (curr) {
+		char_val = (*converters[converter_func])(*curr);
+		if (char_val == ERROR_ILLEGAL_CHAR)
+			break;
+		total *= base;
+		total += char_val;
+		num_chars++;
+		curr++;
+	}
+
+	if (num_chars == 0)
+		return ERROR_ILLEGAL_CHAR;
+	if (total > 0xFFFF)
+		return ERROR_TOO_BIG_LITERAL;
+
+	tk->type = TOKEN_LITERAL;
+	tk->value = (unsigned int)total;
+	return num_chars;
 }

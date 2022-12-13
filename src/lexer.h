@@ -31,5 +31,6 @@ struct Lexer *init_lexer(void);
 void destroy_token(struct Token *tk);
 void destroy_lexer(struct Lexer *lexer);
 struct Token *add_token(struct Lexer *lexer, const struct Token *tk);
+int lex_literal(struct Token *tk, char *line);
 
 #endif
