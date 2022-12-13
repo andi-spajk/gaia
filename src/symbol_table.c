@@ -45,7 +45,7 @@ struct SymbolTable *init_symbol_table(void)
 /* destroy_symbol_table()
 	@symtab         ptr to SymbolTable struct
 
-	Frees all the memory used by a SymbolTable and by its symbols
+	Frees all the memory used by a SymbolTable and by its symbols.
 */
 void destroy_symbol_table(struct SymbolTable *symtab)
 {
@@ -105,7 +105,9 @@ static struct Symbol **resize_symbols(struct SymbolTable *symtab)
 		if (old_sym) {
 			rehash = djb2_hash(old_sym->label) % new_size;
 			new_sym = new_symbols[rehash];
+			// linearly probe for an open spot
 			while (new_sym) {
+				// wrap around to 0 if we reach end of array
 				rehash = (rehash + 1) % new_size;
 				new_sym = new_symbols[rehash];
 			}
@@ -168,7 +170,7 @@ int insert_symbol(struct SymbolTable *symtab, const char *label,
 	if (!new_sym)
 		return ERROR_MEMORY_ALLOCATION_FAIL;
 
-	// linearly probe for open spot
+	// linearly probe for an open spot
 	int hash = djb2_hash(label) % symtab->size;
 	struct Symbol *curr = symtab->symbols[hash];
 	while (curr) {
