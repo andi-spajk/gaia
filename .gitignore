@@ -1,0 +1,7 @@
+main
+obj/
+opcodes/
+pseudocode/
+
+tests/symbol_table/test_symbol_table
+tests/prime/test_prime
