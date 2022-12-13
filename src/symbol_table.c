@@ -64,18 +64,6 @@ void destroy_symbol_table(struct SymbolTable *symtab)
 	free(symtab);
 }
 
-/*
-resizing:
-	new size = next prime after (2 * old size)
-		17 -> 37 -> etc. (load factor 0.5?)
-	alloc new symtab
-	for each entry in old symtab
-	rehash it
-	place in new symtab
-	if entry is already there
-		linearly probe for free spot
-*/
-
 /** djb2_hash()
 	@label          string containing assembly label
 
