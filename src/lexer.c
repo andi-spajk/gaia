@@ -8,6 +8,7 @@ struct. The sequence and instruction struct are used by the future parser.
 The lexer detects lexical errors such as illegal characters and labels over the
 maximum character length. It also checks if literal operands are over 2 bytes,
 which is always an error.
+
 */
 
 #include <stdlib.h>
@@ -199,7 +200,7 @@ int lex_literal(struct Token *tk, char *line)
 
 	char *curr = line;
 	int base;
-	int converter_func;  // to index array of function ptrs
+	int converter_func;  // for indexing array of function ptrs
 	if (*curr == '$') {
 		base = 16;
 		converter_func = 0;
