@@ -22,9 +22,8 @@ prime number that is greater than double the previous size.
 #define BASE_SIZE 17
 
 /* init_symbol_table()
-	@symtab         uninitialized ptr to SymbolTable struct
-
-	@return         ptr to dynamically allocated SymbolTable
+	@return         ptr to dynamically allocated SymbolTable, or NULL
+	                if fail
 
 	Dynamically allocates a SymbolTable struct and its array of symbols.
 */
@@ -82,7 +81,7 @@ static unsigned long djb2_hash(const char *label)
 	@symtab         ptr to SymbolTable struct
 
 	@return         dynamically allocated array of ptrs to Symbol structs,
-	                or error code
+	                or NULL if fail
 
 	Creates a new symbols[] array for a SymbolTable struct, rehashes all
 	old items, and inserts them into the new symbols array. The memory
@@ -123,7 +122,8 @@ static struct Symbol **resize_symbols(struct SymbolTable *symtab)
 	@label          string containing assembly label
 	@value          value of the label
 
-	@return         ptr to dynamically allocated Symbol struct
+	@return         ptr to dynamically allocated Symbol struct, or NULL if
+	                failed to allocate
 
 	Dynamically allocates a Symbol struct with a key-value pair of @label
 	and @value. The Symbol's label is dynamically allocated too.
@@ -164,13 +164,12 @@ int insert_symbol(struct SymbolTable *symtab, const char *label,
 			return ERROR_MEMORY_ALLOCATION_FAIL;
 	}
 
-	int hash = djb2_hash(label) % symtab->size;
-
 	struct Symbol *new_sym = init_symbol(label, value);
 	if (!new_sym)
 		return ERROR_MEMORY_ALLOCATION_FAIL;
 
 	// linearly probe for open spot
+	int hash = djb2_hash(label) % symtab->size;
 	struct Symbol *curr = symtab->symbols[hash];
 	while (curr) {
 		// wrap around to index 0 if we reach end of array
