@@ -4,30 +4,25 @@
 #include "error.h"
 #include "symbol_table.h"
 
-struct SymbolTable *symtab;
-
-void setUp(void)
-{
-	symtab = init_symbol_table();
-}
-
-void tearDown(void)
-{
-	destroy_symbol_table(symtab);
-}
+void setUp(void) {}
+void tearDown(void) {}
 
 void test_init_destroy_symtab(void)
 {
+	struct SymbolTable *symtab = init_symbol_table();
 	TEST_ASSERT_NOT_NULL(symtab);
 
 	TEST_ASSERT_EQUAL_INT(17, symtab->size);
 	TEST_ASSERT_EQUAL_INT(0, symtab->count);
 	for (int i = 0; i < symtab->size; i++)
 		TEST_ASSERT_NULL(symtab->symbols[i]);
+
+	destroy_symbol_table(symtab);
 }
 
 void test_insert_symbol(void)
 {
+	struct SymbolTable *symtab = init_symbol_table();
 	TEST_ASSERT_NOT_NULL(symtab);
 
 	TEST_ASSERT_EQUAL_INT(17, symtab->size);
@@ -68,10 +63,13 @@ void test_insert_symbol(void)
 	TEST_ASSERT_NOT_NULL(symtab->symbols[11]);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[11]->label);
 	TEST_ASSERT_EQUAL_STRING("SWAP", symtab->symbols[11]->label);
+
+	destroy_symbol_table(symtab);
 }
 
 void test_search_symbol(void)
 {
+	struct SymbolTable *symtab = init_symbol_table();
 	TEST_ASSERT_NOT_NULL(symtab);
 
 	insert_symbol(symtab, "JANUS", 1);
@@ -105,6 +103,8 @@ void test_search_symbol(void)
 	TEST_ASSERT_NOT_NULL(symtab->symbols[1]);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[1]->label);
 	TEST_ASSERT_EQUAL_INT(8, search_symbol(symtab, "SETW"));
+
+	destroy_symbol_table(symtab);
 }
 
 // the resize function is supposed to be static
@@ -113,17 +113,21 @@ void test_search_symbol(void)
 // resize the symtab yourself
 void test_resize(void)
 {
+	struct SymbolTable *symtab = init_symbol_table();
 	TEST_ASSERT_NOT_NULL(symtab);
 
 	TEST_ASSERT_EQUAL_INT(17, symtab->size);
 	TEST_ASSERT_NOT_NULL(resize_symbols(symtab));
 	TEST_ASSERT_EQUAL_INT(37, symtab->size);
+
+	destroy_symbol_table(symtab);
 }
 */
 
 // symtab resizes itself after inserting over the load factor
 void test_resize_automatic(void)
 {
+	struct SymbolTable *symtab = init_symbol_table();
 	TEST_ASSERT_NOT_NULL(symtab);
 
 	TEST_ASSERT_EQUAL_INT(17, symtab->size);
@@ -188,6 +192,8 @@ void test_resize_automatic(void)
 	TEST_ASSERT_NOT_NULL(symtab->symbols[2]);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[2]->label);
 	TEST_ASSERT_EQUAL_STRING("REVERSE", symtab->symbols[2]->label);
+
+	destroy_symbol_table(symtab);
 }
 
 int main(void)

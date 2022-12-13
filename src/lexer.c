@@ -11,30 +11,30 @@ which is always an error.
 */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "lexer.h"
 
-#define NUM_TOKENS 8
+#define MAX_TOKENS 8
+#define MAX_TOKEN_STR_LEN 32
 
 /* init_token()
 	@return         ptr to dynamically allocated Token struct
 
 	Dynamically allocates a Token struct and initializes its members.
-	The Token's value and str are also dynamically allocated.
+	The Token's str is also dynamically allocated.
 */
-static struct Token *init_token(void)
+struct Token *init_token(void)
 {
 	struct Token *token = malloc(sizeof(struct Token));
 	if (!token)
 		return NULL;
 
 	token->type = TOKEN_NULL;
-	token->str = calloc((size_t)32, sizeof(char));
+	token->str = calloc((size_t)MAX_TOKEN_STR_LEN, sizeof(char));
 	if (!token->str)
 		return NULL;
-	token->value = malloc(sizeof(unsigned int));
-	if (!token->value)
-		return NULL;
+	token->value = 0U;
 	return token;
 }
 
@@ -47,12 +47,12 @@ static struct Token *init_token(void)
 */
 static struct Token **init_sequence(void)
 {
-	struct Token **sequence = malloc(sizeof(struct Token *) * NUM_TOKENS);
+	struct Token **sequence = malloc(sizeof(struct Token *) * MAX_TOKENS);
 	if (!sequence)
 		return NULL;
 
 	// initialize tokens in the sequence
-	for (int i = 0; i < NUM_TOKENS; i++) {
+	for (int i = 0; i < MAX_TOKENS; i++) {
 		sequence[i] = init_token();
 		if (!sequence[i])
 			return NULL;
@@ -79,6 +79,21 @@ struct Lexer *init_lexer(void)
 	return lexer;
 }
 
+/* destroy_token()
+	@tk             ptr to dynamically allocated Token struct
+
+	Frees the memory used by a dynamically allocated Token and by its
+	members.
+*/
+void destroy_token(struct Token *tk)
+{
+	if (tk) {
+		if (tk->str)
+			free(tk->str);
+		free(tk);
+	}
+}
+
 /* destroy_lexer()
 	@lexer         ptr to Lexer struct
 
@@ -88,16 +103,27 @@ struct Lexer *init_lexer(void)
 void destroy_lexer(struct Lexer *lexer)
 {
 	struct Token *curr;
-	for (int i = 0; i < NUM_TOKENS; i++) {
+	for (int i = 0; i < MAX_TOKENS; i++) {
 		curr = lexer->sequence[i];
-		if (curr) {
-			if (curr->str)
-				free(curr->str);
-			if (curr->value)
-				free(curr->value);
-			free(curr);
-		}
+		destroy_token(curr);
 	}
 	free(lexer->sequence);
 	free(lexer);
+}
+
+struct Token *add_token(struct Lexer *lexer, struct Token *tk)
+{
+	// end of sequence array
+	if (lexer->curr == MAX_TOKENS)
+		return NULL;
+
+	struct Token *curr = lexer->sequence[lexer->curr];
+	if (curr->type == TOKEN_NULL) {
+		curr->type = tk->type;
+		strncpy(curr->str, tk->str, MAX_TOKEN_STR_LEN);
+		curr->value = tk->value;
+		lexer->curr++;
+		return curr;
+	}
+	return NULL;
 }

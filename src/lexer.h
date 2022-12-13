@@ -17,7 +17,7 @@ enum TokenType {
 struct Token {
 	enum TokenType type;
 	char *str;
-	unsigned int *value;
+	unsigned int value;
 };
 
 struct Lexer {
@@ -25,7 +25,10 @@ struct Lexer {
 	int curr;
 };
 
+struct Token *init_token(void);
 struct Lexer *init_lexer(void);
+void destroy_token(struct Token *tk);
 void destroy_lexer(struct Lexer *lexer);
+struct Token *add_token(struct Lexer *lexer, struct Token *tk);
 
 #endif
