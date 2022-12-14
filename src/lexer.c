@@ -46,16 +46,19 @@ struct Token *init_token(void)
 
 	Dynamically allocates the Token's string member. If @str is not empty
 	then the string will be duplicated into the token.
+
+	THE LEXER SHOULD GUARANTEE THAT @str FITS INSIDE THE TOKEN STRING!
 */
 struct Token *init_token_str(struct Token *tk, char *str)
 {
-	tk->str = calloc((size_t)MAX_TOKEN_STR_LEN, sizeof(char));
+	size_t length = strlen(str) + 1;
+	tk->str = calloc(length, sizeof(char));
 	if (!tk->str)
 		return NULL;
 
 	if (!str)
 		return tk;
-	strncpy(tk->str, str, strlen(str));
+	strncpy(tk->str, str, length-1);
 	return tk;
 }
 
