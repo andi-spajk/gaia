@@ -1,6 +1,7 @@
 main
 obj/
-opcodes/
+opcodes/opcodes.txt
+opcodes/65C02ops.csv
 pseudocode/
 
 tests/symbol_table/test_symbol_table
