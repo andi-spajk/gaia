@@ -5,9 +5,12 @@ retrieve opcodes, addressing bit flags/fields, and mnemonics.
 
 */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "bitfields.h"
+#include "error.h"
 #include "opcode.h"
 
 /* init_instruction()
@@ -24,8 +27,8 @@ struct Instruction *init_instruction(void)
 		return NULL;
 
 	instr->mnemonic = ILLEGAL_MNEMONIC;
-	instr->addr_field = 0;
-	instr->addr_flag = 0;
+	instr->addr_bitfield = 0;
+	instr->addr_bitflag = 0;
 	instr->opcode = 0;
 	return instr;
 }
@@ -112,4 +115,67 @@ enum Mnemonic str_to_mnemonic(char *str)
 	else if (!strcmp("TXS", str)) return TXS;
 	else if (!strcmp("TYA", str)) return TYA;
 	return ILLEGAL_MNEMONIC;
+}
+
+int16_t get_addr_bitfield(enum Mnemonic mnemonic)
+{
+	switch (mnemonic) {
+	case ADC: return ADC_BITFIELD;
+	case AND: return AND_BITFIELD;
+	case ASL: return ASL_BITFIELD;
+	case BCC: return BCC_BITFIELD;
+	case BCS: return BCS_BITFIELD;
+	case BEQ: return BEQ_BITFIELD;
+	case BIT: return BIT_BITFIELD;
+	case BMI: return BMI_BITFIELD;
+	case BNE: return BNE_BITFIELD;
+	case BPL: return BPL_BITFIELD;
+	case BRK: return BRK_BITFIELD;
+	case BVC: return BVC_BITFIELD;
+	case BVS: return BVS_BITFIELD;
+	case CLC: return CLC_BITFIELD;
+	case CLD: return CLD_BITFIELD;
+	case CLI: return CLI_BITFIELD;
+	case CLV: return CLV_BITFIELD;
+	case CMP: return CMP_BITFIELD;
+	case CPX: return CPX_BITFIELD;
+	case CPY: return CPY_BITFIELD;
+	case DEC: return DEC_BITFIELD;
+	case DEX: return DEX_BITFIELD;
+	case DEY: return DEY_BITFIELD;
+	case EOR: return EOR_BITFIELD;
+	case INC: return INC_BITFIELD;
+	case INX: return INX_BITFIELD;
+	case INY: return INY_BITFIELD;
+	case JMP: return JMP_BITFIELD;
+	case JSR: return JSR_BITFIELD;
+	case LDA: return LDA_BITFIELD;
+	case LDX: return LDX_BITFIELD;
+	case LDY: return LDY_BITFIELD;
+	case LSR: return LSR_BITFIELD;
+	case NOP: return NOP_BITFIELD;
+	case ORA: return ORA_BITFIELD;
+	case PHA: return PHA_BITFIELD;
+	case PHP: return PHP_BITFIELD;
+	case PLA: return PLA_BITFIELD;
+	case PLP: return PLP_BITFIELD;
+	case ROL: return ROL_BITFIELD;
+	case ROR: return ROR_BITFIELD;
+	case RTI: return RTI_BITFIELD;
+	case RTS: return RTS_BITFIELD;
+	case SBC: return SBC_BITFIELD;
+	case SEC: return SEC_BITFIELD;
+	case SED: return SED_BITFIELD;
+	case SEI: return SEI_BITFIELD;
+	case STA: return STA_BITFIELD;
+	case STX: return STX_BITFIELD;
+	case STY: return STY_BITFIELD;
+	case TAX: return TAX_BITFIELD;
+	case TAY: return TAY_BITFIELD;
+	case TSX: return TSX_BITFIELD;
+	case TXA: return TXA_BITFIELD;
+	case TXS: return TXS_BITFIELD;
+	case TYA: return TYA_BITFIELD;
+	default: return ERROR_BITFIELD_NOT_FOUND;
+	}
 }

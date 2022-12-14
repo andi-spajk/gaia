@@ -17,13 +17,14 @@ enum Mnemonic {
 
 struct Instruction {
 	enum Mnemonic mnemonic;
-	uint16_t addr_field;
-	uint16_t addr_flag;
+	int16_t addr_bitfield;
+	int16_t addr_bitflag;
 	int opcode;
 };
 
 struct Instruction *init_instruction(void);
 void destroy_instruction(struct Instruction *instr);
 enum Mnemonic str_to_mnemonic(char *str);
+int16_t get_addr_bitfield(enum Mnemonic mnemonic);
 
 #endif

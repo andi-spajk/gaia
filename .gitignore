@@ -7,3 +7,4 @@ tests/symbol_table/test_symbol_table
 tests/prime/test_prime
 tests/lexer/test_lexer
 tests/opcode/test_opcode
+tests/opcode/gen/bitfields.h

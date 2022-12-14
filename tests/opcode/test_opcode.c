@@ -1,5 +1,7 @@
 #include "../../unity/unity.h"
 
+#include "bitfields.h"
+#include "error.h"
 #include "opcode.h"
 
 void setUp(void) {}
@@ -11,8 +13,8 @@ void test_init_destroy_instr(void)
 	TEST_ASSERT_NOT_NULL(instr);
 
 	TEST_ASSERT_EQUAL_INT(ILLEGAL_MNEMONIC, instr->mnemonic);
-	TEST_ASSERT_EQUAL_INT(0, instr->addr_field);
-	TEST_ASSERT_EQUAL_INT(0, instr->addr_flag);
+	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitfield);
+	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 	TEST_ASSERT_EQUAL_INT(0, instr->opcode);
 
 	destroy_instruction(instr);
@@ -85,12 +87,77 @@ void test_str_to_mnemonic(void)
 	TEST_ASSERT_EQUAL_INT(ILLEGAL_MNEMONIC, str_to_mnemonic("STLOOP"));
 }
 
+void test_get_addr_bitfield(void)
+{
+	TEST_ASSERT_EQUAL_INT(ADC_BITFIELD, get_addr_bitfield(ADC));
+	TEST_ASSERT_EQUAL_INT(AND_BITFIELD, get_addr_bitfield(AND));
+	TEST_ASSERT_EQUAL_INT(ASL_BITFIELD, get_addr_bitfield(ASL));
+	TEST_ASSERT_EQUAL_INT(BCC_BITFIELD, get_addr_bitfield(BCC));
+	TEST_ASSERT_EQUAL_INT(BCS_BITFIELD, get_addr_bitfield(BCS));
+	TEST_ASSERT_EQUAL_INT(BEQ_BITFIELD, get_addr_bitfield(BEQ));
+	TEST_ASSERT_EQUAL_INT(BIT_BITFIELD, get_addr_bitfield(BIT));
+	TEST_ASSERT_EQUAL_INT(BMI_BITFIELD, get_addr_bitfield(BMI));
+	TEST_ASSERT_EQUAL_INT(BNE_BITFIELD, get_addr_bitfield(BNE));
+	TEST_ASSERT_EQUAL_INT(BPL_BITFIELD, get_addr_bitfield(BPL));
+	TEST_ASSERT_EQUAL_INT(BRK_BITFIELD, get_addr_bitfield(BRK));
+	TEST_ASSERT_EQUAL_INT(BVC_BITFIELD, get_addr_bitfield(BVC));
+	TEST_ASSERT_EQUAL_INT(BVS_BITFIELD, get_addr_bitfield(BVS));
+	TEST_ASSERT_EQUAL_INT(CLC_BITFIELD, get_addr_bitfield(CLC));
+	TEST_ASSERT_EQUAL_INT(CLD_BITFIELD, get_addr_bitfield(CLD));
+	TEST_ASSERT_EQUAL_INT(CLI_BITFIELD, get_addr_bitfield(CLI));
+	TEST_ASSERT_EQUAL_INT(CLV_BITFIELD, get_addr_bitfield(CLV));
+	TEST_ASSERT_EQUAL_INT(CMP_BITFIELD, get_addr_bitfield(CMP));
+	TEST_ASSERT_EQUAL_INT(CPX_BITFIELD, get_addr_bitfield(CPX));
+	TEST_ASSERT_EQUAL_INT(CPY_BITFIELD, get_addr_bitfield(CPY));
+	TEST_ASSERT_EQUAL_INT(DEC_BITFIELD, get_addr_bitfield(DEC));
+	TEST_ASSERT_EQUAL_INT(DEX_BITFIELD, get_addr_bitfield(DEX));
+	TEST_ASSERT_EQUAL_INT(DEY_BITFIELD, get_addr_bitfield(DEY));
+	TEST_ASSERT_EQUAL_INT(EOR_BITFIELD, get_addr_bitfield(EOR));
+	TEST_ASSERT_EQUAL_INT(INC_BITFIELD, get_addr_bitfield(INC));
+	TEST_ASSERT_EQUAL_INT(INX_BITFIELD, get_addr_bitfield(INX));
+	TEST_ASSERT_EQUAL_INT(INY_BITFIELD, get_addr_bitfield(INY));
+	TEST_ASSERT_EQUAL_INT(JMP_BITFIELD, get_addr_bitfield(JMP));
+	TEST_ASSERT_EQUAL_INT(JSR_BITFIELD, get_addr_bitfield(JSR));
+	TEST_ASSERT_EQUAL_INT(LDA_BITFIELD, get_addr_bitfield(LDA));
+	TEST_ASSERT_EQUAL_INT(LDX_BITFIELD, get_addr_bitfield(LDX));
+	TEST_ASSERT_EQUAL_INT(LDY_BITFIELD, get_addr_bitfield(LDY));
+	TEST_ASSERT_EQUAL_INT(LSR_BITFIELD, get_addr_bitfield(LSR));
+	TEST_ASSERT_EQUAL_INT(NOP_BITFIELD, get_addr_bitfield(NOP));
+	TEST_ASSERT_EQUAL_INT(ORA_BITFIELD, get_addr_bitfield(ORA));
+	TEST_ASSERT_EQUAL_INT(PHA_BITFIELD, get_addr_bitfield(PHA));
+	TEST_ASSERT_EQUAL_INT(PHP_BITFIELD, get_addr_bitfield(PHP));
+	TEST_ASSERT_EQUAL_INT(PLA_BITFIELD, get_addr_bitfield(PLA));
+	TEST_ASSERT_EQUAL_INT(PLP_BITFIELD, get_addr_bitfield(PLP));
+	TEST_ASSERT_EQUAL_INT(ROL_BITFIELD, get_addr_bitfield(ROL));
+	TEST_ASSERT_EQUAL_INT(ROR_BITFIELD, get_addr_bitfield(ROR));
+	TEST_ASSERT_EQUAL_INT(RTI_BITFIELD, get_addr_bitfield(RTI));
+	TEST_ASSERT_EQUAL_INT(RTS_BITFIELD, get_addr_bitfield(RTS));
+	TEST_ASSERT_EQUAL_INT(SBC_BITFIELD, get_addr_bitfield(SBC));
+	TEST_ASSERT_EQUAL_INT(SEC_BITFIELD, get_addr_bitfield(SEC));
+	TEST_ASSERT_EQUAL_INT(SED_BITFIELD, get_addr_bitfield(SED));
+	TEST_ASSERT_EQUAL_INT(SEI_BITFIELD, get_addr_bitfield(SEI));
+	TEST_ASSERT_EQUAL_INT(STA_BITFIELD, get_addr_bitfield(STA));
+	TEST_ASSERT_EQUAL_INT(STX_BITFIELD, get_addr_bitfield(STX));
+	TEST_ASSERT_EQUAL_INT(STY_BITFIELD, get_addr_bitfield(STY));
+	TEST_ASSERT_EQUAL_INT(TAX_BITFIELD, get_addr_bitfield(TAX));
+	TEST_ASSERT_EQUAL_INT(TAY_BITFIELD, get_addr_bitfield(TAY));
+	TEST_ASSERT_EQUAL_INT(TSX_BITFIELD, get_addr_bitfield(TSX));
+	TEST_ASSERT_EQUAL_INT(TXA_BITFIELD, get_addr_bitfield(TXA));
+	TEST_ASSERT_EQUAL_INT(TXS_BITFIELD, get_addr_bitfield(TXS));
+	TEST_ASSERT_EQUAL_INT(TYA_BITFIELD, get_addr_bitfield(TYA));
+
+	TEST_ASSERT_EQUAL_INT(ERROR_BITFIELD_NOT_FOUND, get_addr_bitfield(123));
+	TEST_ASSERT_EQUAL_INT(ERROR_BITFIELD_NOT_FOUND, get_addr_bitfield(-1));
+	TEST_ASSERT_EQUAL_INT(ERROR_BITFIELD_NOT_FOUND, get_addr_bitfield(0xFFFF));
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
 
 	RUN_TEST(test_init_destroy_instr);
 	RUN_TEST(test_str_to_mnemonic);
+	RUN_TEST(test_get_addr_bitfield);
 
 	return UNITY_END();
 }
