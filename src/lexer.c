@@ -265,7 +265,8 @@ int lex_literal(struct Token *tk, char *line)
 	@return         number of chars read, or error code
 
 	Lexically analyze @tk's string member and check if it's an instruction
-	mnemonic. @instr and @tk are NOT modified if mnemonic was not found.
+	mnemonic. @instr and @tk are NOT modified by this function if a
+	mnemonic was not found.
 */
 int lex_instruction(struct Token *tk, struct Instruction *instr)
 {
@@ -309,7 +310,7 @@ static int is_valid_token_char(const char c)
 
 /* lex_text()
 	@tk             ptr to Token struct
-	@buffer         ptr to token in a line of source code
+	@buffer         ptr aligned to a token in a line of source code
 	@instr          ptr to Instruction struct
 
 	@return         number of chars read, or error code
@@ -317,6 +318,10 @@ static int is_valid_token_char(const char c)
 	Lexically analyze a token at @buffer and update @tk to represent that
 	token. @instr may also be updated if the token was an instruction
 	mnemonic.
+
+	If no valid text is found, @tk is unchanged. If no valid instruction
+	mnemonic is found, @instr is unchanged, and @tk will assume a label
+	was found.
 */
 int lex_text(struct Token *tk, char *buffer, struct Instruction *instr)
 {
@@ -335,12 +340,14 @@ int lex_text(struct Token *tk, char *buffer, struct Instruction *instr)
 			return ERROR_ILLEGAL_CHAR;
 		}
 		// this assembler is case-insensitive
+		// everything defaults to UPPERCASE
 		text[i] = toupper(c);
 	}
 
 	if (i == MAX_TOKEN_STR_LEN) {
 		// the for loop ran its entire course which means there is no
 		// space for the null terminator
+		free(text);
 		return ERROR_TOO_LONG_LABEL;
 	}
 	text[i] = '\0';
@@ -352,7 +359,7 @@ int lex_text(struct Token *tk, char *buffer, struct Instruction *instr)
 
 	int lex_instr = lex_instruction(tk, instr);
 	if (lex_instr == ERROR_INSTRUCTION_NOT_FOUND) {
-		// non-mnemonic texts can only be labels
+		// non-mnemonic text can only be a label
 		tk->type = TOKEN_LABEL;
 		return num_chars;
 	}

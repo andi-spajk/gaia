@@ -342,6 +342,28 @@ void test_lex_text(void)
 	TEST_ASSERT_EQUAL_INT(JSR, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(JSR_BITFIELD, instr->addr_bitfield);
 
+	reset_instruction(instr);
+	char *bad_source_line = "bad&&#label      LDA #$01";
+//                               012345678901234567890123
+	buffer = bad_source_line;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_text(tk, buffer, instr));
+	buffer += 17;
+	TEST_ASSERT_EQUAL_INT(3, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, tk->type);
+	TEST_ASSERT_EQUAL_STRING("LDA", tk->str);
+	TEST_ASSERT_EQUAL_INT(LDA, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(LDA_BITFIELD, instr->addr_bitfield);
+
+	// max label length is 63 chars
+	char *too_long_label = "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefgh BEQ wtf";
+	buffer = too_long_label;
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_LONG_LABEL, lex_text(tk, buffer, instr));
+
+	char *just_enough =    "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefg BEQ wtf";
+	buffer = just_enough;
+	TEST_ASSERT_EQUAL_INT(63, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+
 	destroy_token(tk);
 	destroy_instruction(instr);
 }
