@@ -131,6 +131,14 @@ enum Mnemonic str_to_mnemonic(const char *str)
 	return ILLEGAL_MNEMONIC;
 }
 
+/* get_addr_bitfield()
+	@mnemonic       enum of an instruction mnemonic
+
+	@return         bitfield of valid addressing modes
+
+	Determines a mnemonic's corresponding bitfield which represents the
+	valid addressing modes of that mnemonic
+*/
 int16_t get_addr_bitfield(const enum Mnemonic mnemonic)
 {
 	switch (mnemonic) {

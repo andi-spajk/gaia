@@ -229,19 +229,19 @@ int lex_literal(struct Token *tk, char *line)
 		return ERROR_ILLEGAL_CHAR;
 	}
 
+	// analyze all the digits and convert to actual value
 	unsigned long total = 0;
 	int num_chars = 0;
-	int char_val;
-	while (curr) {
-		char_val = (*converters[converter_func])(*curr);
-		if (char_val == ERROR_ILLEGAL_CHAR)
-			break;
+	int char_value = (*converters[converter_func])(*curr);
+	while (curr && char_value != ERROR_ILLEGAL_CHAR) {
 		total *= base;
-		total += char_val;
+		total += char_value;
 		num_chars++;
 		curr++;
+		char_value = (*converters[converter_func])(*curr);
 	}
 
+	// no valid chars were found
 	if (num_chars == 0)
 		return ERROR_ILLEGAL_CHAR;
 	if (total > 0xFFFF)
