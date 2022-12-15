@@ -26,11 +26,25 @@ struct Instruction *init_instruction(void)
 	if (!instr)
 		return NULL;
 
-	instr->mnemonic = ILLEGAL_MNEMONIC;
+	instr->mnemonic = NULL_MNEMONIC;
 	instr->addr_bitfield = 0;
 	instr->addr_bitflag = 0;
 	instr->opcode = 0;
 	return instr;
+}
+
+/* reset_instruction()
+	@instr          ptr to Instruction struct
+
+	Resets the members of the Instruction to original initialized values.
+	Used by the lexical analyzer to prepare for the next source line.
+*/
+void reset_instruction(struct Instruction *instr)
+{
+	instr->mnemonic = NULL_MNEMONIC;
+	instr->addr_bitfield = 0;
+	instr->addr_bitflag = 0;
+	instr->opcode = 0;
 }
 
 /* destroy_instruction()
@@ -56,7 +70,7 @@ void destroy_instruction(struct Instruction *instr)
 	THE LEXER SHOULD GUARANTEE THAT ONLY ALL-UPPERCASE STRINGS ARE PASSED
 	INTO THIS FUNCTION.
 */
-enum Mnemonic str_to_mnemonic(char *str)
+enum Mnemonic str_to_mnemonic(const char *str)
 {
 	if (!strcmp("ADC", str)) return ADC;
 	else if (!strcmp("AND", str)) return AND;
@@ -117,7 +131,7 @@ enum Mnemonic str_to_mnemonic(char *str)
 	return ILLEGAL_MNEMONIC;
 }
 
-int16_t get_addr_bitfield(enum Mnemonic mnemonic)
+int16_t get_addr_bitfield(const enum Mnemonic mnemonic)
 {
 	switch (mnemonic) {
 	case ADC: return ADC_BITFIELD;

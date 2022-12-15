@@ -16,9 +16,9 @@ which is always an error.
 
 #include "error.h"
 #include "lexer.h"
+#include "opcode.h"
 
 #define MAX_TOKENS 8
-#define MAX_TOKEN_STR_LEN 32
 
 /* init_token()
 	@return         ptr to dynamically allocated Token struct
@@ -41,24 +41,34 @@ struct Token *init_token(void)
 	@tk             ptr to Token struct
 	@str            string to duplicate into @tk. Can be empty string
 
-	@return         ptr to Token if successfully duplicated, or NULL if
-	                fail.
+	@return         ptr to Token if @str is successfully duplicated, or
+	                NULL if fail.
 
-	Dynamically allocates the Token's string member. If @str is not empty
-	then the string will be duplicated into the token.
-
-	THE LEXER SHOULD GUARANTEE THAT @str FITS INSIDE THE TOKEN STRING!
+	Dynamically allocates the Token's string member. If @str is empty,
+	nothing happens. Otherwise, @str will be duplicated into the token
+	string.
 */
 struct Token *init_token_str(struct Token *tk, char *str)
 {
+	if (!str)
+		return tk;
+
+	// include null terminator
 	size_t length = strlen(str) + 1;
-	tk->str = calloc(length, sizeof(char));
+	if (!tk->str) {
+		tk->str = calloc(length, sizeof(char));
+	} else {
+		// tk->str already contains a string
+		// so this function call must be replacing the string
+		tk->str = realloc(tk->str, length);
+	}
+
 	if (!tk->str)
 		return NULL;
 
-	if (!str)
-		return tk;
-	strncpy(tk->str, str, length-1);
+	// writing length bytes will always end with a null terminator in order
+	// to cut off the chars that may be left over from prior strings
+	strncpy(tk->str, str, length);
 	return tk;
 }
 
@@ -240,4 +250,30 @@ int lex_literal(struct Token *tk, char *line)
 	tk->type = TOKEN_LITERAL;
 	tk->value = (unsigned int)total;
 	return num_chars;
+}
+
+/* lex_instruction()
+	@tk             ptr to Token struct
+	@instr          ptr to Instruction struct
+
+	@return         number of chars read, or error code
+
+	Lexically analyze @tk's string member and check if it's an instruction
+	mnemonic. @instr is NOT modified if the mnemonic was not found.
+*/
+int lex_instruction(struct Token *tk, struct Instruction *instr)
+{
+	// we already lexically analyzed an instruction token
+	if (instr->mnemonic != ILLEGAL_MNEMONIC &&
+	    instr->mnemonic != NULL_MNEMONIC)
+		return ERROR_TOO_MANY_INSTRUCTIONS;
+
+	enum Mnemonic mnemonic = str_to_mnemonic(tk->str);
+	if (mnemonic != ILLEGAL_MNEMONIC) {
+		tk->type = TOKEN_INSTRUCTION;
+		instr->mnemonic = mnemonic;
+		instr->addr_bitfield = get_addr_bitfield(mnemonic);
+		return strlen(tk->str);
+	}
+	return ERROR_INSTRUCTION_NOT_FOUND;
 }

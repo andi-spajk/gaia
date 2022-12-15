@@ -1,8 +1,10 @@
 #include <string.h>
 
 #include "../../unity/unity.h"
+#include "bitfields.h"
 #include "error.h"
 #include "lexer.h"
+#include "opcode.h"
 
 // lexer.c has the same define, but it's not in lexer.h because the other
 // modules don't need it
@@ -25,6 +27,31 @@ void test_init_destroy_lexer(void)
 	destroy_lexer(lexer);
 }
 
+void test_init_token_str(void)
+{
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	TEST_ASSERT_NULL(tk->str);
+
+	init_token_str(tk, "label");
+	TEST_ASSERT_NOT_NULL(tk->str);
+	TEST_ASSERT_EQUAL_INT(5, strlen(tk->str));
+
+	init_token_str(tk, "SEARCH");
+	TEST_ASSERT_NOT_NULL(tk->str);
+	TEST_ASSERT_EQUAL_INT(6, strlen(tk->str));
+
+	init_token_str(tk, "CALC");
+	TEST_ASSERT_NOT_NULL(tk->str);
+	TEST_ASSERT_EQUAL_INT(4, strlen(tk->str));
+
+	init_token_str(tk, "test_init_token_str");
+	TEST_ASSERT_NOT_NULL(tk->str);
+	TEST_ASSERT_EQUAL_INT(19, strlen(tk->str));
+
+	destroy_token(tk);
+}
+
 void test_add_token(void)
 {
 	struct Lexer *lexer = init_lexer();
@@ -35,7 +62,6 @@ void test_add_token(void)
 	TEST_ASSERT_NOT_NULL(tk);
 	tk->type = TOKEN_LABEL;
 	TEST_ASSERT_NOT_NULL(init_token_str(tk, "CHKEND"));
-	// strncpy(tk->str, "CHKEND", 7);
 	tk->value = 0x1000U;
 
 	// 1st insertion
@@ -235,13 +261,75 @@ void test_lex_literal(void)
 	destroy_token(tk);
 }
 
+void test_lex_instruction(void)
+{
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+
+	init_token_str(tk, "ADC");
+	TEST_ASSERT_NOT_NULL(tk->str);
+	TEST_ASSERT_EQUAL_INT(3, lex_instruction(tk, instr));
+	TEST_ASSERT_EQUAL_INT(ADC, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(ADC_BITFIELD, instr->addr_bitfield);
+
+	init_token_str(tk, "JSR");
+	TEST_ASSERT_NOT_NULL(tk->str);
+
+	// the lexical analyzer reads on line at a time, so it only expects to
+	// modify Instruction struct ONCE
+	// if it tries to lex another instr, it thinks the line has two
+	// instructions ...
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_INSTRUCTIONS, lex_instruction(tk, instr));
+	// ... therefore we reset the instruction struct
+	reset_instruction(instr);
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitfield);
+	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
+
+	// proceed with tests as expected
+	TEST_ASSERT_EQUAL_INT(3, lex_instruction(tk, instr));
+	TEST_ASSERT_EQUAL_INT(JSR, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(JSR_BITFIELD, instr->addr_bitfield);
+
+	init_token_str(tk, "BEQ");
+	TEST_ASSERT_NOT_NULL(tk->str);
+	reset_instruction(instr);
+	TEST_ASSERT_EQUAL_INT(3, lex_instruction(tk, instr));
+	TEST_ASSERT_EQUAL_INT(BEQ, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(BEQ_BITFIELD, instr->addr_bitfield);
+
+	init_token_str(tk, "badinstruction");
+	TEST_ASSERT_NOT_NULL(tk->str);
+	reset_instruction(instr);
+	TEST_ASSERT_EQUAL_INT(ERROR_INSTRUCTION_NOT_FOUND, lex_instruction(tk, instr));
+	// we called reset_instruction() earlier, and lex_instruction() doesn't
+	// modify Instruction structs if no mnemonic is found
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitfield);
+
+	init_token_str(tk, "LDA");
+	TEST_ASSERT_NOT_NULL(tk->str);
+	reset_instruction(instr);
+	TEST_ASSERT_EQUAL_INT(3, lex_instruction(tk, instr));
+	TEST_ASSERT_EQUAL_INT(LDA, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(LDA_BITFIELD, instr->addr_bitfield);
+
+	destroy_token(tk);
+	destroy_instruction(instr);
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
 
 	RUN_TEST(test_init_destroy_lexer);
+	RUN_TEST(test_init_token_str);
 	RUN_TEST(test_add_token);
 	RUN_TEST(test_lex_literal);
+	RUN_TEST(test_lex_instruction);
 
 	return UNITY_END();
 }

@@ -12,7 +12,7 @@ void test_init_destroy_instr(void)
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
 
-	TEST_ASSERT_EQUAL_INT(ILLEGAL_MNEMONIC, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitfield);
 	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 	TEST_ASSERT_EQUAL_INT(0, instr->opcode);

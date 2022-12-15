@@ -12,6 +12,7 @@ enum Mnemonic {
 	ROR, RTI, RTS, SBC, SEC, SED, SEI, STA,
 	STX, STY, TAX, TAY, TSX, TXA, TXS, TYA,
 	NUM_MNEMONICS,
+	NULL_MNEMONIC,
 	ILLEGAL_MNEMONIC
 };
 
@@ -23,8 +24,9 @@ struct Instruction {
 };
 
 struct Instruction *init_instruction(void);
+void reset_instruction(struct Instruction *instr);
 void destroy_instruction(struct Instruction *instr);
-enum Mnemonic str_to_mnemonic(char *str);
-int16_t get_addr_bitfield(enum Mnemonic mnemonic);
+enum Mnemonic str_to_mnemonic(const char *str);
+int16_t get_addr_bitfield(const enum Mnemonic mnemonic);
 
 #endif

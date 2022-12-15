@@ -1,6 +1,8 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include "opcode.h"
+
 enum TokenType {
 	TOKEN_LABEL,
 	TOKEN_LITERAL,
@@ -32,5 +34,6 @@ void destroy_token(struct Token *tk);
 void destroy_lexer(struct Lexer *lexer);
 struct Token *add_token(struct Lexer *lexer, const struct Token *tk);
 int lex_literal(struct Token *tk, char *line);
+int lex_instruction(struct Token *tk, struct Instruction *instr);
 
 #endif
