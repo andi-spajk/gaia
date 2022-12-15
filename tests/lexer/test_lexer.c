@@ -338,7 +338,7 @@ void test_lex_text(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	// this assembler is case-insensitive!
 	TEST_ASSERT_EQUAL_STRING("MORE_LABEL", tk->str);
-	// instr should NOT be modified if no mnemonic was found
+	// instr should NOT have been modified if no mnemonic was found
 	TEST_ASSERT_EQUAL_INT(JSR, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(JSR_BITFIELD, instr->addr_bitfield);
 
@@ -358,11 +358,13 @@ void test_lex_text(void)
 	char *too_long_label = "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefgh BEQ wtf";
 	buffer = too_long_label;
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_LONG_LABEL, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_STRING("LDA", tk->str);
 
 	char *just_enough =    "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefg BEQ wtf";
 	buffer = just_enough;
 	TEST_ASSERT_EQUAL_INT(63, lex_text(tk, buffer, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+	TEST_ASSERT_EQUAL_STRING("ABCDEFGH2BCDEFGH3BCDEFGH4BCDEFGH5BCDEFGH6BCDEFGH7BCDEFGH8BCDEFG", tk->str);
 
 	destroy_token(tk);
 	destroy_instruction(instr);

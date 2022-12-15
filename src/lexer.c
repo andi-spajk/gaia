@@ -315,9 +315,9 @@ static int is_valid_token_char(const char c)
 
 	@return         number of chars read, or error code
 
-	Lexically analyze a token at @buffer and update @tk to represent that
-	token. @instr may also be updated if the token was an instruction
-	mnemonic.
+	Lexically analyze a TEXT TOKEN at @buffer, which is either a label
+	or an instruction mnemonic. Ipdate @tk to represent that token.
+	@instr may also be updated if the token was an instruction mnemonic.
 
 	If no valid text is found, @tk is unchanged. If no valid instruction
 	mnemonic is found, @instr is unchanged, and @tk will assume a label
@@ -365,3 +365,19 @@ int lex_text(struct Token *tk, char *buffer, struct Instruction *instr)
 	}
 	return num_chars;
 }
+
+/* lex()
+	@tk             ptr to Token struct
+	@buffer         ptr aligned to a token in a line of source code
+	@instr          ptr to Instruction struct
+
+	@return         number of chars read, or error code
+
+	Lexically analyze a token at @buffer and update @tk to represent
+	that token's meaning. @instr may also be updated if @tk is an
+	instruction mnemonic.
+*/
+// int lex(struct Token *tk, char *buffer, struct Instruction *instr)
+// {
+// 	;
+// }
