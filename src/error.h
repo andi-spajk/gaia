@@ -10,6 +10,7 @@
 #define ERROR_TOO_MANY_INSTRUCTIONS     -5
 #define ERROR_INSTRUCTION_NOT_FOUND     -6  // internal error; no error message
 #define ERROR_BITFIELD_NOT_FOUND        -7
+#define ERROR_TOO_LONG_LABEL            -8
 /*
 ;       ;       ;       ;       ;       ;
 */

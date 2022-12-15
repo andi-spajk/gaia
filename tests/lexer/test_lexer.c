@@ -278,17 +278,6 @@ void test_lex_instruction(void)
 	init_token_str(tk, "JSR");
 	TEST_ASSERT_NOT_NULL(tk->str);
 
-	// the lexical analyzer reads on line at a time, so it only expects to
-	// modify Instruction struct ONCE
-	// if it tries to lex another instr, it thinks the line has two
-	// instructions ...
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_INSTRUCTIONS, lex_instruction(tk, instr));
-	// ... therefore we reset the instruction struct
-	reset_instruction(instr);
-	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
-	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitfield);
-	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
-
 	// proceed with tests as expected
 	TEST_ASSERT_EQUAL_INT(3, lex_instruction(tk, instr));
 	TEST_ASSERT_EQUAL_INT(JSR, instr->mnemonic);
@@ -296,26 +285,62 @@ void test_lex_instruction(void)
 
 	init_token_str(tk, "BEQ");
 	TEST_ASSERT_NOT_NULL(tk->str);
-	reset_instruction(instr);
 	TEST_ASSERT_EQUAL_INT(3, lex_instruction(tk, instr));
 	TEST_ASSERT_EQUAL_INT(BEQ, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(BEQ_BITFIELD, instr->addr_bitfield);
 
 	init_token_str(tk, "badinstruction");
 	TEST_ASSERT_NOT_NULL(tk->str);
-	reset_instruction(instr);
 	TEST_ASSERT_EQUAL_INT(ERROR_INSTRUCTION_NOT_FOUND, lex_instruction(tk, instr));
-	// we called reset_instruction() earlier, and lex_instruction() doesn't
-	// modify Instruction structs if no mnemonic is found
-	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
-	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitfield);
+	// instr should NOT be modified if no mnemonic was found
+	TEST_ASSERT_EQUAL_INT(BEQ, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(BEQ_BITFIELD, instr->addr_bitfield);
 
 	init_token_str(tk, "LDA");
 	TEST_ASSERT_NOT_NULL(tk->str);
-	reset_instruction(instr);
 	TEST_ASSERT_EQUAL_INT(3, lex_instruction(tk, instr));
 	TEST_ASSERT_EQUAL_INT(LDA, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(LDA_BITFIELD, instr->addr_bitfield);
+
+	destroy_token(tk);
+	destroy_instruction(instr);
+}
+
+void test_lex_text(void)
+{
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+
+	char *source_line = "LABEL\tJSR\tMORE_LabeL\n";
+
+	char *buffer = source_line;
+	TEST_ASSERT_EQUAL_INT(5, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+	TEST_ASSERT_EQUAL_STRING("LABEL", tk->str);
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitfield);
+	buffer += 5;
+	buffer++;  // lex_text() can't skip leading whitespace
+	           // but lex_line() will be able to
+
+	TEST_ASSERT_EQUAL_INT(3, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, tk->type);
+	TEST_ASSERT_EQUAL_STRING("JSR", tk->str);
+	TEST_ASSERT_EQUAL_INT(JSR, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(JSR_BITFIELD, instr->addr_bitfield);
+
+	buffer += 3;
+	buffer++;
+	TEST_ASSERT_EQUAL_INT(10, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+	// this assembler is case-insensitive!
+	TEST_ASSERT_EQUAL_STRING("MORE_LABEL", tk->str);
+	// instr should NOT be modified if no mnemonic was found
+	TEST_ASSERT_EQUAL_INT(JSR, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(JSR_BITFIELD, instr->addr_bitfield);
 
 	destroy_token(tk);
 	destroy_instruction(instr);
@@ -330,6 +355,7 @@ int main(void)
 	RUN_TEST(test_add_token);
 	RUN_TEST(test_lex_literal);
 	RUN_TEST(test_lex_instruction);
+	RUN_TEST(test_lex_text);
 
 	return UNITY_END();
 }

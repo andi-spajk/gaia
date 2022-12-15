@@ -11,6 +11,7 @@ which is always an error.
 
 */
 
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -19,6 +20,7 @@ which is always an error.
 #include "opcode.h"
 
 #define MAX_TOKENS 8
+#define MAX_TOKEN_STR_LEN 64
 
 /* init_token()
 	@return         ptr to dynamically allocated Token struct
@@ -151,6 +153,10 @@ void destroy_lexer(struct Lexer *lexer)
 
 	@return         ptr to Token in the lexer sequence if success, or NULL
 	                if fail
+
+	Places @tk into the lexer sequence by copying @tk's data into the
+	sequence's token. Token is placed in the last free position, if
+	able.
 */
 struct Token *add_token(struct Lexer *lexer, const struct Token *tk)
 {
@@ -259,15 +265,10 @@ int lex_literal(struct Token *tk, char *line)
 	@return         number of chars read, or error code
 
 	Lexically analyze @tk's string member and check if it's an instruction
-	mnemonic. @instr is NOT modified if the mnemonic was not found.
+	mnemonic. @instr and @tk are NOT modified if mnemonic was not found.
 */
 int lex_instruction(struct Token *tk, struct Instruction *instr)
 {
-	// we already lexically analyzed an instruction token
-	if (instr->mnemonic != ILLEGAL_MNEMONIC &&
-	    instr->mnemonic != NULL_MNEMONIC)
-		return ERROR_TOO_MANY_INSTRUCTIONS;
-
 	enum Mnemonic mnemonic = str_to_mnemonic(tk->str);
 	if (mnemonic != ILLEGAL_MNEMONIC) {
 		tk->type = TOKEN_INSTRUCTION;
@@ -276,4 +277,84 @@ int lex_instruction(struct Token *tk, struct Instruction *instr)
 		return strlen(tk->str);
 	}
 	return ERROR_INSTRUCTION_NOT_FOUND;
+}
+
+// while scanning a token, encountering one of these characters means that a
+// new token is next
+static int is_end_of_token(const char c)
+{
+	switch (c) {
+	case ' ':
+	case '\t':
+	case '\n':
+	case ',':
+	case '(':
+	case ')':
+	case ';':
+		return 1;
+	}
+	return 0;
+}
+
+// text can have either alphanumeric characters or underscores
+// text will either be label or instruction mnemonic
+static int is_valid_token_char(const char c)
+{
+	// isalnum() is case-insensitive, although lex_text()
+	// guarantees all-uppercase input
+	if (isalnum(c) || c == '_')
+		return 1;
+	return 0;
+}
+
+/* lex_text()
+	@tk             ptr to Token struct
+	@buffer         ptr to token in a line of source code
+	@instr          ptr to Instruction struct
+
+	@return         number of chars read, or error code
+
+	Lexically analyze a token at @buffer and update @tk to represent that
+	token. @instr may also be updated if the token was an instruction
+	mnemonic.
+*/
+int lex_text(struct Token *tk, char *buffer, struct Instruction *instr)
+{
+	char *text = calloc(MAX_TOKEN_STR_LEN, sizeof(char));
+	if (!text)
+		return ERROR_MEMORY_ALLOCATION_FAIL;
+
+	char c;
+	int i;
+	for (i = 0; i < MAX_TOKEN_STR_LEN; i++) {
+		c = buffer[i];
+		if (is_end_of_token(c)) {
+			break;
+		} else if (!is_valid_token_char(c)) {
+			free(text);
+			return ERROR_ILLEGAL_CHAR;
+		}
+		// this assembler is case-insensitive
+		text[i] = toupper(c);
+	}
+
+	if (i == MAX_TOKEN_STR_LEN) {
+		// the for loop ran its entire course which means there is no
+		// space for the null terminator
+		return ERROR_TOO_LONG_LABEL;
+	}
+	text[i] = '\0';
+	int num_chars = strlen(text);
+
+	// copy text into token string
+	init_token_str(tk, text);
+	free(text);
+
+	int lex_instr = lex_instruction(tk, instr);
+	if (lex_instr == ERROR_INSTRUCTION_NOT_FOUND) {
+		// non-mnemonic texts can only be labels
+		tk->type = TOKEN_LABEL;
+		return num_chars;
+	}
+	return num_chars;
 }
