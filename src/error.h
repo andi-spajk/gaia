@@ -12,10 +12,12 @@
 #define ERROR_BITFIELD_NOT_FOUND        -7
 #define ERROR_TOO_LONG_LABEL            -8
 #define ERROR_TOO_MANY_TOKENS           -9
+#define ERROR_UNKNOWN                   -10
 /*
 ;       ;       ;       ;       ;       ;
 */
 // success codes
-#define LEXER_SUCCESS   1
+#define LEXER_SUCCESS           1
+#define TOKEN_INSERTION_SUCCESS 2
 
 #endif

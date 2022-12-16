@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 
 #include "../../unity/unity.h"
@@ -21,33 +22,41 @@ void test_init_destroy_lexer(void)
 	for (int i = 0; i < MAX_TOKENS; i++) {
 		TEST_ASSERT_NOT_NULL(lexer->sequence[i]);
 		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[i]->type);
-		TEST_ASSERT_NULL(lexer->sequence[i]->str);
+		TEST_ASSERT_NOT_NULL(lexer->sequence[i]->str);
 		TEST_ASSERT_EQUAL_INT(0U, lexer->sequence[i]->value);
 	}
 	destroy_lexer(lexer);
 }
 
-void test_init_token_str(void)
+void test_token_strcpy(void)
 {
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
-	TEST_ASSERT_NULL(tk->str);
+	TEST_ASSERT_NOT_NULL(tk->str);
 
-	init_token_str(tk, "label");
+	token_strcpy(tk, "label");
 	TEST_ASSERT_NOT_NULL(tk->str);
 	TEST_ASSERT_EQUAL_INT(5, strlen(tk->str));
 
-	init_token_str(tk, "SEARCH");
+	token_strcpy(tk, "SEARCH");
 	TEST_ASSERT_NOT_NULL(tk->str);
 	TEST_ASSERT_EQUAL_INT(6, strlen(tk->str));
 
-	init_token_str(tk, "CALC");
+	token_strcpy(tk, "CALC");
 	TEST_ASSERT_NOT_NULL(tk->str);
 	TEST_ASSERT_EQUAL_INT(4, strlen(tk->str));
 
-	init_token_str(tk, "test_init_token_str");
+	token_strcpy(tk, "test_token_strcpy");
 	TEST_ASSERT_NOT_NULL(tk->str);
-	TEST_ASSERT_EQUAL_INT(19, strlen(tk->str));
+	TEST_ASSERT_EQUAL_INT(17, strlen(tk->str));
+
+	TEST_ASSERT_EQUAL_INT(0, token_strcpy(tk, ""));
+	// same string from previous call to token_strcpy should still exist
+	TEST_ASSERT_EQUAL_STRING("test_token_strcpy", tk->str);
+	TEST_ASSERT_EQUAL_INT(17, strlen(tk->str));
+	TEST_ASSERT_EQUAL_INT(0, token_strcpy(tk, NULL));
+	TEST_ASSERT_EQUAL_STRING("test_token_strcpy", tk->str);
+	TEST_ASSERT_EQUAL_INT(17, strlen(tk->str));
 
 	destroy_token(tk);
 }
@@ -61,11 +70,11 @@ void test_add_token(void)
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
 	tk->type = TOKEN_LABEL;
-	TEST_ASSERT_NOT_NULL(init_token_str(tk, "CHKEND"));
+	TEST_ASSERT_EQUAL_INT(6, token_strcpy(tk, "CHKEND"));
 	tk->value = 0x1000U;
 
 	// 1st insertion
-	TEST_ASSERT_NOT_NULL(add_token(lexer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSERTION_SUCCESS, add_token(lexer, tk));
 	struct Token *prev = lexer->sequence[lexer->curr-1];
 
 	// check if inserted properly
@@ -76,19 +85,19 @@ void test_add_token(void)
 	TEST_ASSERT_EQUAL_INT(1, lexer->curr);
 
 	// now max out the sequence array
-	TEST_ASSERT_NOT_NULL(add_token(lexer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSERTION_SUCCESS, add_token(lexer, tk));
 	TEST_ASSERT_EQUAL_INT(2, lexer->curr);
-	TEST_ASSERT_NOT_NULL(add_token(lexer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSERTION_SUCCESS, add_token(lexer, tk));
 	TEST_ASSERT_EQUAL_INT(3, lexer->curr);
-	TEST_ASSERT_NOT_NULL(add_token(lexer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSERTION_SUCCESS, add_token(lexer, tk));
 	TEST_ASSERT_EQUAL_INT(4, lexer->curr);
-	TEST_ASSERT_NOT_NULL(add_token(lexer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSERTION_SUCCESS, add_token(lexer, tk));
 	TEST_ASSERT_EQUAL_INT(5, lexer->curr);
-	TEST_ASSERT_NOT_NULL(add_token(lexer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSERTION_SUCCESS, add_token(lexer, tk));
 	TEST_ASSERT_EQUAL_INT(6, lexer->curr);
-	TEST_ASSERT_NOT_NULL(add_token(lexer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSERTION_SUCCESS, add_token(lexer, tk));
 	TEST_ASSERT_EQUAL_INT(7, lexer->curr);
-	TEST_ASSERT_NOT_NULL(add_token(lexer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSERTION_SUCCESS, add_token(lexer, tk));
 	TEST_ASSERT_EQUAL_INT(8, lexer->curr);
 
 	// all tokens in the sequence should be identical
@@ -100,8 +109,8 @@ void test_add_token(void)
 		TEST_ASSERT_EQUAL_INT(0x1000U, curr->value);
 	}
 
-	// this insertion should fail and return NULL
-	TEST_ASSERT_NULL(add_token(lexer, tk));
+	// all tokens are filled so this insertion should fail
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_TOKENS, add_token(lexer, tk));
 	TEST_ASSERT_EQUAL_INT(8, lexer->curr);
 
 	destroy_token(tk);
@@ -269,13 +278,13 @@ void test_lex_instruction(void)
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
 
-	init_token_str(tk, "ADC");
+	token_strcpy(tk, "ADC");
 	TEST_ASSERT_NOT_NULL(tk->str);
 	TEST_ASSERT_EQUAL_INT(3, lex_instruction(tk, instr));
 	TEST_ASSERT_EQUAL_INT(ADC, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(ADC_BITFIELD, instr->addr_bitfield);
 
-	init_token_str(tk, "JSR");
+	token_strcpy(tk, "JSR");
 	TEST_ASSERT_NOT_NULL(tk->str);
 
 	// proceed with tests as expected
@@ -283,20 +292,20 @@ void test_lex_instruction(void)
 	TEST_ASSERT_EQUAL_INT(JSR, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(JSR_BITFIELD, instr->addr_bitfield);
 
-	init_token_str(tk, "BEQ");
+	token_strcpy(tk, "BEQ");
 	TEST_ASSERT_NOT_NULL(tk->str);
 	TEST_ASSERT_EQUAL_INT(3, lex_instruction(tk, instr));
 	TEST_ASSERT_EQUAL_INT(BEQ, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(BEQ_BITFIELD, instr->addr_bitfield);
 
-	init_token_str(tk, "badinstruction");
+	token_strcpy(tk, "badinstruction");
 	TEST_ASSERT_NOT_NULL(tk->str);
 	TEST_ASSERT_EQUAL_INT(ERROR_INSTRUCTION_NOT_FOUND, lex_instruction(tk, instr));
 	// instr should NOT be modified if no mnemonic was found
 	TEST_ASSERT_EQUAL_INT(BEQ, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(BEQ_BITFIELD, instr->addr_bitfield);
 
-	init_token_str(tk, "LDA");
+	token_strcpy(tk, "LDA");
 	TEST_ASSERT_NOT_NULL(tk->str);
 	TEST_ASSERT_EQUAL_INT(3, lex_instruction(tk, instr));
 	TEST_ASSERT_EQUAL_INT(LDA, instr->mnemonic);
@@ -545,7 +554,7 @@ int main(void)
 	UNITY_BEGIN();
 
 	RUN_TEST(test_init_destroy_lexer);
-	RUN_TEST(test_init_token_str);
+	RUN_TEST(test_token_strcpy);
 	RUN_TEST(test_add_token);
 	RUN_TEST(test_lex_literal);
 	RUN_TEST(test_lex_instruction);

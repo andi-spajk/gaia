@@ -34,44 +34,65 @@ struct Token *init_token(void)
 		return NULL;
 
 	tk->type = TOKEN_NULL;
-	tk->str = NULL;
+	tk->str = calloc(MAX_TOKEN_STR_LEN, sizeof(char));
+	if (!tk->str)
+		return NULL;
 	tk->value = 0U;
 	return tk;
 }
 
-/* init_token_str()
+/* token_strcpy()
 	@tk             ptr to Token struct
 	@str            string to duplicate into @tk. Can be empty string
 
-	@return         ptr to Token if @str is successfully duplicated, or
-	                NULL if fail.
+	@return         number of characters in @str, excluding null terminator
 
-	Dynamically allocates the Token's string member. If @str is empty,
-	nothing happens. Otherwise, @str will be duplicated into the token
-	string.
+	Duplicates a string into @tk's string member. If @str is empty,
+	nothing happens.
+
+	This function takes in a string of unknown length and figures out the
+	length. This is useful because we keep a single, running token to
+	lexically analyze the whole line. At each token, we copy the string of
+	the running token into the string of the lexer token. Since we do not
+	remember the length of the string, this function will figure it out.
 */
-struct Token *init_token_str(struct Token *tk, const char *str)
+int token_strcpy(struct Token *tk, const char *str)
 {
-	if (!str)
-		return tk;
+	if (!str || *str == '\0')
+		return 0;
 
-	// include null terminator
+	// include null terminator to cut off the chars that may be left over
+	// from the prior string
 	size_t length = strlen(str) + 1;
-	if (!tk->str) {
-		tk->str = calloc(length, sizeof(char));
-	} else {
-		// tk->str already contains a string
-		// so this function call must be replacing the string
-		tk->str = realloc(tk->str, length);
-	}
-
-	if (!tk->str)
-		return NULL;
-
-	// writing length bytes will always end with a null terminator which
-	// will cut off the chars that may be left over from prior strings
 	strncpy(tk->str, str, length);
-	return tk;
+	return length - 1;
+}
+
+/* token_strncpy()
+	@tk             ptr to Token struct
+	@buffer         ptr to line of source code
+	@length         number of chars to copy, excluding null terminator
+
+	@return         @length
+
+	Copy @length amount of chars from @buffer into the token string.
+	All characters will be converted to uppercase. A null terminator will
+	be appended.
+
+	This function takes in a known length and copies that many chars from
+	@buffer. This is needed when we call lex_text() because that function
+	copies from buffer to token string (external source to internal), but
+	token_strcpy() copies from token string to token string (all internal).
+	We must extract only the safe chars from external input.
+*/
+int token_strncpy(struct Token *tk, const char *buffer, int length)
+{
+	for (int i = 0; i < length; i++) {
+		// all UPPERCASE because this assembler is case-insensitive
+		tk->str[i] = toupper(buffer[i]);
+	}
+	tk->str[length] = '\0';
+	return length;
 }
 
 /* init_sequence()
@@ -162,29 +183,27 @@ void destroy_lexer(struct Lexer *lexer)
 	@lexer          ptr to Lexer struct
 	@tk             ptr to Token struct with populated members
 
-	@return         ptr to Token in the lexer sequence if success, or NULL
-	                if fail
+	@return         success or error code
 
 	Places @tk into the lexer sequence by copying @tk's data into the
 	sequence's token. Token is placed in the last free position, if
 	able.
 */
-struct Token *add_token(struct Lexer *lexer, const struct Token *tk)
+int add_token(struct Lexer *lexer, const struct Token *tk)
 {
 	// end of sequence array
 	if (lexer->curr == MAX_TOKENS)
-		return NULL;
+		return ERROR_TOO_MANY_TOKENS;
 
 	struct Token *new = lexer->sequence[lexer->curr];
 	if (new->type == TOKEN_NULL) {
 		new->type = tk->type;
-		if (!init_token_str(new, tk->str))
-			return NULL;
+		token_strcpy(new, tk->str);
 		new->value = tk->value;
 		lexer->curr++;
-		return new;
+		return TOKEN_INSERTION_SUCCESS;
 	}
-	return NULL;
+	return ERROR_UNKNOWN;
 }
 
 static int hex_digit_to_int(const char c)
@@ -343,37 +362,25 @@ static int is_valid_token_char(const char c)
 */
 int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 {
-	char *text = calloc(MAX_TOKEN_STR_LEN, sizeof(char));
-	if (!text)
-		return ERROR_MEMORY_ALLOCATION_FAIL;
-
 	char c;
-	int i;
-	for (i = 0; i < MAX_TOKEN_STR_LEN; i++) {
-		c = buffer[i];
+	int num_chars;
+	for (num_chars = 0; num_chars < MAX_TOKEN_STR_LEN; num_chars++) {
+		c = buffer[num_chars];
 		if (is_end_of_token(c)) {
 			break;
 		} else if (!is_valid_token_char(c)) {
-			free(text);
 			return ERROR_ILLEGAL_CHAR;
 		}
-		// this assembler is case-insensitive
-		// everything defaults to UPPERCASE
-		text[i] = toupper(c);
 	}
 
-	if (i == MAX_TOKEN_STR_LEN) {
+	if (num_chars == MAX_TOKEN_STR_LEN) {
 		// the for loop ran its entire course which means there is no
 		// space for the null terminator
-		free(text);
 		return ERROR_TOO_LONG_LABEL;
 	}
-	text[i] = '\0';
-	int num_chars = i;
 
-	// copy text into token string
-	init_token_str(tk, text);
-	free(text);
+	// copy the token from buffer to token string
+	token_strncpy(tk, buffer, num_chars);
 
 	if (!strcmp(tk->str, "X")) {
 		tk->type = TOKEN_X_REGISTER;
@@ -384,10 +391,10 @@ int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 	}
 
 	int lex_instr = lex_instruction(tk, instr);
-	if (lex_instr == ERROR_INSTRUCTION_NOT_FOUND) {
-		// non-mnemonic text can only be a label
+	if (lex_instr == ERROR_INSTRUCTION_NOT_FOUND)
 		tk->type = TOKEN_LABEL;
-	} // else token is an instr, lex_instruction() already modified *instr
+	// else token is instruction, lex_instruction() already modified *instr
+	// and updated tk->type for us
 	return num_chars;
 }
 
@@ -443,7 +450,6 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
              struct Instruction *instr)
 {
 	// skip whitespace at BEGINNING OF LINE
-	// const char *curr = skip_leading_whitespace(buffer);
 	const char *curr = buffer;
 	while (*curr == ' ' || *curr == '\t')
 		curr++;
@@ -455,7 +461,7 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 		// negative returns indicate an error code
 		if (num_chars < 0)
 			return num_chars;
-		if (!add_token(lexer, tk))
+		if (add_token(lexer, tk)  == ERROR_TOO_MANY_TOKENS)
 			return ERROR_TOO_MANY_TOKENS;
 		curr += num_chars;
 		// skip whitespace AFTER A TOKEN
