@@ -411,7 +411,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
 
 //                           01234 5 678901234567 8 9012345678901234567890 1
-	char *source_line = "SORT8\t\tlda (array)\t\t; FETCH ELEMENT COUNT\n";
+	char *source_line = "SORT8\t\tlda (array),Y\t\t; FETCH ELEMENT COUNT\n";
 	buffer = source_line;
 
 	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
@@ -441,6 +441,26 @@ void test_lex(void)
 
 	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_CLOSE_PARENTHESIS, tk->type);
+	buffer += 1;
+
+	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_COMMA, tk->type);
+	buffer += 1;
+
+	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, tk->type);
+
+//                              0123456789
+	char *another_source = "LDA #$0001\n";
+	buffer = another_source + 4;
+
+	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_IMMEDIATE, tk->type);
+	buffer += 1;
+
+	TEST_ASSERT_EQUAL_INT(4, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
+	TEST_ASSERT_EQUAL_INT(1, tk->value);
 
 	destroy_token(tk);
 	destroy_instruction(instr);
