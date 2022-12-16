@@ -31,15 +31,18 @@ struct Lexer {
 struct Token *init_token(void);
 struct Token *init_token_str(struct Token *tk, const char *str);
 struct Lexer *init_lexer(void);
+void reset_lexer(struct Lexer *lexer);
 
 void destroy_token(struct Token *tk);
 void destroy_lexer(struct Lexer *lexer);
 
 struct Token *add_token(struct Lexer *lexer, const struct Token *tk);
 
-int lex_literal(struct Token *tk, const char *line);
+int lex_literal(struct Token *tk, const char *literal);
 int lex_instruction(struct Token *tk, struct Instruction *instr);
 int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr);
 int lex(const char *buffer, struct Token *tk, struct Instruction *instr);
+int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
+             struct Instruction *instr);
 
 #endif

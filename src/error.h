@@ -11,7 +11,11 @@
 #define ERROR_INSTRUCTION_NOT_FOUND     -6  // internal error; no error message
 #define ERROR_BITFIELD_NOT_FOUND        -7
 #define ERROR_TOO_LONG_LABEL            -8
+#define ERROR_TOO_MANY_TOKENS           -9
 /*
 ;       ;       ;       ;       ;       ;
 */
+// success codes
+#define LEXER_SUCCESS   1
+
 #endif

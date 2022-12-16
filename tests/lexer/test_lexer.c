@@ -466,6 +466,80 @@ void test_lex(void)
 	destroy_instruction(instr);
 }
 
+void test_lex_line(void)
+{
+	struct Lexer *lexer = init_lexer();
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+
+	char *source_line = "SEARCH\t\tLDA\tBOARD,X\n";
+	char *buffer = source_line;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// 5 tokens from index [0,4], so lexer->curr should be index 5
+	TEST_ASSERT_EQUAL_INT(5, lexer->curr);
+
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_STRING("SEARCH", lexer->sequence[0]->str);
+
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_INT(LDA, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(LDA_BITFIELD, instr->addr_bitfield);
+
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[2]->type);
+	TEST_ASSERT_EQUAL_STRING("BOARD", lexer->sequence[2]->str);
+
+	TEST_ASSERT_EQUAL_INT(TOKEN_COMMA, lexer->sequence[3]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, lexer->sequence[4]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
+
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	char *bad_line = "\t\tADC\tBCC\t; lol\n";
+	buffer = bad_line;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[1]->type);
+	// only the last instr should be saved
+	TEST_ASSERT_EQUAL_INT(BCC, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(BCC_BITFIELD, instr->addr_bitfield);
+
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[2]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[3]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[4]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
+
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	char *really_bad_line = "LABEL LABEL2 JMP ADC (LMAO,X)\n";
+	buffer = really_bad_line;
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_TOKENS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, lexer->sequence[7]->type);
+
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	char *y_register_example = "ELOOP\t\tCMP\tBK,Y\n";
+	buffer = y_register_example;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(CMP, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(CMP_BITFIELD, instr->addr_bitfield);
+	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, lexer->sequence[4]->type);
+
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
@@ -477,6 +551,7 @@ int main(void)
 	RUN_TEST(test_lex_instruction);
 	RUN_TEST(test_lex_text);
 	RUN_TEST(test_lex);
+	RUN_TEST(test_lex_line);
 
 	return UNITY_END();
 }

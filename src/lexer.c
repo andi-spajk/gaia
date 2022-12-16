@@ -115,6 +115,17 @@ struct Lexer *init_lexer(void)
 	return lexer;
 }
 
+void reset_lexer(struct Lexer *lexer)
+{
+	for (int i = 0; i < MAX_TOKENS; i++) {
+		lexer->sequence[i]->type = TOKEN_NULL;
+		lexer->sequence[i]->value = 0;
+		// waste of time to reset the string member
+		// we only use token type as a sentinel
+	}
+	lexer->curr = 0;
+}
+
 /* destroy_token()
 	@tk             ptr to dynamically allocated Token struct
 
@@ -205,14 +216,14 @@ static int dec_digit_to_int(const char c)
 
 /* lex_literal()
 	@tk             ptr to Token in the lexer sequence
-	@line           ptr to first char of the literal token
+	@literal           ptr to first char of the literal token
 
 	@return         number of chars read, or error code
 
 	Lexically analyze a literal token and update @tk to hold the literal's
 	information.
 */
-int lex_literal(struct Token *tk, const char *line)
+int lex_literal(struct Token *tk, const char *literal)
 {
 	// array of ptrs to converter function
 	int (*converters[])(char) = {hex_digit_to_int, bin_digit_to_int,
@@ -220,7 +231,7 @@ int lex_literal(struct Token *tk, const char *line)
 	// for indexing array of function ptrs
 	int (*converter_func)(char);
 
-	const char *curr = line;
+	const char *curr = literal;
 	int base;
 	int num_chars = 0;
 	if (*curr == '$') {
@@ -417,4 +428,46 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 	else if (c == '$' || c == '%' || (c >= '0' && c <= '9'))
 		return lex_literal(tk, buffer);
 	return ERROR_ILLEGAL_CHAR;
+}
+
+/* lex_line()
+	@buffer         ptr to source line of code
+	@lexer          ptr to Lexer struct
+
+	@return         success or error code
+
+	Lexically analyze an entire line of source code. Place (up to 8) valid
+	tokens into @lexer's token sequence.
+*/
+int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
+             struct Instruction *instr)
+{
+	// skip whitespace at BEGINNING OF LINE
+	// const char *curr = skip_leading_whitespace(buffer);
+	const char *curr = buffer;
+	while (*curr == ' ' || *curr == '\t')
+		curr++;
+
+	// tokenize and perform lexical analysis on token
+	int num_chars;
+	while (*curr != '\n' && *curr != ';') {
+		num_chars = lex(curr, tk, instr);
+		// negative returns indicate an error code
+		if (num_chars < 0)
+			return num_chars;
+		if (!add_token(lexer, tk))
+			return ERROR_TOO_MANY_TOKENS;
+		curr += num_chars;
+		// skip whitespace AFTER A TOKEN
+		while (*curr == ' ' || *curr == '\t')
+			curr++;
+	}
+
+	// fill the rest of lexer's sequence with null tokens
+	int curr_token = lexer->curr;
+	while (curr_token < MAX_TOKENS) {
+		lexer->sequence[curr_token]->type = TOKEN_NULL;
+		curr_token++;
+	}
+	return LEXER_SUCCESS;
 }
