@@ -50,7 +50,7 @@ struct Token *init_token(void)
 	nothing happens. Otherwise, @str will be duplicated into the token
 	string.
 */
-struct Token *init_token_str(struct Token *tk, char *str)
+struct Token *init_token_str(struct Token *tk, const char *str)
 {
 	if (!str)
 		return tk;
@@ -212,12 +212,12 @@ static int dec_digit_to_int(const char c)
 	Lexically analyze a literal token and update @tk to hold the literal's
 	information.
 */
-int lex_literal(struct Token *tk, char *line)
+int lex_literal(struct Token *tk, const char *line)
 {
 	int (*converters[])(char) = {hex_digit_to_int, bin_digit_to_int,
 	                             dec_digit_to_int};
 
-	char *curr = line;
+	const char *curr = line;
 	int base;
 	int converter_func;  // for indexing array of function ptrs
 	if (*curr == '$') {
@@ -309,13 +309,13 @@ static int is_valid_token_char(const char c)
 }
 
 /* lex_text()
-	@tk             ptr to Token struct
 	@buffer         ptr aligned to a token in a line of source code
+	@tk             ptr to Token struct
 	@instr          ptr to Instruction struct
 
 	@return         number of chars read, or error code
 
-	Lexically analyze a TEXT TOKEN at @buffer, which is either a label
+	Lexically analyze a TEXT TOKEN at @buffer, which is a label, register,
 	or an instruction mnemonic. Ipdate @tk to represent that token.
 	@instr may also be updated if the token was an instruction mnemonic.
 
@@ -323,7 +323,7 @@ static int is_valid_token_char(const char c)
 	mnemonic is found, @instr is unchanged, and @tk will assume a label
 	was found.
 */
-int lex_text(struct Token *tk, char *buffer, struct Instruction *instr)
+int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 {
 	char *text = calloc(MAX_TOKEN_STR_LEN, sizeof(char));
 	if (!text)
@@ -357,6 +357,14 @@ int lex_text(struct Token *tk, char *buffer, struct Instruction *instr)
 	init_token_str(tk, text);
 	free(text);
 
+	if (!strcmp(tk->str, "X")) {
+		tk->type = TOKEN_X_REGISTER;
+		return num_chars;
+	} else if (!strcmp(tk->str, "Y")) {
+		tk->type = TOKEN_Y_REGISTER;
+		return num_chars;
+	}
+
 	int lex_instr = lex_instruction(tk, instr);
 	if (lex_instr == ERROR_INSTRUCTION_NOT_FOUND) {
 		// non-mnemonic text can only be a label
@@ -367,17 +375,40 @@ int lex_text(struct Token *tk, char *buffer, struct Instruction *instr)
 }
 
 /* lex()
-	@tk             ptr to Token struct
 	@buffer         ptr aligned to a token in a line of source code
+	@tk             ptr to Token struct
 	@instr          ptr to Instruction struct
 
 	@return         number of chars read, or error code
 
 	Lexically analyze a token at @buffer and update @tk to represent
 	that token's meaning. @instr may also be updated if @tk is an
-	instruction mnemonic.
+	instruction token.
 */
-// int lex(struct Token *tk, char *buffer, struct Instruction *instr)
-// {
-// 	;
-// }
+int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
+{
+	char c = buffer[0];
+	switch (c) {
+	case '#':
+		tk->type = TOKEN_IMMEDIATE;
+		return 1;
+	case '(':
+		tk->type = TOKEN_OPEN_PARENTHESIS;
+		return 1;
+	case ')':
+		tk->type = TOKEN_CLOSE_PARENTHESIS;
+		return 1;
+	case ',':
+		tk->type = TOKEN_COMMA;
+		return 1;
+	case '=':
+		tk->type = TOKEN_EQUAL_SIGN;
+		return 1;
+	}
+
+	if (isalpha(c))
+		return lex_text(buffer, tk, instr);
+	else if (c == '$' || c == '%' || (c >= '0' && c <= '9'))
+		return lex_literal(tk, buffer);
+	return ERROR_ILLEGAL_CHAR;
+}

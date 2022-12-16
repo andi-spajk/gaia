@@ -314,10 +314,10 @@ void test_lex_text(void)
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
 
-	char *source_line = "LABEL\tJSR\tMORE_LabeL\n";
+	char *source_line = "LABEL\tJSR MORE_LabeL\n";
 
 	char *buffer = source_line;
-	TEST_ASSERT_EQUAL_INT(5, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(5, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	TEST_ASSERT_EQUAL_STRING("LABEL", tk->str);
 	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
@@ -326,7 +326,7 @@ void test_lex_text(void)
 	buffer++;  // lex_text() can't skip leading whitespace
 	           // but lex_line() will be able to
 
-	TEST_ASSERT_EQUAL_INT(3, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(3, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, tk->type);
 	TEST_ASSERT_EQUAL_STRING("JSR", tk->str);
 	TEST_ASSERT_EQUAL_INT(JSR, instr->mnemonic);
@@ -334,7 +334,7 @@ void test_lex_text(void)
 
 	buffer += 3;
 	buffer++;
-	TEST_ASSERT_EQUAL_INT(10, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(10, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	// this assembler is case-insensitive!
 	TEST_ASSERT_EQUAL_STRING("MORE_LABEL", tk->str);
@@ -346,9 +346,9 @@ void test_lex_text(void)
 	char *bad_source_line = "bad&&#label      LDA #$01";
 //                               012345678901234567890123
 	buffer = bad_source_line;
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_text(buffer, tk, instr));
 	buffer += 17;
-	TEST_ASSERT_EQUAL_INT(3, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(3, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, tk->type);
 	TEST_ASSERT_EQUAL_STRING("LDA", tk->str);
 	TEST_ASSERT_EQUAL_INT(LDA, instr->mnemonic);
@@ -357,14 +357,90 @@ void test_lex_text(void)
 	// max label length is 63 chars
 	char *too_long_label = "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefgh BEQ wtf";
 	buffer = too_long_label;
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_LONG_LABEL, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_LONG_LABEL, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_STRING("LDA", tk->str);
 
 	char *just_enough =    "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefg BEQ wtf";
 	buffer = just_enough;
-	TEST_ASSERT_EQUAL_INT(63, lex_text(tk, buffer, instr));
+	TEST_ASSERT_EQUAL_INT(63, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	TEST_ASSERT_EQUAL_STRING("ABCDEFGH2BCDEFGH3BCDEFGH4BCDEFGH5BCDEFGH6BCDEFGH7BCDEFGH8BCDEFG", tk->str);
+
+//                          01234567890 1
+	char *x_register = "LDA ($00,X)\n";
+	buffer = x_register + 9;
+	TEST_ASSERT_EQUAL_INT(1, lex_text(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, tk->type);
+
+//                           012345678901 2
+	char *y_register = "\tSTA $0200,Y\n";
+	buffer = y_register + 11;
+	TEST_ASSERT_EQUAL_INT(1, lex_text(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, tk->type);
+
+	destroy_token(tk);
+	destroy_instruction(instr);
+}
+
+void test_lex(void)
+{
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+
+//                              01234 5 67 8901 2
+	char *constant_label = "array\t\t=\t$30\n";
+	char *buffer = constant_label;
+	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
+	buffer += 5;
+
+	buffer += 2;
+	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_EQUAL_SIGN, tk->type);
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
+	buffer += 1;
+
+	buffer += 1;
+	TEST_ASSERT_EQUAL_INT(2, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
+	TEST_ASSERT_EQUAL_INT(0x30, tk->value);
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
+
+//                           01234 5 678901234567 8 9012345678901234567890 1
+	char *source_line = "SORT8\t\tlda (array)\t\t; FETCH ELEMENT COUNT\n";
+	buffer = source_line;
+
+	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
+	buffer += 5;
+
+	buffer += 2;
+	TEST_ASSERT_EQUAL_INT(3, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, tk->type);
+	TEST_ASSERT_EQUAL_INT(LDA, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(LDA_BITFIELD, instr->addr_bitfield);
+	buffer += 3;
+
+	buffer += 1;
+	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_OPEN_PARENTHESIS, tk->type);
+	// instr should be unchanged
+	TEST_ASSERT_EQUAL_INT(LDA, instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(LDA_BITFIELD, instr->addr_bitfield);
+	buffer += 1;
+
+	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+	TEST_ASSERT_EQUAL_STRING("ARRAY", tk->str);
+	buffer += 5;
+
+	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_CLOSE_PARENTHESIS, tk->type);
 
 	destroy_token(tk);
 	destroy_instruction(instr);
@@ -380,6 +456,7 @@ int main(void)
 	RUN_TEST(test_lex_literal);
 	RUN_TEST(test_lex_instruction);
 	RUN_TEST(test_lex_text);
+	RUN_TEST(test_lex);
 
 	return UNITY_END();
 }
