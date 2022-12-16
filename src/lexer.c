@@ -68,8 +68,8 @@ struct Token *init_token_str(struct Token *tk, const char *str)
 	if (!tk->str)
 		return NULL;
 
-	// writing length bytes will always end with a null terminator in order
-	// to cut off the chars that may be left over from prior strings
+	// writing length bytes will always end with a null terminator which
+	// will cut off the chars that may be left over from prior strings
 	strncpy(tk->str, str, length);
 	return tk;
 }
@@ -164,14 +164,14 @@ struct Token *add_token(struct Lexer *lexer, const struct Token *tk)
 	if (lexer->curr == MAX_TOKENS)
 		return NULL;
 
-	struct Token *curr = lexer->sequence[lexer->curr];
-	if (curr->type == TOKEN_NULL) {
-		curr->type = tk->type;
-		if (!init_token_str(curr, tk->str))
+	struct Token *new = lexer->sequence[lexer->curr];
+	if (new->type == TOKEN_NULL) {
+		new->type = tk->type;
+		if (!init_token_str(new, tk->str))
 			return NULL;
-		curr->value = tk->value;
+		new->value = tk->value;
 		lexer->curr++;
-		return curr;
+		return new;
 	}
 	return NULL;
 }
@@ -358,7 +358,7 @@ int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 		return ERROR_TOO_LONG_LABEL;
 	}
 	text[i] = '\0';
-	int num_chars = strlen(text);
+	int num_chars = i;
 
 	// copy text into token string
 	init_token_str(tk, text);
@@ -376,8 +376,7 @@ int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 	if (lex_instr == ERROR_INSTRUCTION_NOT_FOUND) {
 		// non-mnemonic text can only be a label
 		tk->type = TOKEN_LABEL;
-		return num_chars;
-	}
+	} // else token is an instr, lex_instruction() already modified *instr
 	return num_chars;
 }
 
