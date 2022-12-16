@@ -127,9 +127,9 @@ void test_lex_literal(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, ""));
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, "\t\n"));
 
-	/*
-	HEXADECIMAL LEXING
-	*/
+	//
+	// HEXADECIMAL LEXING
+	//
 	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$1234"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x1234, tk->value);
@@ -198,9 +198,9 @@ void test_lex_literal(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk, "$1234567890ABCDEF"));
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk, "$10000"));
 
-	/*
-	BINARY LEXING
-	*/
+	//
+	// BINARY LEXING
+	//
 	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%11111111"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFF, tk->value);
@@ -237,9 +237,9 @@ void test_lex_literal(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk,
 	                      "%1010101010101010101010101010101010101010101010101010110101010101"));
 
-	/*
-	DECIMAL LEXING
-	*/
+	//
+	// DECIMAL LEXING
+	//
 	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "1234"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(1234, tk->value);

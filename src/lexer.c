@@ -136,13 +136,19 @@ struct Lexer *init_lexer(void)
 	return lexer;
 }
 
+/* reset_lexer()
+	@lexer          ptr to Lexer struct
+
+	Reset all tokens in @lexer sequence to null tokens. This prepares the
+	lexer for the next source line.
+*/
 void reset_lexer(struct Lexer *lexer)
 {
 	for (int i = 0; i < MAX_TOKENS; i++) {
 		lexer->sequence[i]->type = TOKEN_NULL;
 		lexer->sequence[i]->value = 0;
-		// waste of time to reset the string member
-		// we only use token type as a sentinel
+		// no need to wipe the string's contents
+		// lexing functions will do that automatically without trouble
 	}
 	lexer->curr = 0;
 }
@@ -366,11 +372,10 @@ int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 	int num_chars;
 	for (num_chars = 0; num_chars < MAX_TOKEN_STR_LEN; num_chars++) {
 		c = buffer[num_chars];
-		if (is_end_of_token(c)) {
+		if (is_end_of_token(c))
 			break;
-		} else if (!is_valid_token_char(c)) {
+		else if (!is_valid_token_char(c))
 			return ERROR_ILLEGAL_CHAR;
-		}
 	}
 
 	if (num_chars == MAX_TOKEN_STR_LEN) {
@@ -463,6 +468,7 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 			return num_chars;
 		if (add_token(lexer, tk)  == ERROR_TOO_MANY_TOKENS)
 			return ERROR_TOO_MANY_TOKENS;
+
 		curr += num_chars;
 		// skip whitespace AFTER A TOKEN
 		while (*curr == ' ' || *curr == '\t')
