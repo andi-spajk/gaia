@@ -121,66 +121,66 @@ void test_lex_literal(void)
 	/*
 	HEXADECIMAL LEXING
 	*/
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$1234"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$1234"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x1234, tk->value);
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$FACE\n"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$FACE\n"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFACE, tk->value);
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$DEAD\t"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$DEAD\t"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xDEAD, tk->value);
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$A00B\t"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$A00B\t"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xA00B, tk->value);
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$0BEE"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$0BEE"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xBEE, tk->value);
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$005A"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$005A"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x5A, tk->value);
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$0001"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$0001"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x1, tk->value);
-	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$0A0 ; lol comment"));
+	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$0A0 ; lol comment"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0A0, tk->value);
 	// lowercase
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$face\n"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$face\n"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFACE, tk->value);
-	TEST_ASSERT_EQUAL_INT(8, lex_literal(tk, "$0000dead\t"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "$0000dead\t"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xDEAD, tk->value);
-	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$bee"));
+	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$bee"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xBEE, tk->value);
-	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "$5a"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$5a"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x5A, tk->value);
-	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$ace\t\t\t"));
+	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$ace\t\t\t"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xACE, tk->value);
-	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "$ff"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$ff"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFF, tk->value);
 	// more
-	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "$ab\t;AAAAAAAAAA\n"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$ab\t;AAAAAAAAAA\n"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xab, tk->value);
-	TEST_ASSERT_EQUAL_INT(1, lex_literal(tk, "$1"));
+	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "$1"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x1, tk->value);
-	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "$0c"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$0c"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xC, tk->value);
-	TEST_ASSERT_EQUAL_INT(10, lex_literal(tk, "$000000000a"));
+	TEST_ASSERT_EQUAL_INT(11, lex_literal(tk, "$000000000a"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xA, tk->value);
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$0000"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$0000"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
-	TEST_ASSERT_EQUAL_INT(8, lex_literal(tk, "$00000000"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "$00000000"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
 
@@ -192,34 +192,34 @@ void test_lex_literal(void)
 	/*
 	BINARY LEXING
 	*/
-	TEST_ASSERT_EQUAL_INT(8, lex_literal(tk, "%11111111"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%11111111"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFF, tk->value);
-	TEST_ASSERT_EQUAL_INT(8, lex_literal(tk, "%01010001"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%01010001"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x51, tk->value);
-	TEST_ASSERT_EQUAL_INT(8, lex_literal(tk, "%00000000\n"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%00000000\n"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
-	TEST_ASSERT_EQUAL_INT(8, lex_literal(tk, "%10000001"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%10000001"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x81, tk->value);
-	TEST_ASSERT_EQUAL_INT(16, lex_literal(tk, "%1111111100001110"));
+	TEST_ASSERT_EQUAL_INT(17, lex_literal(tk, "%1111111100001110"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFF0E, tk->value);
-	TEST_ASSERT_EQUAL_INT(11, lex_literal(tk, "%10101010101\t\t"));
+	TEST_ASSERT_EQUAL_INT(12, lex_literal(tk, "%10101010101\t\t"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x555, tk->value);
-	TEST_ASSERT_EQUAL_INT(1, lex_literal(tk, "%0"));
+	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "%0"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "%00000"));
+	TEST_ASSERT_EQUAL_INT(6, lex_literal(tk, "%00000"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
-	TEST_ASSERT_EQUAL_INT(8, lex_literal(tk, "%00001001\t\t"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%00001001\t\t"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x9, tk->value);
-	TEST_ASSERT_EQUAL_INT(20, lex_literal(tk, "%00001111111111111111"));
+	TEST_ASSERT_EQUAL_INT(21, lex_literal(tk, "%00001111111111111111"));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFFFF, tk->value);
 
@@ -255,8 +255,8 @@ void test_lex_literal(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, "A"));
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, "ffff"));
 
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, "$"));
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, "%"));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, "$\n"));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, "%\n"));
 
 	destroy_token(tk);
 }
@@ -405,7 +405,7 @@ void test_lex(void)
 	buffer += 1;
 
 	buffer += 1;
-	TEST_ASSERT_EQUAL_INT(2, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(3, lex(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x30, tk->value);
 	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
@@ -458,7 +458,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_IMMEDIATE, tk->type);
 	buffer += 1;
 
-	TEST_ASSERT_EQUAL_INT(4, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(1, tk->value);
 

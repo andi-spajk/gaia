@@ -214,42 +214,49 @@ static int dec_digit_to_int(const char c)
 */
 int lex_literal(struct Token *tk, const char *line)
 {
+	// array of ptrs to converter function
 	int (*converters[])(char) = {hex_digit_to_int, bin_digit_to_int,
 	                             dec_digit_to_int};
+	// for indexing array of function ptrs
+	int (*converter_func)(char);
 
 	const char *curr = line;
 	int base;
-	int converter_func;  // for indexing array of function ptrs
+	int num_chars = 0;
 	if (*curr == '$') {
 		base = 16;
-		converter_func = 0;
+		converter_func = converters[0];
 		curr++;
+		num_chars++;
 	} else if (*curr == '%') {
 		base = 2;
-		converter_func = 1;
+		converter_func = converters[1];
 		curr++;
+		num_chars++;
 	} else if (*curr >= '0' && *curr <= '9') {
 		base = 10;
-		converter_func = 2;
+		converter_func = converters[2];
 	} else {
 		return ERROR_ILLEGAL_CHAR;
 	}
 
 	// analyze all the digits and convert to actual value
-	unsigned long total = 0;
-	int num_chars = 0;
-	int char_value = (*converters[converter_func])(*curr);
+	unsigned long long total = 0;
+	int char_value = (*converter_func)(*curr);
 	while (curr && char_value != ERROR_ILLEGAL_CHAR) {
 		total *= base;
 		total += char_value;
 		num_chars++;
 		curr++;
-		char_value = (*converters[converter_func])(*curr);
+		char_value = (*converter_func)(*curr);
 	}
 
 	// no valid chars were found
 	if (num_chars == 0)
 		return ERROR_ILLEGAL_CHAR;
+	else if (num_chars == 1 && (base == 2 || base == 16))
+		return ERROR_ILLEGAL_CHAR;
+
 	if (total > 0xFFFF)
 		return ERROR_TOO_BIG_LITERAL;
 
