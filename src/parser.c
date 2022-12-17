@@ -117,7 +117,34 @@ int parse_instr_tree(struct Token **seq, int index)
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
-// int parse_label_tree(const struct Lexer *lexer, int index)
+/* parse_label_tree()
+	@seq            ptr to sequence of tokens from a lexer
+	@index          index of label token
+
+	@return         success or error code
+
+	Parse the label line and detect syntax errors.
+*/
+int parse_label_tree(struct Token **seq, int index)
+{
+	// =
+	if (seq[index+1]->type == TOKEN_EQUAL_SIGN) {
+		// = $A0
+		if (seq[index+2]->type == TOKEN_LITERAL) {
+			if (seq[index+3]->type == TOKEN_NULL)
+				return PARSER_SUCCESS;
+		}
+	}
+	// LDA
+	else if (seq[index+1]->type == TOKEN_INSTRUCTION) {
+		return parse_instr_tree(seq, index+1);
+	}
+	// just a declaration of label
+	else if (seq[index+1]->type == TOKEN_NULL) {
+		return PARSER_SUCCESS;
+	}
+	return ERROR_ILLEGAL_SEQUENCE;
+}
 
 /* parse_token_sequence()
 	@lexer          ptr to Lexer struct
@@ -132,7 +159,7 @@ int parse_token_sequence(struct Lexer *lexer)
 	struct Token **seq = lexer->sequence;
 	if (seq[index]->type == TOKEN_INSTRUCTION)
 		return parse_instr_tree(seq, index);
-	// else if (seq[index]->type == TOKEN_LABEL)
-	// 	return parse_label_tree(seq, index);
+	else if (seq[index]->type == TOKEN_LABEL)
+		return parse_label_tree(seq, index);
 	return ERROR_ILLEGAL_SEQUENCE;
 }
