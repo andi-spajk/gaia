@@ -89,7 +89,7 @@ void test_parse_label_tree(void)
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
-	const char *label_operand = "REG CMP (STR),Y\n";
+	const char *label_operand = "REG\t\tCMP\t(STR),Y\t;stuff\n";
 	buffer = label_operand;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_tree(seq, 0));
@@ -120,12 +120,47 @@ void test_parse_label_tree(void)
 	destroy_instruction(instr);
 }
 
+void test_parse_token_sequence(void)
+{
+	struct Lexer *lexer = init_lexer();
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+	const char *buffer;
+
+	const char *source_line = "DISP\t\tLDX\t#$1F\n";
+	buffer = source_line;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	const char *source_line2 = "AND #$7F\n";
+	buffer = source_line2;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	const char *source_line3 = "INCHEK\t=\t$B4\n";
+	buffer = source_line3;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
 
 	RUN_TEST(test_parse_instr_tree);
 	RUN_TEST(test_parse_label_tree);
+	RUN_TEST(test_parse_token_sequence);
 
 	return UNITY_END();
 }
