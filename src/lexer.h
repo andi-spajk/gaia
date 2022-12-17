@@ -3,6 +3,10 @@
 
 #include "opcode.h"
 
+// success codes
+#define LEXER_SUCCESS           1
+#define TOKEN_INSERTION_SUCCESS 2
+
 enum TokenType {
 	TOKEN_LABEL,
 	TOKEN_LITERAL,

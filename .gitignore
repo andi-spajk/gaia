@@ -9,3 +9,4 @@ tests/prime/test_prime
 tests/lexer/test_lexer
 tests/opcode/test_opcode
 tests/opcode/gen/bitfields.h
+tests/parser/test_parser

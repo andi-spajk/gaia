@@ -13,11 +13,9 @@
 #define ERROR_TOO_LONG_LABEL            -8
 #define ERROR_TOO_MANY_TOKENS           -9
 #define ERROR_UNKNOWN                   -10
+#define ERROR_ILLEGAL_SEQUENCE          -11
 /*
 ;       ;       ;       ;       ;       ;
 */
-// success codes
-#define LEXER_SUCCESS           1
-#define TOKEN_INSERTION_SUCCESS 2
 
 #endif

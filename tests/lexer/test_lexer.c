@@ -323,9 +323,9 @@ void test_lex_text(void)
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
 
-	char *source_line = "LABEL\tJSR MORE_LabeL\n";
+	const char *source_line = "LABEL\tJSR MORE_LabeL\n";
 
-	char *buffer = source_line;
+	const char *buffer = source_line;
 	TEST_ASSERT_EQUAL_INT(5, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	TEST_ASSERT_EQUAL_STRING("LABEL", tk->str);
@@ -352,7 +352,7 @@ void test_lex_text(void)
 	TEST_ASSERT_EQUAL_INT(JSR_BITFIELD, instr->addr_bitfield);
 
 	reset_instruction(instr);
-	char *bad_source_line = "bad&&#label      LDA #$01";
+	const char *bad_source_line = "bad&&#label      LDA #$01";
 //                               012345678901234567890123
 	buffer = bad_source_line;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_text(buffer, tk, instr));
@@ -364,25 +364,25 @@ void test_lex_text(void)
 	TEST_ASSERT_EQUAL_INT(LDA_BITFIELD, instr->addr_bitfield);
 
 	// max label length is 63 chars
-	char *too_long_label = "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefgh BEQ wtf";
+	const char *too_long_label = "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefgh BEQ wtf";
 	buffer = too_long_label;
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_LONG_LABEL, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_STRING("LDA", tk->str);
 
-	char *just_enough =    "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefg BEQ wtf";
+	const char *just_enough =    "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefg BEQ wtf";
 	buffer = just_enough;
 	TEST_ASSERT_EQUAL_INT(63, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	TEST_ASSERT_EQUAL_STRING("ABCDEFGH2BCDEFGH3BCDEFGH4BCDEFGH5BCDEFGH6BCDEFGH7BCDEFGH8BCDEFG", tk->str);
 
 //                          01234567890 1
-	char *x_register = "LDA ($00,X)\n";
+	const char *x_register = "LDA ($00,X)\n";
 	buffer = x_register + 9;
 	TEST_ASSERT_EQUAL_INT(1, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, tk->type);
 
 //                           012345678901 2
-	char *y_register = "\tSTA $0200,Y\n";
+	const char *y_register = "\tSTA $0200,Y\n";
 	buffer = y_register + 11;
 	TEST_ASSERT_EQUAL_INT(1, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, tk->type);
@@ -400,8 +400,8 @@ void test_lex(void)
 	TEST_ASSERT_NOT_NULL(instr);
 
 //                              01234 5 67 8901 2
-	char *constant_label = "array\t\t=\t$30\n";
-	char *buffer = constant_label;
+	const char *constant_label = "array\t\t=\t$30\n";
+	const char *buffer = constant_label;
 	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
@@ -420,7 +420,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
 
 //                           01234 5 678901234567 8 9012345678901234567890 1
-	char *source_line = "SORT8\t\tlda (array),Y\t\t; FETCH ELEMENT COUNT\n";
+	const char *source_line = "SORT8\t\tlda (array),Y\t\t; FETCH ELEMENT COUNT\n";
 	buffer = source_line;
 
 	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
@@ -460,7 +460,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, tk->type);
 
 //                              0123456789
-	char *another_source = "LDA #$0001\n";
+	const char *another_source = "LDA #$0001\n";
 	buffer = another_source + 4;
 
 	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
@@ -484,8 +484,8 @@ void test_lex_line(void)
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
 
-	char *source_line = "SEARCH\t\tLDA\tBOARD,X\n";
-	char *buffer = source_line;
+	const char *source_line = "SEARCH\t\tLDA\tBOARD,X\n";
+	const char *buffer = source_line;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// 5 tokens from index [0,4], so lexer->curr should be index 5
 	TEST_ASSERT_EQUAL_INT(5, lexer->curr);
@@ -509,7 +509,7 @@ void test_lex_line(void)
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
-	char *bad_line = "\t\tADC\tBCC\t; lol\n";
+	const char *bad_line = "\t\tADC\tBCC\t; lol\n";
 	buffer = bad_line;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 
@@ -529,7 +529,7 @@ void test_lex_line(void)
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
-	char *really_bad_line = "LABEL LABEL2 JMP ADC (LMAO,X)\n";
+	const char *really_bad_line = "LABEL LABEL2 JMP ADC (LMAO,X)\n";
 	buffer = really_bad_line;
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_TOKENS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, lexer->sequence[7]->type);
@@ -537,7 +537,7 @@ void test_lex_line(void)
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
-	char *y_register_example = "ELOOP\t\tCMP\tBK,Y\n";
+	const char *y_register_example = "ELOOP\t\tCMP\tBK,Y\n";
 	buffer = y_register_example;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(CMP, instr->mnemonic);
