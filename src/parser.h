@@ -31,6 +31,7 @@ LabelTree
 #ifndef PARSER_H
 #define PARSER_H
 
+#include "lexer.h"
 #include "symbol_table.h"
 
 #define PARSER_SUCCESS 1

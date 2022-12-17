@@ -139,29 +139,47 @@ int parse_token_sequence(struct Lexer *lexer)
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
+/* parse_label_declaration()
+	@lexer          ptr to Lexer struct
+	@symtab         ptr to symbol table
+	@pc             current program counter
+
+	@return         success or error code
+
+	Parse a source line that begins with a label and insert the label into
+	the symbol table. The label's value is either the current program
+	counter location, or a constant.
+*/
 int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
                             int pc)
 {
 	struct Token **seq = lexer->sequence;
 	struct Token *label = seq[0];
 	int found = search_symbol(symtab, label->str);
+
 	if (seq[1]->type != TOKEN_EQUAL_SIGN) {
 		// address label
 		if (found != ERROR_SYMBOL_NOT_FOUND) {
 			return ERROR_LABEL_REDEFINITION;
 		} else {
 			label->value = pc;
-			return insert_symbol(symtab, label->str, label->value);
+			if (insert_symbol(symtab, label->str, label->value))
+				return PARSER_SUCCESS;
 		}
 	} else if (seq[1]->type == TOKEN_EQUAL_SIGN) {
 		// constant label
 		if (found != ERROR_SYMBOL_NOT_FOUND) {
 			return ERROR_LABEL_REDEFINITION;
 		} else {
+			// 0     1 2
+			// LABEL = $00
 			label->value = seq[2]->value;
-			return insert_symbol(symtab, label->str, label->value);
+			if (insert_symbol(symtab, label->str, label->value))
+				return PARSER_SUCCESS;
 		}
+	} else if (seq[1]->type == TOKEN_NULL) {
+		// lone label declaration
+		return PARSER_SUCCESS;
 	}
-	// lone label declaration
-	return PARSER_SUCCESS;
+	return -1; // placeholder
 }
