@@ -41,60 +41,6 @@ struct Token *init_token(void)
 	return tk;
 }
 
-/* token_strcpy()
-	@tk             ptr to Token struct
-	@str            string to duplicate into @tk. Can be empty string
-
-	@return         number of characters in @str, excluding null terminator
-
-	Duplicates a string into @tk's string member. If @str is empty,
-	nothing happens.
-
-	This function takes in a string of unknown length and figures out the
-	length. This is useful because we keep a single, running token to
-	lexically analyze the whole line. At each token, we copy the string of
-	the running token into the string of the lexer token. Since we do not
-	remember the length of the string, this function will figure it out.
-*/
-int token_strcpy(struct Token *tk, const char *str)
-{
-	if (!str || *str == '\0')
-		return 0;
-
-	// include null terminator to cut off the chars that may be left over
-	// from the prior string
-	size_t length = strlen(str) + 1;
-	strncpy(tk->str, str, length);
-	return length - 1;
-}
-
-/* token_strncpy()
-	@tk             ptr to Token struct
-	@buffer         ptr to line of source code
-	@length         number of chars to copy, excluding null terminator
-
-	@return         @length
-
-	Copy @length amount of chars from @buffer into the token string.
-	All characters will be converted to uppercase. A null terminator will
-	be appended.
-
-	This function takes in a known length and copies that many chars from
-	@buffer. This is needed when we call lex_text() because that function
-	copies from buffer to token string (external source to internal), but
-	token_strcpy() copies from token string to token string (all internal).
-	We must extract only the safe chars from external input.
-*/
-int token_strncpy(struct Token *tk, const char *buffer, int length)
-{
-	for (int i = 0; i < length; i++) {
-		// all UPPERCASE because this assembler is case-insensitive
-		tk->str[i] = toupper(buffer[i]);
-	}
-	tk->str[length] = '\0';
-	return length;
-}
-
 /* init_sequence()
 	@return         ptr to dynamically allocated array of ptrs to Token
 	                structs, or NULL if fail
@@ -183,6 +129,60 @@ void destroy_lexer(struct Lexer *lexer)
 	}
 	free(lexer->sequence);
 	free(lexer);
+}
+
+/* token_strcpy()
+	@tk             ptr to Token struct
+	@str            string to duplicate into @tk. Can be empty string
+
+	@return         number of characters in @str, excluding null terminator
+
+	Duplicates a string into @tk's string member. If @str is empty,
+	nothing happens.
+
+	This function takes in a string of unknown length and figures out the
+	length. This is useful because we keep a single, running token to
+	lexically analyze the whole line. At each token, we copy the string of
+	the running token into the string of the lexer token. Since we do not
+	remember the length of the string, this function will figure it out.
+*/
+int token_strcpy(struct Token *tk, const char *str)
+{
+	if (!str || *str == '\0')
+		return 0;
+
+	// include null terminator to cut off the chars that may be left over
+	// from the prior string
+	size_t length = strlen(str) + 1;
+	strncpy(tk->str, str, length);
+	return length - 1;
+}
+
+/* token_strncpy()
+	@tk             ptr to Token struct
+	@buffer         ptr to line of source code
+	@length         number of chars to copy, excluding null terminator
+
+	@return         @length
+
+	Copy @length amount of chars from @buffer into the token string.
+	All characters will be converted to uppercase. A null terminator will
+	be appended.
+
+	This function takes in a known length and copies that many chars from
+	@buffer. This is needed when we call lex_text() because that function
+	copies from buffer to token string (external source to internal), but
+	token_strcpy() copies from token string to token string (all internal).
+	We must extract only the safe chars from external input.
+*/
+int token_strncpy(struct Token *tk, const char *buffer, int length)
+{
+	for (int i = 0; i < length; i++) {
+		// all UPPERCASE because this assembler is case-insensitive
+		tk->str[i] = toupper(buffer[i]);
+	}
+	tk->str[length] = '\0';
+	return length;
 }
 
 /* add_token()

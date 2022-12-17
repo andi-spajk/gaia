@@ -14,6 +14,7 @@
 #define ERROR_TOO_MANY_TOKENS           -9
 #define ERROR_UNKNOWN                   -10
 #define ERROR_ILLEGAL_SEQUENCE          -11
+#define ERROR_LABEL_REDEFINITION        -12
 /*
 ;       ;       ;       ;       ;       ;
 */

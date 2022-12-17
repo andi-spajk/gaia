@@ -3,6 +3,7 @@
 #include "lexer.h"
 #include "opcode.h"
 #include "parser.h"
+#include "symbol_table.h"
 
 void setUp(void) {}
 void tearDown(void) {}
@@ -154,6 +155,66 @@ void test_parse_token_sequence(void)
 	destroy_instruction(instr);
 }
 
+void test_parse_label_declaration(void)
+{
+	struct Lexer *lexer = init_lexer();
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+	struct SymbolTable *symtab = init_symbol_table();
+	TEST_ASSERT_NOT_NULL(symtab);
+	const char *buffer;
+
+	const char *address_label = "NEXT\t\tLDA PATTERN,X\n";
+	buffer = address_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_declaration(lexer, symtab, 0x4));
+	TEST_ASSERT_EQUAL_INT(0x4, search_symbol(symtab, lexer->sequence[0]->str));
+	TEST_ASSERT_EQUAL_INT(0x4, lexer->sequence[0]->value);
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	const char *constant_label = "flag\t=\t$32\n";
+	buffer = constant_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(0, lexer->sequence[0]->value);
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_declaration(lexer, symtab, 0x0));
+	TEST_ASSERT_EQUAL_INT(0x32, lexer->sequence[0]->value);
+	TEST_ASSERT_EQUAL_INT(0x32, search_symbol(symtab, lexer->sequence[0]->str));
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	const char *lone_label = "PATTERNMATCH\n";
+	buffer = lone_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_declaration(lexer, symtab, 0x0));
+	TEST_ASSERT_EQUAL_INT(0x0, search_symbol(symtab, lexer->sequence[0]->str));
+	TEST_ASSERT_EQUAL_INT(0x0, lexer->sequence[0]->value);
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	const char *label_redefinition = "flag\t\t=\t$1234\n";
+	buffer = label_redefinition;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_LABEL_REDEFINITION, parse_label_declaration(lexer, symtab, 0x0));
+	// old value should still be saved in symtab
+	TEST_ASSERT_EQUAL_INT(0x32, search_symbol(symtab, lexer->sequence[0]->str));
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	const char *label_redefinition2 = "NEXT TXA\n";
+	buffer = label_redefinition2;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_LABEL_REDEFINITION, parse_label_declaration(lexer, symtab, 0x7));
+
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+	destroy_symbol_table(symtab);
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
@@ -161,6 +222,7 @@ int main(void)
 	RUN_TEST(test_parse_instr_tree);
 	RUN_TEST(test_parse_label_tree);
 	RUN_TEST(test_parse_token_sequence);
+	RUN_TEST(test_parse_label_declaration);
 
 	return UNITY_END();
 }

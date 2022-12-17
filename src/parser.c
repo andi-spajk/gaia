@@ -9,38 +9,13 @@ The parser determines syntax errors such as illegal sequences of tokens, or
 instructions with incompatible addressing modes. Other errors include redefining
 label constants, missing label declarations, or illegal forward references.
 
-TOKEN SEQUENCES:
-InstructionTree
-	instruction
-		open parenthesis
-			operand
-				comma
-					x_register
-						close parenthesis
-							null
-				close parenthesis
-					comma
-						y_register
-							null
-					null
-		operand
-			null
-		immediate
-			operand
-				null
-
-LabelTree
-	label
-		equal_sign
-			literal
-				null
-		InstructionTree
-		null
+See parser.h for full diagram of valid token sequences.
 */
 
 #include "error.h"
 #include "lexer.h"
 #include "parser.h"
+#include "symbol_table.h"
 
 /* parse_indirect_operand_tree()
 	@seq            ptr to sequence of tokens from a lexer
@@ -162,4 +137,31 @@ int parse_token_sequence(struct Lexer *lexer)
 	else if (seq[index]->type == TOKEN_LABEL)
 		return parse_label_tree(seq, index);
 	return ERROR_ILLEGAL_SEQUENCE;
+}
+
+int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
+                            int pc)
+{
+	struct Token **seq = lexer->sequence;
+	struct Token *label = seq[0];
+	int found = search_symbol(symtab, label->str);
+	if (seq[1]->type != TOKEN_EQUAL_SIGN) {
+		// address label
+		if (found != ERROR_SYMBOL_NOT_FOUND) {
+			return ERROR_LABEL_REDEFINITION;
+		} else {
+			label->value = pc;
+			return insert_symbol(symtab, label->str, label->value);
+		}
+	} else if (seq[1]->type == TOKEN_EQUAL_SIGN) {
+		// constant label
+		if (found != ERROR_SYMBOL_NOT_FOUND) {
+			return ERROR_LABEL_REDEFINITION;
+		} else {
+			label->value = seq[2]->value;
+			return insert_symbol(symtab, label->str, label->value);
+		}
+	}
+	// lone label declaration
+	return PARSER_SUCCESS;
 }
