@@ -8,6 +8,34 @@ determined and saved into the Instruction struct.
 The parser determines syntax errors such as illegal sequences of tokens, or
 instructions with incompatible addressing modes. Other errors include redefining
 label constants, missing label declarations, or illegal forward references.
+
+TOKEN SEQUENCES:
+InstructionTree
+	instruction
+		open parenthesis
+			operand
+				comma
+					x_register
+						close parenthesis
+							null
+				close parenthesis
+					comma
+						y_register
+							null
+					null
+		operand
+			null
+		immediate
+			operand
+				null
+
+LabelTree
+	label
+		equal_sign
+			literal
+				null
+		InstructionTree
+		null
 */
 
 #include "error.h"
@@ -15,7 +43,7 @@ label constants, missing label declarations, or illegal forward references.
 #include "parser.h"
 
 /* parse_indirect_operand_tree()
-	@lexer          ptr to Lexer struct
+	@seq            ptr to sequence of tokens from a lexer
 	@index          index of operand token
 
 	@return         success or error code
@@ -54,7 +82,7 @@ int parse_indirect_operand_tree(struct Token **seq, int index)
 }
 
 /* parse_instr_tree()
-	@lexer          ptr to Lexer struct
+	@seq            ptr to sequence of tokens from a lexer
 	@index          index of instruction token
 
 	@return         success or error code
