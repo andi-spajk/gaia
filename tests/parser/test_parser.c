@@ -170,7 +170,7 @@ void test_parse_label_declaration(void)
 	const char *address_label = "NEXT\t\tLDA PATTERN,X\n";
 	buffer = address_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_declaration(lexer, symtab, 0x4));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x4));
 	TEST_ASSERT_EQUAL_INT(0x4, search_symbol(symtab, lexer->sequence[0]->str));
 	TEST_ASSERT_EQUAL_INT(0x4, lexer->sequence[0]->value);
 	reset_lexer(lexer);
@@ -180,7 +180,7 @@ void test_parse_label_declaration(void)
 	buffer = constant_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(0, lexer->sequence[0]->value);
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_declaration(lexer, symtab, 0x0));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x0));
 	TEST_ASSERT_EQUAL_INT(0x32, lexer->sequence[0]->value);
 	TEST_ASSERT_EQUAL_INT(0x32, search_symbol(symtab, lexer->sequence[0]->str));
 	reset_lexer(lexer);

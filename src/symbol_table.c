@@ -9,7 +9,6 @@ to delete symbol -- assembler doesn't need it.
 This implementation uses djb2 hashing and linear probing. The starting size is
 17 symbols. Resizing occurs with a load factor of 0.5. The new size is the next
 prime number that is greater than double the previous size.
-
 */
 
 #include <stdlib.h>
@@ -151,10 +150,11 @@ static struct Symbol *init_symbol(const char *label, const int value)
 	@label          string containing assembly label
 	@value          value of the label
 
-	@return         1 if success, or error code
+	@return         success, or error code
 
-	Initialize, hash, and insert a symbol into the symbol table.
-	Calls resize if the load factor of 0.5 is reached.
+	Initialize, hash, and insert a symbol into the symbol table. Find open
+	slots via linear probing. Calls resize if the load factor of 0.5 is
+	reached.
 */
 int insert_symbol(struct SymbolTable *symtab, const char *label,
                   const int value)
@@ -181,7 +181,7 @@ int insert_symbol(struct SymbolTable *symtab, const char *label,
 	}
 	symtab->symbols[hash] = new_sym;
 	symtab->count++;
-	return 1;
+	return SYMBOL_INSERTION_SUCCESS;
 }
 
 /* search_symbol()

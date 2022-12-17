@@ -1,6 +1,8 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
+#define SYMBOL_INSERTION_SUCCESS 1
+
 struct Symbol {
 	// label and value form the key-value pair respectively
 	char *label;

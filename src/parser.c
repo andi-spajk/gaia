@@ -163,8 +163,7 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 			return ERROR_LABEL_REDEFINITION;
 		} else {
 			label->value = pc;
-			if (insert_symbol(symtab, label->str, label->value))
-				return PARSER_SUCCESS;
+			return insert_symbol(symtab, label->str, label->value);
 		}
 	} else if (seq[1]->type == TOKEN_EQUAL_SIGN) {
 		// constant label
@@ -174,12 +173,11 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 			// 0     1 2
 			// LABEL = $00
 			label->value = seq[2]->value;
-			if (insert_symbol(symtab, label->str, label->value))
-				return PARSER_SUCCESS;
+			return insert_symbol(symtab, label->str, label->value);
 		}
 	} else if (seq[1]->type == TOKEN_NULL) {
 		// lone label declaration
 		return PARSER_SUCCESS;
 	}
-	return -1; // placeholder
+	return ERROR_UNKNOWN;
 }

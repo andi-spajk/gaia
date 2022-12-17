@@ -28,37 +28,37 @@ void test_insert_symbol(void)
 	TEST_ASSERT_EQUAL_INT(17, symtab->size);
 	TEST_ASSERT_EQUAL_INT(0, symtab->count);
 	// hash 8
-	TEST_ASSERT_EQUAL_INT(1, insert_symbol(symtab, "JANUS", 1));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, insert_symbol(symtab, "JANUS", 1));
 	TEST_ASSERT_EQUAL_INT(1, symtab->count);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[8]);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[8]->label);
 	TEST_ASSERT_EQUAL_STRING("JANUS", symtab->symbols[8]->label);
 	// hash 15
-	TEST_ASSERT_EQUAL_INT(1, insert_symbol(symtab, "CHKEND", 2));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, insert_symbol(symtab, "CHKEND", 2));
 	TEST_ASSERT_EQUAL_INT(2, symtab->count);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[15]);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[15]->label);
 	TEST_ASSERT_EQUAL_STRING("CHKEND", symtab->symbols[15]->label);
 	// hash 15 again, should be probed into index 16
-	TEST_ASSERT_EQUAL_INT(1, insert_symbol(symtab, "SORT8", 3));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, insert_symbol(symtab, "SORT8", 3));
 	TEST_ASSERT_EQUAL_INT(3, symtab->count);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[16]);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[16]->label);
 	TEST_ASSERT_EQUAL_STRING("SORT8", symtab->symbols[16]->label);
 	// hash 4
-	TEST_ASSERT_EQUAL_INT(1, insert_symbol(symtab, "NXTEL", 4));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, insert_symbol(symtab, "NXTEL", 4));
 	TEST_ASSERT_EQUAL_INT(4, symtab->count);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[4]);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[4]->label);
 	TEST_ASSERT_EQUAL_STRING("NXTEL", symtab->symbols[4]->label);
 	// hash 15 again, should be probed into index 0 (wrap around 16)
-	TEST_ASSERT_EQUAL_INT(1, insert_symbol(symtab, "OPNING", 5));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, insert_symbol(symtab, "OPNING", 5));
 	TEST_ASSERT_EQUAL_INT(5, symtab->count);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[0]);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[0]->label);
 	TEST_ASSERT_EQUAL_STRING("OPNING", symtab->symbols[0]->label);
 	// hash 11
-	TEST_ASSERT_EQUAL_INT(1, insert_symbol(symtab, "SWAP", 6));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, insert_symbol(symtab, "SWAP", 6));
 	TEST_ASSERT_EQUAL_INT(6, symtab->count);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[11]);
 	TEST_ASSERT_NOT_NULL(symtab->symbols[11]->label);
