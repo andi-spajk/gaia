@@ -58,6 +58,13 @@ void destroy_instruction(struct Instruction *instr)
 		free(instr);
 }
 
+/* is_branch()
+	@mnemonic       mnemonic to check
+
+	@return         1 if branch mnemonic, 0 if not
+
+	Check if an instruction mnemonic is a branch instruction.
+*/
 int is_branch(const enum Mnemonic mnemonic)
 {
 	switch (mnemonic) {
@@ -75,6 +82,13 @@ int is_branch(const enum Mnemonic mnemonic)
 	}
 }
 
+/* is_jump()
+	@mnemonic       mnemonic to check
+
+	@return         1 if jump mnemonic, 0 if not
+
+	Check if an instruction mnemonic is a jump instruction.
+*/
 int is_jump(const enum Mnemonic mnemonic)
 {
 	return mnemonic == JMP || mnemonic == JSR;

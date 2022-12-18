@@ -212,6 +212,13 @@ int add_token(struct Lexer *lexer, const struct Token *tk)
 	return ERROR_UNKNOWN;
 }
 
+/* hex_digit_to_int()
+	@c              char to check
+
+	@return         integer value of @c, or error code
+
+	Convert a hexadecimal digit to its integer value.
+*/
 static int hex_digit_to_int(const char c)
 {
 	if (c >= 'A' && c <= 'F')
@@ -223,6 +230,13 @@ static int hex_digit_to_int(const char c)
 	return ERROR_ILLEGAL_CHAR;
 }
 
+/* bin_digit_to_int()
+	@c              char to check
+
+	@return         integer value of @c, or error code
+
+	Convert a binary digit to its integer value.
+*/
 static int bin_digit_to_int(const char c)
 {
 	if (c == '0')
@@ -232,6 +246,13 @@ static int bin_digit_to_int(const char c)
 	return ERROR_ILLEGAL_CHAR;
 }
 
+/* dec_digit_to_int()
+	@c              char to check
+
+	@return         integer value of @c, or error code
+
+	Convert a decimal digit to its integer value.
+*/
 static int dec_digit_to_int(const char c)
 {
 	if (c >= '0' && c <= '9')
@@ -323,8 +344,13 @@ int lex_instruction(struct Token *tk, struct Instruction *instr)
 	return ERROR_INSTRUCTION_NOT_FOUND;
 }
 
-// while scanning a token, encountering one of these characters means that a
-// new token is next
+/* is_end_of_token()
+	@c              char to check
+
+	@return         1 if end of token, 0 if not
+
+	Check if a text token's character denotes the end of the token.
+*/
 static int is_end_of_token(const char c)
 {
 	switch (c) {
@@ -340,15 +366,19 @@ static int is_end_of_token(const char c)
 	return 0;
 }
 
-// text can have either alphanumeric characters or underscores
-// text will either be label or instruction mnemonic
+/* is_valid_token_char()
+	@c              char to check
+
+	@return         1 if valid character, 0 if not
+
+	Check whether a character is alphanumeric or an underscore since those
+	are the only legal characters in labels or instructions.
+*/
 static int is_valid_token_char(const char c)
 {
 	// isalnum() is case-insensitive, although lex_text()
 	// guarantees all-uppercase input
-	if (isalnum(c) || c == '_')
-		return 1;
-	return 0;
+	return isalnum(c) || c == '_';
 }
 
 /* lex_text()

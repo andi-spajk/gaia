@@ -222,14 +222,12 @@ int parse_label_operand(struct Token *operand, struct Instruction *instr,
 	} else {
 		// nonexistent symbol may be a forward reference
 		// no forward references to constant labels!
-		if (!branch && !jump) {
+		if (branch)
+			return BRANCH_FORWARD_REFERENCE;
+		else if (jump)
+			return JUMP_FORWARD_REFERENCE;
+		else
 			return ERROR_ILLEGAL_FORWARD_REFERENCE;
-		} else {
-			if (branch)
-				return BRANCH_FORWARD_REFERENCE;
-			else if (jump)
-				return JUMP_FORWARD_REFERENCE;
-		}
 	}
 	return ERROR_UNKNOWN;
 }
