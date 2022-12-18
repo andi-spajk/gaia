@@ -484,10 +484,16 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 	tokens into @lexer's token sequence and possibly modify @instr to match
 	the instruction in the source line. Use @tk as a running token to
 	temporarily hold each actual token as we analyze.
+
+	Any information previously inside the lexer or instruction will be
+	wiped before proceeding to the lexical analysis.
 */
 int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
              struct Instruction *instr)
 {
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
 	// skip whitespace at BEGINNING OF LINE
 	const char *curr = buffer;
 	while (*curr == ' ' || *curr == '\t')

@@ -506,9 +506,6 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
 
-	reset_lexer(lexer);
-	reset_instruction(instr);
-
 	const char *bad_line = "\t\tADC\tBCC\t; lol\n";
 	buffer = bad_line;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
@@ -526,16 +523,10 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
 
-	reset_lexer(lexer);
-	reset_instruction(instr);
-
 	const char *really_bad_line = "LABEL LABEL2 JMP ADC (LMAO,X)\n";
 	buffer = really_bad_line;
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_TOKENS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, lexer->sequence[7]->type);
-
-	reset_lexer(lexer);
-	reset_instruction(instr);
 
 	const char *y_register_example = "ELOOP\t\tCMP\tBK,Y\n";
 	buffer = y_register_example;
