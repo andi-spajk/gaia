@@ -32,6 +32,7 @@ LabelTree
 #define PARSER_H
 
 #include "lexer.h"
+#include "opcode.h"
 #include "symbol_table.h"
 
 #define PARSER_SUCCESS 1
@@ -41,5 +42,8 @@ int parse_label_tree(struct Token **seq, int index);
 int parse_token_sequence(struct Lexer *lexer);
 int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
                             int pc);
+// int parse_operand(struct Lexer *lexer, struct SymbolTable *symtab,
+//                   struct Instruction *instr, int pc);
+struct Token *get_operand(struct Lexer *lexer);
 
 #endif

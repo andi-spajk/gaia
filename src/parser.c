@@ -12,8 +12,11 @@ label constants, missing label declarations, or illegal forward references.
 See parser.h for full diagram of valid token sequences.
 */
 
+#include <stddef.h>
+
 #include "error.h"
 #include "lexer.h"
+#include "opcode.h"
 #include "parser.h"
 #include "symbol_table.h"
 
@@ -181,3 +184,40 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 	}
 	return ERROR_UNKNOWN;
 }
+
+/* get_operand()
+	@lexer          ptr to Lexer struct
+
+	@return         ptr to operand token in the lexer sequence
+
+	Find location of the operand token in a lexer's sequence of tokens.
+*/
+struct Token *get_operand(struct Lexer *lexer)
+{
+	struct Token *operand = NULL;
+	// start at 2nd token
+	// operand will always be 2nd or later
+	for (int i = 1; !operand; i++) {
+		if (lexer->sequence[i]->type == TOKEN_LABEL ||
+		    lexer->sequence[i]->type == TOKEN_LITERAL)
+			operand = lexer->sequence[i];
+	}
+	return operand;
+}
+
+/* parse_operand()
+	@lexer          ptr to Lexer struct
+	@symtab         ptr to symbol table
+	@pc             current program counter
+
+	@return         success code denoting operand type or error code
+
+	Determine whether the operand is a branch/jump instruction and whether
+	it is a forward reference. Operands which are neither are ignored.
+	Illegal forward references or label references cause errors.
+*/
+// int parse_operand(struct Lexer *lexer, struct SymbolTable *symtab,
+//                   struct Instruction *instr, int pc)
+// {
+// 	struct Token *operand = get_operand(lexer);
+// }

@@ -215,6 +215,42 @@ void test_parse_label_declaration(void)
 	destroy_symbol_table(symtab);
 }
 
+void test_get_operand(void)
+{
+	struct Lexer *lexer = init_lexer();
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+	const char *buffer;
+
+//                                   0      1    23
+	const char *label_operand = "REG\t\tCMP\t(STR),Y\t;stuff\n";
+	buffer = label_operand;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_PTR(lexer->sequence[3], get_operand(lexer));
+	reset_lexer(lexer);
+
+//                                 0       1    23
+	const char *source_line = "DISP\t\tLDX\t#$1F\n";
+	buffer = source_line;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_PTR(lexer->sequence[3], get_operand(lexer));
+	reset_lexer(lexer);
+
+//                                   0       1   2
+	const char *address_label = "NEXT\t\tLDA PATTERN,X\n";
+	buffer = address_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_PTR(lexer->sequence[2], get_operand(lexer));
+	reset_lexer(lexer);
+
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
@@ -223,6 +259,7 @@ int main(void)
 	RUN_TEST(test_parse_label_tree);
 	RUN_TEST(test_parse_token_sequence);
 	RUN_TEST(test_parse_label_declaration);
+	RUN_TEST(test_get_operand);
 
 	return UNITY_END();
 }
