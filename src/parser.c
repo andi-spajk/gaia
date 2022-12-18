@@ -79,8 +79,17 @@ int parse_instr_tree(struct Token **seq, int index)
 	// OPERAND
 	else if (seq[index+1]->type == TOKEN_LABEL ||
 	         seq[index+1]->type == TOKEN_LITERAL) {
-		if (seq[index+2]->type == TOKEN_NULL)
+		if (seq[index+2]->type == TOKEN_NULL) {
 			return PARSER_SUCCESS;
+		}
+		// OPERAND,
+		else if (seq[index+2]->type == TOKEN_COMMA) {
+			// OPERAND,X
+			// OPERAND,Y
+			if (seq[index+3]->type == TOKEN_X_REGISTER ||
+			    seq[index+3]->type == TOKEN_Y_REGISTER)
+				return PARSER_SUCCESS;
+		}
 	}
 	// #
 	else if (seq[index+1]->type == TOKEN_IMMEDIATE) {
@@ -185,6 +194,43 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 	return ERROR_UNKNOWN;
 }
 
+/* parse_label_operand()
+	@operand        ptr to operand token in a Lexer sequence
+	@instr          ptr to Instruction struct
+	@symtab         ptr to symbol table
+
+	@return         operand status, or error code
+*/
+int parse_label_operand(struct Token *operand, struct Instruction *instr,
+                        struct SymbolTable *symtab)
+{
+	int label_value = search_symbol(symtab, operand->str);
+	int branch = is_branch(instr->mnemonic);
+	int jump = is_jump(instr->mnemonic);
+
+	if (label_value != ERROR_SYMBOL_NOT_FOUND) {
+		operand->value = label_value;
+		if (branch)
+			return BRANCH_OPERAND;
+		else if (jump)
+			return JUMP_OPERAND;
+		else
+			return PARSER_SUCCESS;
+	} else {
+		// nonexistent symbol may be a forward reference
+		// no forward references to constant labels!
+		if (!branch && !jump) {
+			return ERROR_ILLEGAL_FORWARD_REFERENCE;
+		} else {
+			if (branch)
+				return BRANCH_FORWARD_REFERENCE;
+			else if (jump)
+				return JUMP_FORWARD_REFERENCE;
+		}
+	}
+	return ERROR_UNKNOWN;
+}
+
 /* get_operand()
 	@lexer          ptr to Lexer struct
 
@@ -210,7 +256,7 @@ struct Token *get_operand(struct Lexer *lexer)
 	@symtab         ptr to symbol table
 	@pc             current program counter
 
-	@return         success code denoting operand type or error code
+	@return         operand status, or error code
 
 	Determine whether the operand is a branch/jump instruction and whether
 	it is a forward reference. Operands which are neither are ignored.

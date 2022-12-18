@@ -15,6 +15,7 @@
 #define ERROR_UNKNOWN                   -10
 #define ERROR_ILLEGAL_SEQUENCE          -11
 #define ERROR_LABEL_REDEFINITION        -12
+#define ERROR_ILLEGAL_FORWARD_REFERENCE -13
 /*
 ;       ;       ;       ;       ;       ;
 */

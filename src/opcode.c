@@ -58,6 +58,28 @@ void destroy_instruction(struct Instruction *instr)
 		free(instr);
 }
 
+int is_branch(const enum Mnemonic mnemonic)
+{
+	switch (mnemonic) {
+	case BCC:
+	case BCS:
+	case BEQ:
+	case BMI:
+	case BNE:
+	case BPL:
+	case BVC:
+	case BVS:
+		return 1;
+	default:
+		return 0;
+	}
+}
+
+int is_jump(const enum Mnemonic mnemonic)
+{
+	return mnemonic == JMP || mnemonic == JSR;
+}
+
 /* str_to_mnemonic()
 	@str            string containing possible mnemonic
 

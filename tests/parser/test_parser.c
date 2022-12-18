@@ -149,6 +149,29 @@ void test_parse_token_sequence(void)
 	buffer = source_line3;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	const char *address_label = "NEXT\t\tLDA PATTERN,X\n";
+	buffer = address_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	const char *label_operand = "REG\t\tCMP\t(STR),Y\t;stuff\n";
+	buffer = label_operand;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	const char *indirect_x = "LDA ($00,X)\n";
+	buffer = indirect_x;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	reset_lexer(lexer);
+	reset_instruction(instr);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -251,6 +274,31 @@ void test_get_operand(void)
 	destroy_instruction(instr);
 }
 
+void test_parse_label_operand(void)
+{
+	struct Lexer *lexer = init_lexer();
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+	struct SymbolTable *symtab = init_symbol_table();
+	TEST_ASSERT_NOT_NULL(symtab);
+	const char *buffer;
+
+	const char *address_label = "NEXT\t\tLDA PATTERN,X\n";
+	buffer = address_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	reset_lexer(lexer);
+	reset_instruction(instr);
+
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+	destroy_symbol_table(symtab);
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
@@ -260,6 +308,7 @@ int main(void)
 	RUN_TEST(test_parse_token_sequence);
 	RUN_TEST(test_parse_label_declaration);
 	RUN_TEST(test_get_operand);
+	// RUN_TEST(test_parse_label_operand);
 
 	return UNITY_END();
 }
