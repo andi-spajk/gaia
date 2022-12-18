@@ -101,6 +101,9 @@ int parse_instr_tree(struct Token **seq, int index)
 				return PARSER_SUCCESS;
 		}
 	}
+	else if (seq[index+1]->type == TOKEN_NULL) {
+		return PARSER_SUCCESS;
+	}
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 

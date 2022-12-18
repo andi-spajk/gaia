@@ -445,11 +445,15 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 /* lex_line()
 	@buffer         ptr to source line of code
 	@lexer          ptr to Lexer struct
+	@tk             ptr to Token struct
+	@instr          ptr to Instruction struct
 
 	@return         success or error code
 
 	Lexically analyze an entire line of source code. Place (up to 8) valid
-	tokens into @lexer's token sequence.
+	tokens into @lexer's token sequence and possibly modify @instr to match
+	the instruction in the source line. Use @tk as a running token to
+	temporarily hold each actual token as we analyze.
 */
 int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
              struct Instruction *instr)

@@ -22,6 +22,7 @@ InstructionTree
 		immediate
 			operand
 				null
+		null
 
 LabelTree
 	label
