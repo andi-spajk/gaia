@@ -121,7 +121,7 @@ void test_parse_label_tree(void)
 	destroy_instruction(instr);
 }
 
-void test_parse_token_sequence(void)
+void test_parse_line(void)
 {
 	struct Lexer *lexer = init_lexer();
 	TEST_ASSERT_NOT_NULL(lexer);
@@ -134,49 +134,49 @@ void test_parse_token_sequence(void)
 	const char *source_line = "DISP\t\tLDX\t#$1F\n";
 	buffer = source_line;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
 	const char *source_line2 = "AND #$7F\n";
 	buffer = source_line2;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
 	const char *source_line3 = "INCHEK\t=\t$B4\n";
 	buffer = source_line3;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
 	const char *address_label = "NEXT\t\tLDA PATTERN,X\n";
 	buffer = address_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
 	const char *label_operand = "REG\t\tCMP\t(STR),Y\t;stuff\n";
 	buffer = label_operand;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
 	const char *indirect_x = "LDA ($00,X)\n";
 	buffer = indirect_x;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
 	const char *address_label2 = "STAR\t\tINX\n";
 	buffer = address_label2;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -310,7 +310,7 @@ byte count on the far left side
 	const char *illegal_for_ref = "\tLDX\tPATTERN\n";
 	buffer = illegal_for_ref;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(ERROR_SYMBOL_NOT_FOUND, search_symbol(symtab, "PATTERN"));
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_FORWARD_REFERENCE,
 	                      parse_label_operand(lexer->sequence[1], instr, symtab));
@@ -320,7 +320,7 @@ byte count on the far left side
 	const char *constant_label = "PATTERN = $2000\n";
 	buffer = constant_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_declaration(lexer, symtab, pc));
 	TEST_ASSERT_EQUAL_INT(0x2000, search_symbol(symtab, "PATTERN"));
 	reset_lexer(lexer);
@@ -330,10 +330,10 @@ byte count on the far left side
 	const char *address_label = "NEXT\t\tLDA PATTERN,X\n";
 	buffer = address_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_declaration(lexer, symtab, pc));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_operand(lexer->sequence[2], instr, symtab));
-	TEST_ASSERT_EQUAL_INT(0x0, search_symbol(symtab, "NEXT"));
+	TEST_ASSERT_EQUAL_INT(0x2000, search_symbol(symtab, lexer->sequence[2]->str));
 	reset_lexer(lexer);
 	reset_instruction(instr);
 	pc += 3;
@@ -341,7 +341,7 @@ byte count on the far left side
 	const char *branch = "\t\tBEQ NEXT\n";
 	buffer = branch;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(BRANCH_OPERAND, parse_label_operand(lexer->sequence[1], instr, symtab));
 	TEST_ASSERT_EQUAL_INT(0x0, search_symbol(symtab, lexer->sequence[1]->str));
 	reset_lexer(lexer);
@@ -351,7 +351,7 @@ byte count on the far left side
 	const char *jump = "\t\tJSR NEXT\t; comment\n";
 	buffer = jump;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(JUMP_OPERAND, parse_label_operand(lexer->sequence[1], instr, symtab));
 	TEST_ASSERT_EQUAL_INT(0x0, search_symbol(symtab, lexer->sequence[1]->str));
 	reset_lexer(lexer);
@@ -361,7 +361,7 @@ byte count on the far left side
 	const char *branch_for_ref = "BCC\tSTAR\n";
 	buffer = branch_for_ref;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(BRANCH_FORWARD_REFERENCE, parse_label_operand(lexer->sequence[1], instr, symtab));
 	reset_lexer(lexer);
 	reset_instruction(instr);
@@ -370,7 +370,7 @@ byte count on the far left side
 	const char *jump_for_ref = "JMP STAR\n";
 	buffer = jump_for_ref;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(JUMP_FORWARD_REFERENCE, parse_label_operand(lexer->sequence[1], instr, symtab));
 	reset_lexer(lexer);
 	reset_instruction(instr);
@@ -380,7 +380,7 @@ byte count on the far left side
 	const char *address_label2 = "STAR\t\tINX\n";
 	buffer = address_label2;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_token_sequence(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_declaration(lexer, symtab, pc));
 	TEST_ASSERT_EQUAL_INT(0xD, search_symbol(symtab, lexer->sequence[0]->str));
 	reset_lexer(lexer);
@@ -399,7 +399,7 @@ int main(void)
 
 	RUN_TEST(test_parse_instr_tree);
 	RUN_TEST(test_parse_label_tree);
-	RUN_TEST(test_parse_token_sequence);
+	RUN_TEST(test_parse_line);
 	RUN_TEST(test_parse_label_declaration);
 	RUN_TEST(test_get_operand);
 	RUN_TEST(test_parse_label_operand);

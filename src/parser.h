@@ -48,7 +48,7 @@ LabelTree
 
 int parse_instr_tree(struct Token **seq, int index);
 int parse_label_tree(struct Token **seq, int index);
-int parse_token_sequence(struct Lexer *lexer);
+int parse_line(struct Lexer *lexer);
 int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
                             int pc);
 int parse_label_operand(struct Token *operand, struct Instruction *instr,

@@ -136,14 +136,14 @@ int parse_label_tree(struct Token **seq, int index)
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
-/* parse_token_sequence()
+/* parse_line()
 	@lexer          ptr to Lexer struct
 
 	@return         success or error code
 
 	Check @lexer's token sequence for syntax errors.
 */
-int parse_token_sequence(struct Lexer *lexer)
+int parse_line(struct Lexer *lexer)
 {
 	int index = 0;
 	struct Token **seq = lexer->sequence;
