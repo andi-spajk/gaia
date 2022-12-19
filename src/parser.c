@@ -174,6 +174,7 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 
 	if (seq[1]->type != TOKEN_EQUAL_SIGN) {
 		// address label
+		// might be lone label or a label and instr
 		if (found != ERROR_SYMBOL_NOT_FOUND) {
 			return ERROR_LABEL_REDEFINITION;
 		} else {
@@ -190,9 +191,6 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 			label->value = seq[2]->value;
 			return insert_symbol(symtab, label->str, label->value);
 		}
-	} else if (seq[1]->type == TOKEN_NULL) {
-		// lone label declaration
-		return PARSER_SUCCESS;
 	}
 	return ERROR_UNKNOWN;
 }
@@ -232,19 +230,19 @@ int parse_label_operand(struct Token *operand, struct Instruction *instr,
 	return ERROR_UNKNOWN;
 }
 
-/* get_operand()
+/* find_operand()
 	@lexer          ptr to Lexer struct
 
 	@return         ptr to operand token in the lexer sequence
 
 	Find location of the operand token in a lexer's sequence of tokens.
 */
-struct Token *get_operand(struct Lexer *lexer)
+struct Token *find_operand(struct Lexer *lexer)
 {
 	struct Token *operand = NULL;
 	// start at 2nd token
 	// operand will always be 2nd or later
-	for (int i = 1; !operand; i++) {
+	for (int i = 1; i < MAX_TOKENS; i++) {
 		if (lexer->sequence[i]->type == TOKEN_LABEL ||
 		    lexer->sequence[i]->type == TOKEN_LITERAL)
 			operand = lexer->sequence[i];
@@ -266,5 +264,5 @@ struct Token *get_operand(struct Lexer *lexer)
 // int parse_operand(struct Lexer *lexer, struct SymbolTable *symtab,
 //                   struct Instruction *instr, int pc)
 // {
-// 	struct Token *operand = get_operand(lexer);
+// 	struct Token *operand = find_operand(lexer);
 // }

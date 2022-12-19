@@ -7,11 +7,6 @@
 #include "lexer.h"
 #include "opcode.h"
 
-// lexer.c has the same define, but it's not in lexer.h because the other
-// modules don't need it
-// therefore I must redefine MAX_TOKENS here just for this test file
-#define MAX_TOKENS 8
-
 void setUp(void) {}
 void tearDown(void) {}
 

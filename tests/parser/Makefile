@@ -12,8 +12,8 @@ DEP = $(OBJ)/test_parser.o $(OBJ)/parser.o $(OBJ)/lexer.o $(OBJ)/opcode.o \
 test_parser: $(DEP)
 	$(CC) $(CFLAGS) $^ $(UNITY) -lm -o test_parser
 
-$(OBJ)/test_parser.o: test_parser.c
-	$(CC) $(CFLAGS) $^ -c
+$(OBJ)/test_parser.o: test_parser.c exhaustive_lines.h
+	$(CC) $(CFLAGS) $< -c
 	mv test_parser.o $(OBJ)
 
 $(OBJ)/%.o: $(SRC)/%.c $(SRC)/%.h

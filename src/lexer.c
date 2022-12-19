@@ -19,7 +19,6 @@ which is always an error.
 #include "lexer.h"
 #include "opcode.h"
 
-#define MAX_TOKENS 8
 #define MAX_TOKEN_STR_LEN 64
 
 /* init_token()
@@ -173,7 +172,8 @@ int token_strcpy(struct Token *tk, const char *str)
 	@buffer. This is needed when we call lex_text() because that function
 	copies from buffer to token string (external source to internal), but
 	token_strcpy() copies from token string to token string (all internal).
-	We must extract only the safe chars from external input.
+	We must extract only the safe chars from external input and convert them
+	to uppercase.
 */
 int token_strncpy(struct Token *tk, const char *buffer, int length)
 {
