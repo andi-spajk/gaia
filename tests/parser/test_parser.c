@@ -1293,6 +1293,8 @@ void test_parse_addr_mode(void)
 	operand_status = parse_operand(lexer, instr, symtab);
 	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_IMPLIED, parse_addr_mode(operand_status, lexer, instr));
 
+	// exhaustive_lines.h has exhaustive token sequences
+	// BUT NOT exhaustive addressing modes (missing accumulator)
 	buffer = "\t\tASL\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
@@ -1430,6 +1432,8 @@ void test_parse_addr_mode(void)
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
 	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	// no need to check results of parse_forward_reference_addr_mode()
+	// we already tested that exhaustively
 
 	buffer = jump;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));

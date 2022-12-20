@@ -299,7 +299,7 @@ int parse_operand(struct Lexer *lexer, struct Instruction *instr,
 	@return         resulting bitfield after masks
 
 	Apply bitmasks to @curr_field to weed out the expressed addressing mode.
-	Fields pertaining to registers and indirect modes are applied.
+	Only bitfields pertaining to registers and indirect modes are applied.
 
 	This function will only work partway. The functions below this one will
 	finalize the true result bitfield.
@@ -342,7 +342,6 @@ int16_t apply_masks(struct Lexer *lexer, int16_t curr_field)
 	@return         FORWARD_REFERENCE signal code, used by assembler to
 	                delay writing bytes until label is resolved
 
-
 	Saves the information needed to parse a forward reference address when
 	we try to resolve the label later. Save info now because we do not save
 	all the source lines so we must preserve that info.
@@ -366,7 +365,6 @@ int16_t parse_forward_reference_addr_mode(struct Lexer *lexer,
 	                        reference
 	@lexer                  ptr to Lexer struct
 	@instr                  ptr to Instruction struct
-	@symtab                 symbol table
 
 	Apply bit masks to determine the addressing mode of a lexer sequence.
 	Any invalid sequences will have incompatible bit masks and an
@@ -396,7 +394,7 @@ int16_t parse_addr_mode(int operand_status, struct Lexer *lexer,
 	if (operand->value > 0xFF) {
 		addr_mode = ABSOLUTE_FIELD;
 	} else {
-		// a jump label may have a zero page value but it's always
+		// a jump label may have a zero page value but it's still
 		// absolute because we always write 3 bytes
 		if (!is_jump(instr->mnemonic))
 			addr_mode = ZERO_PAGE_FIELD;
@@ -404,6 +402,7 @@ int16_t parse_addr_mode(int operand_status, struct Lexer *lexer,
 			addr_mode = ABSOLUTE_FIELD;
 	}
 
+	// branching is always relative
 	if (is_branch(instr->mnemonic))
 		return addr_mode & ADDR_MODE_RELATIVE;
 	else
