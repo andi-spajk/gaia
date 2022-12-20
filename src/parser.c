@@ -252,8 +252,8 @@ struct Token *find_operand(struct Lexer *lexer)
 
 /* parse_operand()
 	@lexer          ptr to Lexer struct
+	@instr          ptr to Instruction struct
 	@symtab         ptr to symbol table
-	@pc             current program counter
 
 	@return         operand status, or error code
 
@@ -261,8 +261,20 @@ struct Token *find_operand(struct Lexer *lexer)
 	it is a forward reference. Operands which are neither are ignored.
 	Illegal forward references or label references cause errors.
 */
-// int parse_operand(struct Lexer *lexer, struct SymbolTable *symtab,
-//                   struct Instruction *instr, int pc)
-// {
-// 	struct Token *operand = find_operand(lexer);
-// }
+int parse_operand(struct Lexer *lexer, struct Instruction *instr,
+                  struct SymbolTable *symtab)
+{
+	struct Token *operand = find_operand(lexer);
+	// implied operand or accumulator
+	if (!operand)
+		return PARSER_SUCCESS;
+
+	if (operand->type == TOKEN_LABEL) {
+		return parse_label_operand(operand, instr, symtab);
+	} else if (operand->type == TOKEN_LITERAL) {
+		// no need to do anything special to parse literal
+		// the lexer did everything needed
+		return PARSER_SUCCESS;
+	}
+	return ERROR_UNKNOWN;
+}

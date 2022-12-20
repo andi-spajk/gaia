@@ -54,7 +54,7 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 int parse_label_operand(struct Token *operand, struct Instruction *instr,
                         struct SymbolTable *symtab);
 struct Token *find_operand(struct Lexer *lexer);
-// int parse_operand(struct Lexer *lexer, struct SymbolTable *symtab,
-//                   struct Instruction *instr, int pc);
+int parse_operand(struct Lexer *lexer, struct Instruction *instr,
+                  struct SymbolTable *symtab);
 
 #endif

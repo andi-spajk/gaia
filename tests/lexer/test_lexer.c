@@ -530,6 +530,11 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(CMP_BITFIELD, instr->addr_bitfield);
 	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, lexer->sequence[4]->type);
 
+	const char *constant = "addres\t=\t$1234\n";
+	buffer = constant;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
+
 	destroy_lexer(lexer);
 	destroy_token(tk);
 	destroy_instruction(instr);
