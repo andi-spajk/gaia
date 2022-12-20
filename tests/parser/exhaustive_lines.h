@@ -40,6 +40,8 @@ LABEL2          BCC     LABEL1          ; label branch
 FORREF1         BVS     L19             ; label branch forward ref
 LABEL3          JSR     LABEL2          ; label jump
 FORREF2         JMP     L21             ; label jump forward ref
+                JMP     (WHERE)         ; indirect forward ref
+FORREF3         JMP     (WHERE)         ; label indirect forward ref
 
 L1              DEY
 L2              STY     $AA
@@ -119,33 +121,5 @@ const char *label_indx =            "L18\t\tADC\t($EE,X)\n";
 const char *label_indx_label =      "L19\t\tLDA\t(CONSTANT8,X)\n";
 const char *label_indy =            "L20\t\tSTA\t($FF),Y\n";
 const char *label_indy_label =      "L21\t\tSBC\t(CONSTANT8),Y\n";
-
-// char *good_lines[] = {
-// 	constant_addr, constant_8bit, constant_16bit,
-// 	lone_label,
-// 	lone_instr,
-// 	zp, zp_label, absolute, abs_label, zpx, zpx_label, absx, absx_label,
-// 	zpy, zpy_label, absy, absy_label, ind, ind_label, imm, imm_label,
-// 	indx, indx_label, indy, indy_label,
-// 	branch, branch_forref, jump, jump_forref,
-// 	label_branch, label_branch_forref, label_jump, label_jump_forref,
-// 	label_lone_instr,
-// 	label_zp, label_zp_label, label_abs, label_abs_label,
-// 	label_zpx, label_zpx_label, label_absx, label_absx_label,
-// 	label_zpy, label_zpy_label, label_absy, label_absy_label,
-// 	label_ind, label_ind_label, label_imm, label_imm_label,
-// 	label_indx, label_indx_label, label_indy, label_indy_label
-// };
-
-// INDICES:
-//   0-2   symbol defines
-//     3   lone label
-//     4   lone instr
-//  5-24   instr, operand
-// 25-32   branching/jumping
-//    33   label, lone instr
-// 34-53   label, instr, operand
-
-const int num_lines = 54;
 
 #endif

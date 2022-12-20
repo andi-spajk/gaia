@@ -212,6 +212,8 @@ int parse_label_operand(struct Token *operand, struct Instruction *instr,
 	int jump = is_jump(instr->mnemonic);
 
 	if (label_value != ERROR_SYMBOL_NOT_FOUND) {
+		// save value in both symtab and sequence token
+		// allows for faster lookup when we parse the addressing mode
 		operand->value = label_value;
 		if (branch)
 			return BRANCH_OPERAND;
@@ -235,21 +237,23 @@ int parse_label_operand(struct Token *operand, struct Instruction *instr,
 /* find_operand()
 	@lexer          ptr to Lexer struct
 
-	@return         ptr to operand token in the lexer sequence
+	@return         ptr to operand token in the lexer sequence, or NULL if
+	                not found
 
 	Find location of the operand token in a lexer's sequence of tokens.
 */
 struct Token *find_operand(struct Lexer *lexer)
 {
-	struct Token *operand = NULL;
+	struct Token *curr = lexer->sequence[1];
 	// start at 2nd token
 	// operand will always be 2nd or later
-	for (int i = 1; i < MAX_TOKENS; i++) {
-		if (lexer->sequence[i]->type == TOKEN_LABEL ||
-		    lexer->sequence[i]->type == TOKEN_LITERAL)
-			operand = lexer->sequence[i];
+	for (int i = 1; curr->type != TOKEN_NULL; i++) {
+		curr = lexer->sequence[i];
+		if (curr->type == TOKEN_LABEL ||
+		    curr->type == TOKEN_LITERAL)
+			return curr;
 	}
-	return operand;
+	return NULL;
 }
 
 /* parse_operand()
@@ -262,6 +266,13 @@ struct Token *find_operand(struct Lexer *lexer)
 	Determine whether the operand is a branch/jump instruction and whether
 	it is a forward reference. Operands which are neither are ignored.
 	Illegal forward references or label references cause errors.
+
+	All operand statuses (from parser.h):
+	PARSER_SUCCESS           1
+	BRANCH_OPERAND           2
+	JUMP_OPERAND             3
+	BRANCH_FORWARD_REFERENCE 4
+	JUMP_FORWARD_REFERENCE   5
 */
 int parse_operand(struct Lexer *lexer, struct Instruction *instr,
                   struct SymbolTable *symtab)
@@ -275,7 +286,7 @@ int parse_operand(struct Lexer *lexer, struct Instruction *instr,
 		return parse_label_operand(operand, instr, symtab);
 	} else if (operand->type == TOKEN_LITERAL) {
 		// no need to do anything special to parse literal
-		// the lexer did everything needed
+		// the lexer did everything necessary
 		return PARSER_SUCCESS;
 	}
 	return ERROR_UNKNOWN;
@@ -288,10 +299,10 @@ int parse_operand(struct Lexer *lexer, struct Instruction *instr,
 	@return         resulting bitfield after masks
 
 	Apply bitmasks to @curr_field to weed out the expressed addressing mode.
-	Only fields pertaining to registers and indirect modes are applied.
+	Fields pertaining to registers and indirect modes are applied.
 
-	This will only work partway. The functions below this one will finalize
-	the true result bitfield.
+	This function will only work partway. The functions below this one will
+	finalize the true result bitfield.
 */
 int16_t apply_masks(struct Lexer *lexer, int16_t curr_field)
 {
@@ -355,15 +366,56 @@ int16_t parse_forward_reference_addr_mode(struct Lexer *lexer,
 	                        reference
 	@lexer                  ptr to Lexer struct
 	@instr                  ptr to Instruction struct
+	@symtab                 symbol table
 
 	Apply bit masks to determine the addressing mode of a lexer sequence.
 	Any invalid sequences will have incompatible bit masks and an
 	instruction bitfield that zero each other out.
 */
-// int16_t parse_addr_mode(int operand_status, struct Lexer *lexer,
-//                               struct Instruction *instr)
-// {
-// 	if (operand_status == BRANCH_FORWARD_REFERENCE ||
-// 	    operand_status == JUMP_FORWARD_REFERENCE)
-// 		return parse_forward_reference_addr_mode(lexer, instr);
-// }
+int16_t parse_addr_mode(int operand_status, struct Lexer *lexer,
+                        struct Instruction *instr)
+{
+	if (operand_status == BRANCH_FORWARD_REFERENCE ||
+	    operand_status == JUMP_FORWARD_REFERENCE)
+		return parse_forward_reference_addr_mode(lexer, instr);
+
+	struct Token *operand = find_operand(lexer);
+	if (!operand) {
+		switch (instr->mnemonic) {
+		case ASL:
+		case LSR:
+		case ROL:
+		case ROR:
+			return ADDR_MODE_ACCUMULATOR;
+		default:
+			return ADDR_MODE_IMPLIED;
+		}
+	}
+
+	int16_t addr_mode = 0x1FFF;
+	if (operand->value > 0xFF) {
+		addr_mode = ABSOLUTE_FIELD;
+	} else {
+		// a jump label may have a zero page value but it's always
+		// absolute because we always write 3 bytes
+		if (!is_jump(instr->mnemonic))
+			addr_mode = ZERO_PAGE_FIELD;
+		else
+			addr_mode = ABSOLUTE_FIELD;
+	}
+
+	if (is_branch(instr->mnemonic))
+		return addr_mode & ADDR_MODE_RELATIVE;
+	else
+		addr_mode &= ~ADDR_MODE_RELATIVE;
+
+	// immediate token is either at index 1 or 2
+	if (lexer->sequence[1]->type == TOKEN_IMMEDIATE ||
+	    lexer->sequence[2]->type == TOKEN_IMMEDIATE)
+		addr_mode &= ADDR_MODE_IMMEDIATE;
+	else
+		addr_mode &= ~ADDR_MODE_IMMEDIATE;
+
+	addr_mode = apply_masks(lexer, addr_mode);
+	return addr_mode;
+}

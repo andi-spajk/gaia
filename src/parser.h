@@ -62,5 +62,7 @@ int parse_operand(struct Lexer *lexer, struct Instruction *instr,
 int16_t apply_masks(struct Lexer *lexer, int16_t curr_field);
 int16_t parse_forward_reference_addr_mode(struct Lexer *lexer,
                                           struct Instruction *instr);
+int16_t parse_addr_mode(int operand_status, struct Lexer *lexer,
+                        struct Instruction *instr);
 
 #endif
