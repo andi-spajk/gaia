@@ -1223,16 +1223,33 @@ void test_parse_forward_reference_addr_mode(void)
 	TEST_ASSERT_NOT_NULL(tk);
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
-	// int16_t expected = 0;
+	int16_t expected = 0;
 	const char *buffer;
 
 	buffer = label_branch_forref;
+	expected = ADDR_MODE_RELATIVE & NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
-	// TEST_ASSERT_EQUAL_INT16(, instr->addr_bitflag)
+	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
+
 	buffer = label_jump_forref;
+	expected = ADDR_MODE_ABSOLUTE & NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
+
+	buffer = ind_forref;
+	expected = ADDR_MODE_ABSOLUTE & INDIRECT_FIELD & NOT_REGISTER_FIELD;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
+
+	buffer = label_ind_forref;
+	// same expected masks
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
