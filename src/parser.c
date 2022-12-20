@@ -323,3 +323,47 @@ int16_t apply_masks(struct Lexer *lexer, int16_t curr_field)
 		curr_field &= NOT_INDIRECT_FIELD;
 	return curr_field;
 }
+
+/* parse_forward_reference_addr_mode()
+	@lexer          ptr to Lexer struct
+	@instr          ptr to Instruction struct
+
+	@return         FORWARD_REFERENCE signal code, used by assembler to
+	                delay writing bytes until label is resolved
+
+
+	Saves the information needed to parse a forward reference address when
+	we try to resolve the label later. Save info now because we do not save
+	all the source lines so we must preserve that info.
+*/
+int16_t parse_forward_reference_addr_mode(struct Lexer *lexer,
+                                          struct Instruction *instr)
+{
+	int16_t addr_mode = 0x1FFF;
+	addr_mode = apply_masks(lexer, addr_mode);
+
+	if (is_branch(instr->mnemonic)) {
+		instr->addr_bitflag = addr_mode & ADDR_MODE_RELATIVE;
+		return FORWARD_REFERENCE;
+	}
+	instr->addr_bitflag = addr_mode & ADDR_MODE_ABSOLUTE;
+	return FORWARD_REFERENCE;
+}
+
+/* parse_addr_mode()
+	@operand_status         whether operand is branch/jump and/or forward
+	                        reference
+	@lexer                  ptr to Lexer struct
+	@instr                  ptr to Instruction struct
+
+	Apply bit masks to determine the addressing mode of a lexer sequence.
+	Any invalid sequences will have incompatible bit masks and an
+	instruction bitfield that zero each other out.
+*/
+// int16_t parse_addr_mode(int operand_status, struct Lexer *lexer,
+//                               struct Instruction *instr)
+// {
+// 	if (operand_status == BRANCH_FORWARD_REFERENCE ||
+// 	    operand_status == JUMP_FORWARD_REFERENCE)
+// 		return parse_forward_reference_addr_mode(lexer, instr);
+// }

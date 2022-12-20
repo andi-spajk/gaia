@@ -47,6 +47,7 @@ LabelTree
 #define JUMP_OPERAND             3
 #define BRANCH_FORWARD_REFERENCE 4
 #define JUMP_FORWARD_REFERENCE   5
+#define FORWARD_REFERENCE        0xFFFF
 
 int parse_instr_tree(struct Token **seq, int index);
 int parse_label_tree(struct Token **seq, int index);
@@ -59,5 +60,7 @@ struct Token *find_operand(struct Lexer *lexer);
 int parse_operand(struct Lexer *lexer, struct Instruction *instr,
                   struct SymbolTable *symtab);
 int16_t apply_masks(struct Lexer *lexer, int16_t curr_field);
+int16_t parse_forward_reference_addr_mode(struct Lexer *lexer,
+                                          struct Instruction *instr);
 
 #endif

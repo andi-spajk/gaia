@@ -701,7 +701,10 @@ pc      LABEL1                                  ; 0 bytes
 14      FORREF1         BVS     L19             ; 2, 16
 16      LABEL3          JSR     LABEL2          ; 3, 19
 19      FORREF2         JMP     L21             ; 3, 22
-                                                ; 22
+22      L2              STA     $AA             ; 2, 24
+24                      JMP     (WHERE)         ; 3, 27
+27      FORREF3         JMP     (WHERE)         ; 3, 30
+                                                ; 30
 */
 	// the earlier tests already defined ADDRESS
 	// so we must reset the symbol table
@@ -804,11 +807,27 @@ pc      LABEL1                                  ; 0 bytes
 	pc += 3;
 
 	// random instruction in order to test gauge symbol insertion
+	// L2 STY $AA
 	buffer = label_zp;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, pc));
 	TEST_ASSERT_EQUAL_INT(22, search_symbol(symtab, "L2"));
+	pc += 2;
+
+	// JMP (WHERE)
+	buffer = ind_forref;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	TEST_ASSERT_EQUAL_INT(JUMP_FORWARD_REFERENCE, parse_label_operand(find_operand(lexer), instr, symtab));
+	pc += 3;
+
+	// FORREF3 JMP (WHERE)
+	buffer = label_ind_forref;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, pc));
+	TEST_ASSERT_EQUAL_INT(27, search_symbol(symtab, "FORREF3"));
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -1085,8 +1104,10 @@ void test_apply_masks(void)
 
 	buffer = lone_instr;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// no need to parse
 	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD;
 	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	// 0x1FFF is 13 bits, which is all we ever use
 
 	buffer = zp;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
@@ -1194,6 +1215,29 @@ void test_apply_masks(void)
 	destroy_instruction(instr);
 }
 
+void test_parse_forward_reference_addr_mode(void)
+{
+	struct Lexer *lexer = init_lexer();
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+	// int16_t expected = 0;
+	const char *buffer;
+
+	buffer = label_branch_forref;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	// TEST_ASSERT_EQUAL_INT16(, instr->addr_bitflag)
+	buffer = label_jump_forref;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+}
 int main(void)
 {
 	UNITY_BEGIN();
@@ -1206,6 +1250,7 @@ int main(void)
 	RUN_TEST(test_parse_label_operand);
 	RUN_TEST(test_parse_operand);
 	RUN_TEST(test_apply_masks);
+	RUN_TEST(test_parse_forward_reference_addr_mode);
 
 	return UNITY_END();
 }
