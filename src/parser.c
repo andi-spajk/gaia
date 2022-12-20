@@ -13,7 +13,9 @@ See parser.h for full diagram of valid token sequences.
 */
 
 #include <stddef.h>
+#include <stdint.h>
 
+#include "addressing_modes.h"
 #include "error.h"
 #include "lexer.h"
 #include "opcode.h"
@@ -277,4 +279,47 @@ int parse_operand(struct Lexer *lexer, struct Instruction *instr,
 		return PARSER_SUCCESS;
 	}
 	return ERROR_UNKNOWN;
+}
+
+/* apply_masks()
+	@lexer          ptr to Lexer struct
+	@curr_field     current working bitfield
+
+	@return         resulting bitfield after masks
+
+	Apply bitmasks to @curr_field to weed out the expressed addressing mode.
+	Only fields pertaining to registers and indirect modes are applied.
+
+	This will only work partway. The functions below this one will finalize
+	the true result bitfield.
+*/
+int16_t apply_masks(struct Lexer *lexer, int16_t curr_field)
+{
+	int has_x = 0;
+	int has_y = 0;
+	int is_indirect = 0;
+
+	struct Token *curr;
+	for (int i = 0; i < MAX_TOKENS; i++) {
+		curr = lexer->sequence[i];
+		if (curr->type == TOKEN_X_REGISTER)
+			has_x = 1;
+		else if (curr->type == TOKEN_Y_REGISTER)
+			has_y = 1;
+		else if (curr->type == TOKEN_OPEN_PARENTHESIS)
+			is_indirect = 1;
+	}
+
+	if (has_x)
+		curr_field &= X_REGISTER_FIELD;
+	else if (has_y)
+		curr_field &= Y_REGISTER_FIELD;
+	else
+		curr_field &= NOT_REGISTER_FIELD;
+
+	if (is_indirect)
+		curr_field &= INDIRECT_FIELD;
+	else
+		curr_field &= NOT_INDIRECT_FIELD;
+	return curr_field;
 }

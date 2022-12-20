@@ -1,4 +1,7 @@
+#include <stdint.h>
+
 #include "../../unity/unity.h"
+#include "addressing_modes.h"
 #include "error.h"
 #include "lexer.h"
 #include "opcode.h"
@@ -397,6 +400,23 @@ void test_parse_line(void)
 	buffer = label_indy_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+
+	const char *bad = "LDA LDX LDY LOLOL\n";
+	buffer = bad;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_line(lexer));
+	const char *really_bad = "LDX (),\tX LABEL\n";
+	buffer = really_bad;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_line(lexer));
+	const char *too_many = "LABEL1 LABEL2 STLOOP JANUS YOYOYOEOYEOYOEYO\n";
+	buffer = too_many;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_line(lexer));
+	const char *triple = "sexy === $ffff\n";
+	buffer = triple;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_line(lexer));
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -1052,6 +1072,128 @@ void test_parse_operand(void)
 	destroy_symbol_table(symtab);
 }
 
+void test_apply_masks(void)
+{
+	struct Lexer *lexer = init_lexer();
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+	int16_t expected = 0;
+	const char *buffer;
+
+	buffer = lone_instr;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = zp;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected value is the same for these tests
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = zp_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = absolute;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = abs_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = zpx;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	expected = X_REGISTER_FIELD & NOT_INDIRECT_FIELD;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = zpx_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = absx;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = absx_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = zpy;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	expected = Y_REGISTER_FIELD & NOT_INDIRECT_FIELD;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = zpy_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = absy;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = absy_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = ind;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	expected = NOT_REGISTER_FIELD & INDIRECT_FIELD;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = ind_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = imm;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = imm_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = indx;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	expected = X_REGISTER_FIELD & INDIRECT_FIELD;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = indx_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = indy;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	expected = Y_REGISTER_FIELD & INDIRECT_FIELD;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	buffer = indy_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// expected = ;
+	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
@@ -1063,6 +1205,7 @@ int main(void)
 	RUN_TEST(test_find_operand);
 	RUN_TEST(test_parse_label_operand);
 	RUN_TEST(test_parse_operand);
+	RUN_TEST(test_apply_masks);
 
 	return UNITY_END();
 }
