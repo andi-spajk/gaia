@@ -356,7 +356,9 @@ int16_t parse_forward_reference_addr_mode(struct Lexer *lexer,
 		instr->addr_bitflag = addr_mode & ADDR_MODE_RELATIVE;
 		return FORWARD_REFERENCE;
 	}
-	instr->addr_bitflag = addr_mode & ADDR_MODE_ABSOLUTE;
+	// two possible addressing modes for jumps, so we AND with the
+	// absolute FIELD!!!
+	instr->addr_bitflag = addr_mode & ABSOLUTE_FIELD;
 	return FORWARD_REFERENCE;
 }
 
