@@ -17,7 +17,7 @@ struct ForwardRef {
 
 struct Unresolved {
 	struct ForwardRef **refs;
-	int curr;
+	int curr;  // first open slot in refs[]
 	int size;
 };
 

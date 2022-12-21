@@ -129,8 +129,7 @@ void test_add_forward_ref(void)
 
 	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
 
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS,
-	                      add_forward_ref(unresolved, ref));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 
 	ref = unresolved->refs[0];
 	TEST_ASSERT_EQUAL_STRING("FORREF", ref->label);
@@ -156,8 +155,7 @@ void test_add_forward_ref(void)
 	// saved the previous ptr into unresolved->refs.
 	// destroy_unresolved() will free that memory for us
 
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS,
-	                      add_forward_ref(unresolved, ref));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 
 	ref = unresolved->refs[1];
 	TEST_ASSERT_EQUAL_STRING("FORREF2", ref->label);
@@ -175,6 +173,63 @@ void test_add_forward_ref(void)
 	destroy_symbol_table(symtab);
 }
 
+void test_resize_unresolved(void)
+{
+	struct Lexer *lexer = init_lexer();
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+	struct SymbolTable *symtab = init_symbol_table();
+	TEST_ASSERT_NOT_NULL(symtab);
+	struct Unresolved *unresolved = init_unresolved();
+	TEST_ASSERT_NOT_NULL(unresolved);
+	struct ForwardRef *ref;
+	int pc;
+	int line_num;
+	int operand_status;
+	const char *buffer;
+
+	// JMP (FORREF)
+	buffer = "\t\tJMP\t(FORREF)\t;hi\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	pc = 0x0;
+	line_num = 1;
+
+	operand_status = parse_operand(lexer, instr, symtab);
+	parse_addr_mode(operand_status, lexer, instr);
+
+	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	TEST_ASSERT_EQUAL_INT(8, unresolved->size);
+	TEST_ASSERT_EQUAL_INT(7, unresolved->curr);
+
+	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	TEST_ASSERT_EQUAL_INT(16, unresolved->size);
+	TEST_ASSERT_EQUAL_INT(8, unresolved->curr);
+
+	destroy_unresolved(unresolved);
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+	destroy_symbol_table(symtab);
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
@@ -182,6 +237,7 @@ int main(void)
 	RUN_TEST(test_init_destroy_unresolved);
 	RUN_TEST(test_create_forward_ref);
 	RUN_TEST(test_add_forward_ref);
+	RUN_TEST(test_resize_unresolved);
 
 	return UNITY_END();
 }

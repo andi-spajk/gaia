@@ -54,8 +54,7 @@ void destroy_forward_ref(struct ForwardRef *forward_ref)
 		free(forward_ref->source_line);
 	if (forward_ref->instr)
 		destroy_instruction(forward_ref->instr);
-	if (forward_ref)
-		free(forward_ref);
+	free(forward_ref);
 }
 
 /* destroy_unresolved()
@@ -154,10 +153,19 @@ struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
 struct Unresolved *resize_unresolved(struct Unresolved *unresolved)
 {
 	unresolved->size *= 2;
-	size_t new_size = unresolved->size * sizeof(struct ForwardRef *);
-	// size_t new_size = (unresolved->size * 2) * sizeof(struct ForwardRef *);
-	if (!realloc(unresolved->refs, new_size))
-		return NULL;
+	struct ForwardRef **new = calloc(unresolved->size,
+	                                 sizeof(struct ForwardRef *));
+	// transfer old forward refs
+	for (int i = 0; i < unresolved->size / 2; i++) {
+		if (unresolved->refs[i])
+			new[i] = unresolved->refs[i];
+	}
+	// initialize new refs
+	for (int j = unresolved->size / 2; j < unresolved->size; j++)
+		new[j] = NULL;
+
+	free(unresolved->refs);
+	unresolved->refs = new;
 	return unresolved;
 }
 
@@ -172,6 +180,7 @@ struct Unresolved *resize_unresolved(struct Unresolved *unresolved)
 */
 int add_forward_ref(struct Unresolved *unresolved, struct ForwardRef *ref)
 {
+	// array is full
 	if (unresolved->curr == unresolved->size - 1) {
 		if (!resize_unresolved(unresolved))
 			return ERROR_MEMORY_ALLOCATION_FAIL;

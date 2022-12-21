@@ -31,7 +31,7 @@ struct Token {
 
 struct Lexer {
 	struct Token **sequence;
-	int curr;
+	int curr;  // first open slot in sequence[]
 };
 
 struct Token *init_token(void);
