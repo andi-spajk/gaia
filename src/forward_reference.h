@@ -1,14 +1,15 @@
 #ifndef FORWARD_REFERENCE_H
 #define FORWARD_REFERENCE_H
 
+#include "lexer.h"
 #include "opcode.h"
 
 struct ForwardRef {
 	char *label;
 	char *source_line;
-	int line_num;
-	int pc;
 	struct Instruction *instr;
+	int pc;
+	int line_num;
 	int operand_status;
 };
 
@@ -19,6 +20,10 @@ struct Unresolved {
 };
 
 struct Unresolved *init_unresolved(void);
-void destroy_unresolved(struct Unresolved *forward_refs);
+void destroy_forward_ref(struct ForwardRef *forward_ref);
+void destroy_unresolved(struct Unresolved *unresolved);
+struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
+                                      struct Instruction *instr, int pc,
+                                      int line_num, int operand_status);
 
 #endif

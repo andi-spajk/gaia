@@ -1,5 +1,11 @@
 #include "../../unity/unity.h"
+#include "addressing_modes.h"
+#include "bitfields.h"
 #include "forward_reference.h"
+#include "lexer.h"
+#include "opcode.h"
+#include "parser.h"
+#include "symbol_table.h"
 
 void setUp(void) {}
 void tearDown(void) {}
@@ -13,11 +19,56 @@ void test_init_destroy_unresolved(void)
 	destroy_unresolved(unresolved);
 }
 
+void test_create_forward_ref(void)
+{
+	struct Lexer *lexer = init_lexer();
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+	struct SymbolTable *symtab = init_symbol_table();
+	TEST_ASSERT_NOT_NULL(symtab);
+
+	const char *buffer = "\t\tJMP\tL21\t; comment\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	int pc = 0x4;
+	int line_num = 1;
+	int operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT(operand_status, JUMP_FORWARD_REFERENCE);
+	int16_t expected = NOT_INDIRECT_FIELD & ADDR_MODE_ABSOLUTE & NOT_REGISTER_FIELD;
+	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
+
+	struct ForwardRef *ref = create_forward_ref(buffer, lexer, instr, pc,
+	                                           line_num, operand_status);
+	TEST_ASSERT_NOT_NULL(ref);
+
+	TEST_ASSERT_EQUAL_INT(0x4, ref->pc);
+	TEST_ASSERT_EQUAL_INT(1, ref->line_num);
+	TEST_ASSERT_EQUAL_INT(JUMP_FORWARD_REFERENCE, ref->operand_status);
+
+	TEST_ASSERT_EQUAL_INT(JMP, ref->instr->mnemonic);
+	TEST_ASSERT_EQUAL_INT(JMP_BITFIELD, ref->instr->addr_bitfield);
+	TEST_ASSERT_EQUAL_INT16(expected, ref->instr->addr_bitflag);
+
+	TEST_ASSERT_EQUAL_STRING("JMP\tL21\t; comment\n", ref->source_line);
+	TEST_ASSERT_EQUAL_STRING("L21", ref->label);
+
+	destroy_forward_ref(ref);
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+	destroy_symbol_table(symtab);
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
 
 	RUN_TEST(test_init_destroy_unresolved);
+	RUN_TEST(test_create_forward_ref);
 
 	return UNITY_END();
 }

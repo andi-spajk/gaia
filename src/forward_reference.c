@@ -8,9 +8,12 @@ them to the array. Automatically resizes array when full.
 */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "forward_reference.h"
+#include "lexer.h"
 #include "opcode.h"
+#include "parser.h"
 
 #define BASE_SIZE 8
 
@@ -27,7 +30,7 @@ struct Unresolved *init_unresolved(void)
 		return NULL;
 
 	struct ForwardRef **refs = calloc(BASE_SIZE,
-	                                   sizeof(struct ForwardRef *));
+	                                  sizeof(struct ForwardRef *));
 	if (!refs)
 		return NULL;
 
@@ -42,7 +45,7 @@ struct Unresolved *init_unresolved(void)
 
 	Free the memory used by a dynamically allocated ForwardRef struct.
 */
-static void destroy_forward_ref(struct ForwardRef *forward_ref)
+void destroy_forward_ref(struct ForwardRef *forward_ref)
 {
 	if (forward_ref->label)
 		free(forward_ref->label);
@@ -71,4 +74,61 @@ void destroy_unresolved(struct Unresolved *unresolved)
 	}
 	free(unresolved->refs);
 	free(unresolved);
+}
+
+/* create_forward_ref()
+	@
+
+	@return         ptr to dynamically allocated ForwardRef, or NULL if fail
+
+	Dynamically allocates a ForwardRef and stores the necessary information
+	for resolution and assembling later.
+*/
+struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
+                                      struct Instruction *instr, int pc,
+                                      int line_num, int operand_status)
+{
+	struct ForwardRef *ref = malloc(sizeof(struct ForwardRef));
+	if (!ref)
+		return NULL;
+
+	// save source line
+	const char *begin = buffer;
+	const char *end = buffer + strlen(buffer) - 1;
+	while (*begin == ' ' || *begin == '\t')
+		begin++;
+	while (*end == ' ' || *end == '\t')
+		end--;
+	size_t line_length = end - begin + 1;
+
+	ref->source_line = calloc(line_length + 1, sizeof(char));
+	if (!ref->source_line)
+		return NULL;
+	// keep the comments and newline in, no one cares
+	strncpy(ref->source_line, begin, line_length);
+
+	// find label operand (from parser.c)
+	struct Token *operand = find_operand(lexer);
+	// copy label string into forward ref's label
+	size_t label_length = strlen(operand->str) + 1;
+	ref->label = calloc(label_length, sizeof(char));
+	if (!ref->label)
+		return NULL;
+	strncpy(ref->label, operand->str, label_length);
+
+	// copy instr into forward ref's instr
+	struct Instruction *new_instr = init_instruction();
+	if (!new_instr)
+		return NULL;
+	new_instr->mnemonic = instr->mnemonic;
+	new_instr->addr_bitfield = instr->addr_bitfield;
+	new_instr->addr_bitflag = instr->addr_bitflag;
+	new_instr->opcode = instr->opcode;
+	ref->instr = new_instr;
+
+	ref->pc = pc;
+	ref->line_num = line_num;
+	ref->operand_status = operand_status;
+
+	return ref;
 }

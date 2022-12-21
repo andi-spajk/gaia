@@ -4,6 +4,7 @@
 #include "opcode.h"
 
 #define MAX_TOKENS 8
+
 // success codes
 #define LEXER_SUCCESS           1
 #define TOKEN_INSERTION_SUCCESS 2
