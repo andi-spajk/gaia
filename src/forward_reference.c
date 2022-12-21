@@ -10,6 +10,7 @@ them to the array. Automatically resizes array when full.
 #include <stdlib.h>
 #include <string.h>
 
+#include "error.h"
 #include "forward_reference.h"
 #include "lexer.h"
 #include "opcode.h"
@@ -53,7 +54,8 @@ void destroy_forward_ref(struct ForwardRef *forward_ref)
 		free(forward_ref->source_line);
 	if (forward_ref->instr)
 		destroy_instruction(forward_ref->instr);
-	free(forward_ref);
+	if (forward_ref)
+		free(forward_ref);
 }
 
 /* destroy_unresolved()
@@ -77,9 +79,16 @@ void destroy_unresolved(struct Unresolved *unresolved)
 }
 
 /* create_forward_ref()
-	@
+	@buffer                 ptr to source line
+	@lexer                  ptr to Lexer struct
+	@instr                  ptr to Instruction struct
+	@pc                     current program counter
+	@line_num               line number of @buffer
+	@operand_status         whether operand is branch/jmp and/or a forward
+	                        ref, from parse_operand()
 
-	@return         ptr to dynamically allocated ForwardRef, or NULL if fail
+	@return                 ptr to dynamically allocated ForwardRef, or
+	                        NULL if fail
 
 	Dynamically allocates a ForwardRef and stores the necessary information
 	for resolution and assembling later.
@@ -92,9 +101,10 @@ struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
 	if (!ref)
 		return NULL;
 
-	// save source line
+	// save source line without leading/trailing whitespace
 	const char *begin = buffer;
-	const char *end = buffer + strlen(buffer) - 1;
+	// -1 to skip null terminator, -1 to skip newline
+	const char *end = buffer + strlen(buffer) - 2;
 	while (*begin == ' ' || *begin == '\t')
 		begin++;
 	while (*end == ' ' || *end == '\t')
@@ -104,7 +114,7 @@ struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
 	ref->source_line = calloc(line_length + 1, sizeof(char));
 	if (!ref->source_line)
 		return NULL;
-	// keep the comments and newline in, no one cares
+	// keep the comments in, no one cares
 	strncpy(ref->source_line, begin, line_length);
 
 	// find label operand (from parser.c)
@@ -131,4 +141,42 @@ struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
 	ref->operand_status = operand_status;
 
 	return ref;
+}
+
+/* resize_unresolved()
+	@unresolved     ptr to Unresolved struct
+
+	@return         ptr to resized struct, or NULL if fail
+
+	Dynamically reallocate the memory of an array of forward references in
+	an Unresolved struct.
+*/
+struct Unresolved *resize_unresolved(struct Unresolved *unresolved)
+{
+	unresolved->size *= 2;
+	size_t new_size = unresolved->size * sizeof(struct ForwardRef *);
+	// size_t new_size = (unresolved->size * 2) * sizeof(struct ForwardRef *);
+	if (!realloc(unresolved->refs, new_size))
+		return NULL;
+	return unresolved;
+}
+
+/* add_forward_ref()
+	@unresolved     ptr to forward references
+	@ref            ptr to new forward reference to add
+
+	@return         success or error code
+
+	Add a forward reference to the array in @unresolved. Resize the array if
+	necessary.
+*/
+int add_forward_ref(struct Unresolved *unresolved, struct ForwardRef *ref)
+{
+	if (unresolved->curr == unresolved->size - 1) {
+		if (!resize_unresolved(unresolved))
+			return ERROR_MEMORY_ALLOCATION_FAIL;
+	}
+	unresolved->refs[unresolved->curr] = ref;
+	unresolved->curr++;
+	return FORWARD_REFERENCE_INSERTION_SUCCESS;
 }

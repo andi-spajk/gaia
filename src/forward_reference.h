@@ -4,6 +4,8 @@
 #include "lexer.h"
 #include "opcode.h"
 
+#define FORWARD_REFERENCE_INSERTION_SUCCESS 1
+
 struct ForwardRef {
 	char *label;
 	char *source_line;
@@ -25,5 +27,6 @@ void destroy_unresolved(struct Unresolved *unresolved);
 struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
                                       struct Instruction *instr, int pc,
                                       int line_num, int operand_status);
+int add_forward_ref(struct Unresolved *unresolved, struct ForwardRef *ref);
 
 #endif
