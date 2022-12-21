@@ -366,6 +366,8 @@ int16_t parse_forward_reference_addr_mode(struct Lexer *lexer,
 	@lexer                  ptr to Lexer struct
 	@instr                  ptr to Instruction struct
 
+	@return                 bitmask containing expressed addressing mode
+
 	Apply bit masks to determine the addressing mode of a lexer sequence.
 	Any invalid sequences will have incompatible bit masks and an
 	instruction bitfield that zero each other out.
@@ -404,7 +406,7 @@ int16_t parse_addr_mode(int operand_status, struct Lexer *lexer,
 
 	// branching is always relative
 	if (is_branch(instr->mnemonic))
-		return addr_mode & ADDR_MODE_RELATIVE;
+		addr_mode &= ADDR_MODE_RELATIVE;
 	else
 		addr_mode &= ~ADDR_MODE_RELATIVE;
 

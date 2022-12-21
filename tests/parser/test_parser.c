@@ -1489,6 +1489,51 @@ void test_parse_addr_mode(void)
 	operand_status = parse_operand(lexer, instr, symtab);
 	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
 
+	// bad branches
+	buffer = "BCC (ADDRESS)\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+
+	buffer = "BCS (CONSTANT8,X)\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+
+	buffer = "BVS (CONSTANT16),Y\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+
+	// bad immediateS
+	buffer = "JMP\t#000\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+
+	buffer = "BMI #CONSTANT16\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+
+	// bad jumps
+	buffer = "\tJMP    (LABEL1),Y\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+
+	buffer = "\t\tJSR\t(ADDRESS,X)\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+
 	destroy_lexer(lexer);
 	destroy_token(tk);
 	destroy_instruction(instr);
