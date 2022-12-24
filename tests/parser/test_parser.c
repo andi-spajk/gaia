@@ -417,6 +417,10 @@ void test_parse_line(void)
 	buffer = triple;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_line(lexer));
+	const char *bad_label = "LDA X\n";  // parser reads X as the register
+	buffer = bad_label;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_line(lexer));
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
