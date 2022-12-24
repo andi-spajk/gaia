@@ -309,6 +309,7 @@ int16_t apply_masks(struct Lexer *lexer, int16_t curr_field)
 	int has_x = 0;
 	int has_y = 0;
 	int is_indirect = 0;
+	int is_immediate = 0;
 
 	struct Token *curr;
 	for (int i = 0; i < MAX_TOKENS; i++) {
@@ -319,6 +320,8 @@ int16_t apply_masks(struct Lexer *lexer, int16_t curr_field)
 			has_y = 1;
 		else if (curr->type == TOKEN_OPEN_PARENTHESIS)
 			is_indirect = 1;
+		else if (curr->type == TOKEN_IMMEDIATE)
+			is_immediate = 1;
 	}
 
 	if (has_x)
@@ -332,6 +335,11 @@ int16_t apply_masks(struct Lexer *lexer, int16_t curr_field)
 		curr_field &= INDIRECT_FIELD;
 	else
 		curr_field &= NOT_INDIRECT_FIELD;
+
+	if (is_immediate)
+		curr_field &= ADDR_MODE_IMMEDIATE;
+	else
+		curr_field &= ~ADDR_MODE_IMMEDIATE;
 	return curr_field;
 }
 

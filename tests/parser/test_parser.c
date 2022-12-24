@@ -1105,7 +1105,7 @@ void test_apply_masks(void)
 	buffer = lone_instr;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// no need to parse
-	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD;
+	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
 	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
 	// 0x1FFF is 13 bits, which is all we ever use
 
@@ -1132,7 +1132,7 @@ void test_apply_masks(void)
 
 	buffer = zpx;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	expected = X_REGISTER_FIELD & NOT_INDIRECT_FIELD;
+	expected = X_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
 	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = zpx_label;
@@ -1152,7 +1152,7 @@ void test_apply_masks(void)
 
 	buffer = zpy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	expected = Y_REGISTER_FIELD & NOT_INDIRECT_FIELD;
+	expected = Y_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
 	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = zpy_label;
@@ -1172,7 +1172,7 @@ void test_apply_masks(void)
 
 	buffer = ind;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	expected = NOT_REGISTER_FIELD & INDIRECT_FIELD;
+	expected = NOT_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
 	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = ind_label;
@@ -1182,7 +1182,7 @@ void test_apply_masks(void)
 
 	buffer = imm;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD;
+	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD & ADDR_MODE_IMMEDIATE;
 	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = imm_label;
@@ -1192,7 +1192,7 @@ void test_apply_masks(void)
 
 	buffer = indx;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	expected = X_REGISTER_FIELD & INDIRECT_FIELD;
+	expected = X_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
 	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = indx_label;
@@ -1202,7 +1202,7 @@ void test_apply_masks(void)
 
 	buffer = indy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	expected = Y_REGISTER_FIELD & INDIRECT_FIELD;
+	expected = Y_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
 	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = indy_label;
@@ -1225,6 +1225,8 @@ void test_parse_forward_reference_addr_mode(void)
 	TEST_ASSERT_NOT_NULL(instr);
 	int16_t expected = 0;
 	const char *buffer;
+
+	// don't insert any symbols
 
 	buffer = label_branch_forref;
 	expected = ADDR_MODE_RELATIVE & NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD;
@@ -1254,6 +1256,34 @@ void test_parse_forward_reference_addr_mode(void)
 	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
 	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
 	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ABSOLUTE_INDIRECT, instr->addr_bitflag);
+
+	// bad forward refs
+	buffer = "BCC (LABEL)\n";
+	expected = 0;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT16(0, instr->addr_bitflag);
+	buffer = "BVS (LABEL),Y\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT16(0, instr->addr_bitflag);
+	buffer = "JMP #LABEL\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT16(0, instr->addr_bitflag);
+
+	// parse_forward_reference_addr_mode() doesn't recognize JSR with indirect label as
+	// an error
+	// this is due to the limited masks in apply_masks()
+	// therefore this error handling will be redelegated to the code generator
+	// buffer = "JSR (LABEL)\n";
+	// TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	// TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	// TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
+	// TEST_ASSERT_EQUAL_INT16(0, instr->addr_bitflag);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
