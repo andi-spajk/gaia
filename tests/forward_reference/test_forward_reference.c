@@ -60,12 +60,12 @@ void test_create_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(JMP_BITFIELD, ref->instr->addr_bitfield);
 	TEST_ASSERT_EQUAL_INT16(expected, ref->instr->addr_bitflag);
 
-	TEST_ASSERT_EQUAL_STRING("JMP\tL21\t; comment", ref->source_line);
+	TEST_ASSERT_EQUAL_STRING("\t\tJMP\tL21\t; comment", ref->source_line);
 	TEST_ASSERT_EQUAL_STRING("L21", ref->label);
 	destroy_forward_ref(ref);
 
 	// BNE LABEL1
-	buffer = "             BNE LABEL1 \n";
+	buffer = "             BNE LABEL1 \t\t\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	pc = 0x3;
@@ -89,7 +89,7 @@ void test_create_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(BNE_BITFIELD, ref->instr->addr_bitfield);
 	TEST_ASSERT_EQUAL_INT16(expected, ref->instr->addr_bitflag);
 
-	TEST_ASSERT_EQUAL_STRING("BNE LABEL1", ref->source_line);
+	TEST_ASSERT_EQUAL_STRING("             BNE LABEL1", ref->source_line);
 	TEST_ASSERT_EQUAL_STRING("LABEL1", ref->label);
 
 	destroy_forward_ref(ref);
@@ -118,7 +118,7 @@ void test_add_forward_ref(void)
 	const char *buffer;
 
 	// JSR FORREF
-	buffer = "JSR\tFORREF\n";
+	buffer = "\t\tJSR\tFORREF\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	pc = 0x0;
@@ -133,7 +133,7 @@ void test_add_forward_ref(void)
 
 	ref = unresolved->refs[0];
 	TEST_ASSERT_EQUAL_STRING("FORREF", ref->label);
-	TEST_ASSERT_EQUAL_STRING("JSR\tFORREF", ref->source_line);
+	TEST_ASSERT_EQUAL_STRING("\t\tJSR\tFORREF", ref->source_line);
 	TEST_ASSERT_EQUAL_INT(JSR, ref->instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ABSOLUTE, ref->instr->addr_bitflag);
 	TEST_ASSERT_EQUAL_INT(0, ref->pc);
@@ -159,7 +159,7 @@ void test_add_forward_ref(void)
 
 	ref = unresolved->refs[1];
 	TEST_ASSERT_EQUAL_STRING("FORREF2", ref->label);
-	TEST_ASSERT_EQUAL_STRING("BMI        FORREF2", ref->source_line);
+	TEST_ASSERT_EQUAL_STRING("             BMI        FORREF2", ref->source_line);
 	TEST_ASSERT_EQUAL_INT(BMI, ref->instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(ADDR_MODE_RELATIVE, ref->instr->addr_bitflag);
 	TEST_ASSERT_EQUAL_INT(3, ref->pc);

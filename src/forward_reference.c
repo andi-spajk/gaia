@@ -21,7 +21,7 @@ them to the array. Automatically resizes array when full.
 /* init_unresolved()
 	@return         ptr to new Unresolved struct, or NULL if fail
 
-	Dynamically allocate a ForwardRef struct and initialize its array of
+	Dynamically allocate an Unresolved struct and initialize its array of
 	ForwardRef elements.
 */
 struct Unresolved *init_unresolved(void)
@@ -91,6 +91,8 @@ void destroy_unresolved(struct Unresolved *unresolved)
 
 	Dynamically allocates a ForwardRef and stores the necessary information
 	for resolution and assembling later.
+
+	The saved source line will have NO trailing whitespace.
 */
 struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
                                       struct Instruction *instr, int pc,
@@ -100,12 +102,10 @@ struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
 	if (!ref)
 		return NULL;
 
-	// save source line without leading/trailing whitespace
 	const char *begin = buffer;
-	// -1 to skip null terminator, -1 to skip newline
+	// save source line without trailing whitespace
+	// -1 to skip null terminator, -1 again to skip newline
 	const char *end = buffer + strlen(buffer) - 2;
-	while (*begin == ' ' || *begin == '\t')
-		begin++;
 	while (*end == ' ' || *end == '\t')
 		end--;
 	size_t line_length = end - begin + 1;
@@ -153,6 +153,9 @@ struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
 struct Unresolved *resize_unresolved(struct Unresolved *unresolved)
 {
 	unresolved->size *= 2;
+	// calloc'ing a whole new array and transfering the old elements is
+	// easier than realloc'ing because I broke myself trying to initialize
+	// the new memory to NULL ptrs
 	struct ForwardRef **new = calloc(unresolved->size,
 	                                 sizeof(struct ForwardRef *));
 	// transfer old forward refs
