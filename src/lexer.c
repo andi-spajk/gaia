@@ -143,7 +143,7 @@ void destroy_lexer(struct Lexer *lexer)
 	length. This is useful because we keep a single, running token to
 	lexically analyze the whole line. At each token, we copy the string of
 	the running token into the string of the lexer token. Since we do not
-	remember the length of the string, this function will figure it out.
+	save the length of the string, this function will figure it out.
 */
 int token_strcpy(struct Token *tk, const char *str)
 {
@@ -169,11 +169,11 @@ int token_strcpy(struct Token *tk, const char *str)
 	be appended.
 
 	This function takes in a known length and copies that many chars from
-	@buffer. This is needed when we call lex_text() because that function
-	copies from buffer to token string (external source to internal), but
-	token_strcpy() copies from token string to token string (all internal).
-	We must extract only the safe chars from external input and convert them
-	to uppercase.
+	@buffer. This is needed during lex_text() because that function calls
+	token_strncpy() to copy from buffer to token string (external source
+	to internal), but token_strcpy() copies from token string to token
+	string (all internal). We must extract only the safe chars from external
+	input and convert them to uppercase.
 */
 int token_strncpy(struct Token *tk, const char *buffer, int length)
 {
@@ -260,6 +260,28 @@ static int dec_digit_to_int(const char c)
 	return ERROR_ILLEGAL_CHAR;
 }
 
+/* is_end_of_token()
+	@c              char to check
+
+	@return         1 if end of token, 0 if not
+
+	Check if a text token's character denotes the end of the token.
+*/
+static int is_end_of_token(const char c)
+{
+	switch (c) {
+	case ' ':
+	case '\t':
+	case '\n':
+	case ',':
+	case '(':
+	case ')':
+	case ';':
+		return 1;
+	}
+	return 0;
+}
+
 /* lex_literal()
 	@tk             ptr to Token in the lexer sequence
 	@literal           ptr to first char of the literal token
@@ -299,13 +321,22 @@ int lex_literal(struct Token *tk, const char *literal)
 
 	// analyze all the digits and convert to actual value
 	unsigned long long total = 0;
-	int char_value = (*converter_func)(*curr);
-	while (curr && char_value != ERROR_ILLEGAL_CHAR) {
-		total *= base;
-		total += char_value;
-		num_chars++;
-		curr++;
+	int char_value;
+	while (*curr) {
 		char_value = (*converter_func)(*curr);
+		if (char_value != ERROR_ILLEGAL_CHAR) {
+			total *= base;
+			total += char_value;
+			num_chars++;
+			curr++;
+		} else if (!is_end_of_token(*curr)) {
+			// illegal char but not the end of token
+			// so it's a char that's incompatible with the base
+			return ERROR_ILLEGAL_CHAR;
+		} else {
+			// illegal and end of token
+			break;
+		}
 	}
 
 	// no valid chars were found
@@ -342,28 +373,6 @@ int lex_instruction(struct Token *tk, struct Instruction *instr)
 		return strlen(tk->str);
 	}
 	return ERROR_INSTRUCTION_NOT_FOUND;
-}
-
-/* is_end_of_token()
-	@c              char to check
-
-	@return         1 if end of token, 0 if not
-
-	Check if a text token's character denotes the end of the token.
-*/
-static int is_end_of_token(const char c)
-{
-	switch (c) {
-	case ' ':
-	case '\t':
-	case '\n':
-	case ',':
-	case '(':
-	case ')':
-	case ';':
-		return 1;
-	}
-	return 0;
 }
 
 /* is_valid_token_char()
@@ -450,18 +459,23 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 	switch (c) {
 	case '#':
 		tk->type = TOKEN_IMMEDIATE;
+		token_strncpy(tk, "#", 1);
 		return 1;
 	case '(':
 		tk->type = TOKEN_OPEN_PARENTHESIS;
+		token_strncpy(tk, "(", 1);
 		return 1;
 	case ')':
 		tk->type = TOKEN_CLOSE_PARENTHESIS;
+		token_strncpy(tk, ")", 1);
 		return 1;
 	case ',':
 		tk->type = TOKEN_COMMA;
+		token_strncpy(tk, ",", 1);
 		return 1;
 	case '=':
 		tk->type = TOKEN_EQUAL_SIGN;
+		token_strncpy(tk, "=", 1);
 		return 1;
 	}
 

@@ -36,6 +36,7 @@ struct Lexer {
 
 struct Token *init_token(void);
 int token_strcpy(struct Token *tk, const char *str);
+int token_strncpy(struct Token *tk, const char *buffer, int length);
 struct Lexer *init_lexer(void);
 void reset_lexer(struct Lexer *lexer);
 
