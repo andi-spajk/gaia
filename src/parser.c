@@ -10,6 +10,7 @@ instructions with incompatible addressing modes. Other errors include redefining
 label constants, missing label declarations, or illegal forward references.
 
 See parser.h for full diagram of valid token sequences.
+
 */
 
 #include <stddef.h>

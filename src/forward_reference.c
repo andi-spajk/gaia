@@ -5,6 +5,7 @@ for later processing.
 
 Initialize and destroy forward reference array, create forref objects, and add
 them to the array. Automatically resizes array when full.
+
 */
 
 #include <stdlib.h>
@@ -108,15 +109,15 @@ struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
 	const char *end = buffer + strlen(buffer) - 2;
 	while (*end == ' ' || *end == '\t')
 		end--;
-	size_t line_length = end - begin + 1;
+	size_t num_chars = end - begin + 1;
 
-	ref->source_line = calloc(line_length + 1, sizeof(char));
+	ref->source_line = calloc(num_chars + 1, sizeof(char));
 	if (!ref->source_line)
 		return NULL;
 	// keep the comments in, no one cares
-	strncpy(ref->source_line, begin, line_length);
+	strncpy(ref->source_line, begin, num_chars);
 
-	// find label operand (from parser.c)
+	// find label operand (function from parser.c)
 	struct Token *operand = find_operand(lexer);
 	// copy label string into forward ref's label
 	size_t label_length = strlen(operand->str) + 1;
@@ -145,30 +146,23 @@ struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
 /* resize_unresolved()
 	@unresolved     ptr to Unresolved struct
 
-	@return         ptr to resized struct, or NULL if fail
+	@return         ptr to Unresolved, or NULL if fail
 
 	Dynamically reallocate the memory of an array of forward references in
 	an Unresolved struct.
 */
 struct Unresolved *resize_unresolved(struct Unresolved *unresolved)
 {
-	unresolved->size *= 2;
-	// calloc'ing a whole new array and transfering the old elements is
-	// easier than realloc'ing because I broke myself trying to initialize
-	// the new memory to NULL ptrs
-	struct ForwardRef **new = calloc(unresolved->size,
-	                                 sizeof(struct ForwardRef *));
-	// transfer old forward refs
-	for (int i = 0; i < unresolved->size / 2; i++) {
-		if (unresolved->refs[i])
-			new[i] = unresolved->refs[i];
-	}
-	// initialize new refs
-	for (int j = unresolved->size / 2; j < unresolved->size; j++)
-		new[j] = NULL;
+	size_t new_size = 2 * unresolved->size * sizeof(struct ForwardRef *);
+	unresolved->refs = realloc(unresolved->refs, new_size);
+	if (!unresolved->refs)
+		return NULL;
 
-	free(unresolved->refs);
-	unresolved->refs = new;
+	// initialize new forward refs
+	unresolved->size *= 2;
+	for (int i = unresolved->size / 2; i < unresolved->size; i++)
+		unresolved->refs[i] = NULL;
+
 	return unresolved;
 }
 

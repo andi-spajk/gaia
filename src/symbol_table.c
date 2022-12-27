@@ -9,6 +9,7 @@ to delete symbol -- assembler doesn't need it.
 This implementation uses djb2 hashing and linear probing. The starting size is
 17 symbols. Resizing occurs with a load factor of 0.5. The new size is the next
 prime number that is greater than double the previous size.
+
 */
 
 #include <stdlib.h>
