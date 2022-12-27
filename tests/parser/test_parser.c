@@ -689,9 +689,24 @@ void test_parse_label_operand(void)
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_operand(find_operand(lexer), instr, symtab));
 
+	// test case-insensitivity
+	buffer = "ADC constant8\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_operand(find_operand(lexer), instr, symtab));
+
+	buffer = "STX constant16\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_operand(find_operand(lexer), instr, symtab));
+
+	buffer = "\t\tSTY\taddress\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_operand(find_operand(lexer), instr, symtab));
 /*
 ;--------------------------------------
-; example program for testing
+; example program for parsing forward refs and branch/jumps
 
 pc      LABEL1                                  ; 0 bytes
 0                       INX                     ; 1 byte, 1 total byte
@@ -1334,6 +1349,24 @@ void test_parse_addr_mode(void)
 	// exhaustive_lines.h has exhaustive token sequences
 	// BUT NOT exhaustive addressing modes (missing accumulator)
 	buffer = "\t\tASL\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
+
+	buffer = "\t\tLSR\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
+
+	buffer = "\t\tROL\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand_status = parse_operand(lexer, instr, symtab);
+	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
+
+	buffer = "\t\tROR\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
