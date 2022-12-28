@@ -16,3 +16,4 @@ tests/assemble/test_assemble
 tests/assemble/gen/assemble.c
 tests/assemble/gen/assemble.h
 tests/generator/test_generator
+tests/generator/a.out
