@@ -65,6 +65,11 @@ L19             LDA     (CONSTANT8,X)
 L20             STA     ($FF),Y
 L21             SBC     (CONSTANT8),Y
 */
+
+// no accumulator instructions because they are lexically identical to implied
+// addressing modes.
+// and only parse_addr_mode() cares about the distinction
+
 const char *constant_addr =     "ADDRESS\t\t=\t$ABCD\n";
 const char *constant_8bit =     "CONSTANT8\t=\t$7F\n";
 const char *constant_16bit =    "CONSTANT16\t=\t$1111\n";

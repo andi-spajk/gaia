@@ -1,6 +1,6 @@
 /** parser.c
 
-Parser for the assembler. Analyzer a sequence of tokens prepared by the lexer
+Parser for the assembler. Analyze a sequence of tokens prepared by the lexer
 to locate syntax errors. Label declarations are inserted into the symbol
 table, and forward references and saved. Addresing modes and opcodes are also
 determined and saved into the Instruction struct.
