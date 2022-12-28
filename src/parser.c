@@ -14,7 +14,6 @@ See parser.h for full diagram of valid token sequences.
 */
 
 #include <stddef.h>
-#include <stdint.h>
 
 #include "addressing_modes.h"
 #include "error.h"
@@ -305,7 +304,7 @@ int parse_operand(struct Lexer *lexer, struct Instruction *instr,
 	This function will only work partway. The functions below this one will
 	finalize the true result bitfield.
 */
-int16_t apply_masks(struct Lexer *lexer, int16_t curr_field)
+int apply_masks(struct Lexer *lexer, int curr_field)
 {
 	int has_x = 0;
 	int has_y = 0;
@@ -355,10 +354,10 @@ int16_t apply_masks(struct Lexer *lexer, int16_t curr_field)
 	we try to resolve the label later. Save info now because we do not save
 	all the source lines so we must preserve that info.
 */
-int16_t parse_forward_reference_addr_mode(struct Lexer *lexer,
+int parse_forward_reference_addr_mode(struct Lexer *lexer,
                                           struct Instruction *instr)
 {
-	int16_t addr_mode = 0x1FFF;
+	int addr_mode = 0x1FFF;
 	addr_mode = apply_masks(lexer, addr_mode);
 
 	if (is_branch(instr->mnemonic)) {
@@ -383,7 +382,7 @@ int16_t parse_forward_reference_addr_mode(struct Lexer *lexer,
 	Any invalid sequences will have incompatible bit masks and an
 	instruction bitfield that zero each other out.
 */
-int16_t parse_addr_mode(int operand_status, struct Lexer *lexer,
+int parse_addr_mode(int operand_status, struct Lexer *lexer,
                         struct Instruction *instr)
 {
 	if (operand_status == BRANCH_FORWARD_REFERENCE ||
@@ -403,7 +402,7 @@ int16_t parse_addr_mode(int operand_status, struct Lexer *lexer,
 		}
 	}
 
-	int16_t addr_mode = 0x1FFF;
+	int addr_mode = 0x1FFF;
 	if (operand->value > 0xFF) {
 		addr_mode = ABSOLUTE_FIELD;
 	} else {

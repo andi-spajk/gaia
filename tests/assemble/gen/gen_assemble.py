@@ -65,7 +65,8 @@ with open("../../../opcodes/6502ops.csv") as f:
 
 def gen_functions():
     for instr,pairs in bitfields.items():
-        print(f"int assemble_{instr:s}(int16_t bitflag)")
+        # print(f"int assemble_{instr:s}(int16_t bitflag)")
+        print(f"int assemble_{instr:s}(int bitflag)")
         print("{")
         print("\tswitch (bitflag) {")
         for pair in pairs:
@@ -105,8 +106,9 @@ def gen_functions():
 
 def gen_headers():
     for instr,pairs in bitfields.items():
-        print(f"int assemble_{instr:s}(int16_t bitflag);")
+        # print(f"int assemble_{instr:s}(int16_t bitflag);")
+        print(f"int assemble_{instr:s}(int bitflag);")
 
 if __name__ == "__main__":
-    gen_functions()
-    # gen_headers()
+    # gen_functions()
+    gen_headers()

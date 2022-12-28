@@ -14,4 +14,5 @@ tests/forward_reference/test_forward_reference
 tests/error/test_error
 tests/assemble/test_assemble
 tests/assemble/gen/assemble.c
+tests/assemble/gen/assemble.h
 tests/generator/test_generator

@@ -1,8 +1,6 @@
 #ifndef OPCODE_H
 #define OPCODE_H
 
-#include <stdint.h>
-
 enum Mnemonic {
 	ADC, AND, ASL, BCC, BCS, BEQ, BIT, BMI,
 	BNE, BPL, BRK, BVC, BVS, CLC, CLD, CLI,
@@ -18,8 +16,8 @@ enum Mnemonic {
 
 struct Instruction {
 	enum Mnemonic mnemonic;
-	int16_t addr_bitfield;
-	int16_t addr_bitflag;
+	int addr_bitfield;
+	int addr_bitflag;
 	int opcode;
 };
 
@@ -29,7 +27,7 @@ void destroy_instruction(struct Instruction *instr);
 int is_branch(const enum Mnemonic mnemonic);
 int is_jump(const enum Mnemonic mnemonic);
 enum Mnemonic str_to_mnemonic(const char *str);
-int16_t get_addr_bitfield(const enum Mnemonic mnemonic);
+int get_addr_bitfield(const enum Mnemonic mnemonic);
 int get_opcode(struct Instruction *instr);
 
 #endif

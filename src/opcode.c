@@ -5,7 +5,6 @@ retrieve opcodes, addressing bit flags/fields, and mnemonics.
 
 */
 
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -176,7 +175,7 @@ enum Mnemonic str_to_mnemonic(const char *str)
 	Determines a mnemonic's corresponding bitfield which represents the
 	valid addressing modes of that mnemonic
 */
-int16_t get_addr_bitfield(const enum Mnemonic mnemonic)
+int get_addr_bitfield(const enum Mnemonic mnemonic)
 {
 	switch (mnemonic) {
 	case ADC: return ADC_BITFIELD;

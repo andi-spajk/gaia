@@ -1,5 +1,3 @@
-#include <stdint.h>
-
 #include "../../unity/unity.h"
 #include "addressing_modes.h"
 #include "error.h"
@@ -1122,116 +1120,116 @@ void test_apply_masks(void)
 	TEST_ASSERT_NOT_NULL(tk);
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
-	int16_t expected = 0;
+	int expected = 0;
 	const char *buffer;
 
 	buffer = imp;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// no need to parse
 	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 	// 0x1FFF is 13 bits, which is all we ever use
 
 	buffer = zp;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected value is the same for these tests
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = zp_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = absolute;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = abs_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = zpx;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	expected = X_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = zpx_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = absx;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = absx_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = zpy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	expected = Y_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = zpy_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = absy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = absy_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = ind;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	expected = NOT_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = ind_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = imm;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD & ADDR_MODE_IMMEDIATE;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = imm_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = indx;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	expected = X_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = indx_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = indy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	expected = Y_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	buffer = indy_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// expected = ;
-	TEST_ASSERT_EQUAL_INT16(expected, apply_masks(lexer, 0x1FFF));
+	TEST_ASSERT_EQUAL_INT(expected, apply_masks(lexer, 0x1FFF));
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -1246,7 +1244,7 @@ void test_parse_forward_reference_addr_mode(void)
 	TEST_ASSERT_NOT_NULL(tk);
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
-	int16_t expected = 0;
+	int expected = 0;
 	const char *buffer;
 
 	// don't insert any symbols
@@ -1254,49 +1252,49 @@ void test_parse_forward_reference_addr_mode(void)
 	buffer = label_branch_forref;
 	expected = ADDR_MODE_RELATIVE & NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
-	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_RELATIVE, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_RELATIVE, instr->addr_bitflag);
 
 	buffer = label_jump_forref;
 	expected = ABSOLUTE_FIELD & NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
-	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ABSOLUTE, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ABSOLUTE, instr->addr_bitflag);
 
 	buffer = ind_forref;
 	expected = ABSOLUTE_FIELD & INDIRECT_FIELD & NOT_REGISTER_FIELD;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
-	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_INDIRECT, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_INDIRECT, instr->addr_bitflag);
 
 	buffer = label_ind_forref;
 	// same expected masks
 	// expected = ;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
-	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_INDIRECT, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_INDIRECT, instr->addr_bitflag);
 
 	// bad forward refs
 	buffer = "BCC (LABEL)\n";
 	expected = 0;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
-	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
-	TEST_ASSERT_EQUAL_INT16(0, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 	buffer = "BVS (LABEL),Y\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
-	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
-	TEST_ASSERT_EQUAL_INT16(0, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 	buffer = "JMP #LABEL\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
-	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
-	TEST_ASSERT_EQUAL_INT16(0, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 
 	// parse_forward_reference_addr_mode() doesn't recognize JSR with indirect label as
 	// an error
@@ -1304,9 +1302,9 @@ void test_parse_forward_reference_addr_mode(void)
 	// therefore this error handling will be redelegated to the code generator
 	// buffer = "JSR (LABEL)\n";
 	// TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	// TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
-	// TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
-	// TEST_ASSERT_EQUAL_INT16(0, instr->addr_bitflag);
+	// TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	// TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
+	// TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -1348,7 +1346,7 @@ void test_parse_addr_mode(void)
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_IMPLIED, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_IMPLIED, parse_addr_mode(operand_status, lexer, instr));
 
 	// exhaustive_lines.h has exhaustive token sequences
 	// BUT NOT exhaustive addressing modes (missing accumulator)
@@ -1356,157 +1354,157 @@ void test_parse_addr_mode(void)
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = "\t\tLSR\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = "\t\tROL\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = "\t\tROR\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ACCUMULATOR, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = zp;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ZERO_PAGE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ZERO_PAGE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = zp_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ZERO_PAGE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ZERO_PAGE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = absolute;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ABSOLUTE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ABSOLUTE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = abs_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ABSOLUTE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ABSOLUTE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = zpx;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ZERO_PAGE_X, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ZERO_PAGE_X, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = zpx_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ZERO_PAGE_X, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ZERO_PAGE_X, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = absx;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ABSOLUTE_X, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ABSOLUTE_X, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = absx_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ABSOLUTE_X, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ABSOLUTE_X, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = zpy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ZERO_PAGE_Y, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ZERO_PAGE_Y, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = zpy_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ZERO_PAGE_Y, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ZERO_PAGE_Y, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = absy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ABSOLUTE_Y, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ABSOLUTE_Y, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = absy_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ABSOLUTE_Y, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ABSOLUTE_Y, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = ind;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_INDIRECT, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_INDIRECT, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = ind_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_INDIRECT, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_INDIRECT, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = imm;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_IMMEDIATE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_IMMEDIATE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = imm_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_IMMEDIATE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_IMMEDIATE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = indx;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_X_INDEXED_INDIRECT, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_X_INDEXED_INDIRECT, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = indx_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_X_INDEXED_INDIRECT, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_X_INDEXED_INDIRECT, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = indy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_INDIRECT_Y_INDEXED, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_INDIRECT_Y_INDEXED, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = indy_label;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_INDIRECT_Y_INDEXED, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_INDIRECT_Y_INDEXED, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = branch;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_RELATIVE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_RELATIVE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = branch_forref;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
 	// no need to check results of parse_forward_reference_addr_mode()
 	// we already tested that exhaustively
 
@@ -1514,13 +1512,13 @@ void test_parse_addr_mode(void)
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ABSOLUTE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ABSOLUTE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = jump_forref;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = label_branch;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
@@ -1528,86 +1526,86 @@ void test_parse_addr_mode(void)
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0));
 	// actual pc value doesn't matter for these tests
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_RELATIVE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_RELATIVE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = label_branch_forref;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = label_jump;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(ADDR_MODE_ABSOLUTE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_ABSOLUTE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = label_jump_forref;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = ind_forref;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = label_ind_forref;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
 
 	// bad branches
 	buffer = "BCC (ADDRESS)\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = "BCS (CONSTANT8,X)\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = "BVS (CONSTANT16),Y\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(operand_status, lexer, instr));
 
 	// bad immediateS
 	buffer = "JMP\t#000\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = "BMI #CONSTANT16\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(operand_status, lexer, instr));
 
 	// bad jumps
 	buffer = "\tJMP    (LABEL1),Y\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(operand_status, lexer, instr));
 
 	buffer = "\t\tJSR\t(ADDRESS,X)\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand_status = parse_operand(lexer, instr, symtab);
-	TEST_ASSERT_EQUAL_INT16(0, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(operand_status, lexer, instr));
 
 	destroy_lexer(lexer);
 	destroy_token(tk);

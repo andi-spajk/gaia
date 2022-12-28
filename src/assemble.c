@@ -8,12 +8,10 @@ Auto-generated with /tests/assemble/gen/gen_assemble.py
 
 */
 
-#include <stdint.h>
-
 #include "addressing_modes.h"
 #include "error.h"
 
-int assemble_ADC(int16_t bitflag)
+int assemble_ADC(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0x69;
@@ -28,7 +26,7 @@ int assemble_ADC(int16_t bitflag)
 	}
 }
 
-int assemble_AND(int16_t bitflag)
+int assemble_AND(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0x29;
@@ -43,7 +41,7 @@ int assemble_AND(int16_t bitflag)
 	}
 }
 
-int assemble_ASL(int16_t bitflag)
+int assemble_ASL(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ACCUMULATOR: return 0xa;
@@ -55,7 +53,7 @@ int assemble_ASL(int16_t bitflag)
 	}
 }
 
-int assemble_BCC(int16_t bitflag)
+int assemble_BCC(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_RELATIVE: return 0x90;
@@ -63,7 +61,7 @@ int assemble_BCC(int16_t bitflag)
 	}
 }
 
-int assemble_BCS(int16_t bitflag)
+int assemble_BCS(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_RELATIVE: return 0xb0;
@@ -71,7 +69,7 @@ int assemble_BCS(int16_t bitflag)
 	}
 }
 
-int assemble_BEQ(int16_t bitflag)
+int assemble_BEQ(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_RELATIVE: return 0xf0;
@@ -79,7 +77,7 @@ int assemble_BEQ(int16_t bitflag)
 	}
 }
 
-int assemble_BIT(int16_t bitflag)
+int assemble_BIT(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ZERO_PAGE: return 0x24;
@@ -88,7 +86,7 @@ int assemble_BIT(int16_t bitflag)
 	}
 }
 
-int assemble_BMI(int16_t bitflag)
+int assemble_BMI(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_RELATIVE: return 0x30;
@@ -96,7 +94,7 @@ int assemble_BMI(int16_t bitflag)
 	}
 }
 
-int assemble_BNE(int16_t bitflag)
+int assemble_BNE(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_RELATIVE: return 0xd0;
@@ -104,7 +102,7 @@ int assemble_BNE(int16_t bitflag)
 	}
 }
 
-int assemble_BPL(int16_t bitflag)
+int assemble_BPL(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_RELATIVE: return 0x10;
@@ -112,7 +110,7 @@ int assemble_BPL(int16_t bitflag)
 	}
 }
 
-int assemble_BRK(int16_t bitflag)
+int assemble_BRK(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x0;
@@ -120,7 +118,7 @@ int assemble_BRK(int16_t bitflag)
 	}
 }
 
-int assemble_BVC(int16_t bitflag)
+int assemble_BVC(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_RELATIVE: return 0x50;
@@ -128,7 +126,7 @@ int assemble_BVC(int16_t bitflag)
 	}
 }
 
-int assemble_BVS(int16_t bitflag)
+int assemble_BVS(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_RELATIVE: return 0x70;
@@ -136,7 +134,7 @@ int assemble_BVS(int16_t bitflag)
 	}
 }
 
-int assemble_CLC(int16_t bitflag)
+int assemble_CLC(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x18;
@@ -144,7 +142,7 @@ int assemble_CLC(int16_t bitflag)
 	}
 }
 
-int assemble_CLD(int16_t bitflag)
+int assemble_CLD(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0xd8;
@@ -152,7 +150,7 @@ int assemble_CLD(int16_t bitflag)
 	}
 }
 
-int assemble_CLI(int16_t bitflag)
+int assemble_CLI(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x58;
@@ -160,7 +158,7 @@ int assemble_CLI(int16_t bitflag)
 	}
 }
 
-int assemble_CLV(int16_t bitflag)
+int assemble_CLV(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0xb8;
@@ -168,7 +166,7 @@ int assemble_CLV(int16_t bitflag)
 	}
 }
 
-int assemble_CMP(int16_t bitflag)
+int assemble_CMP(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0xc9;
@@ -183,7 +181,7 @@ int assemble_CMP(int16_t bitflag)
 	}
 }
 
-int assemble_CPX(int16_t bitflag)
+int assemble_CPX(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0xe0;
@@ -193,7 +191,7 @@ int assemble_CPX(int16_t bitflag)
 	}
 }
 
-int assemble_CPY(int16_t bitflag)
+int assemble_CPY(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0xc0;
@@ -203,7 +201,7 @@ int assemble_CPY(int16_t bitflag)
 	}
 }
 
-int assemble_DEC(int16_t bitflag)
+int assemble_DEC(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ZERO_PAGE: return 0xc6;
@@ -214,7 +212,7 @@ int assemble_DEC(int16_t bitflag)
 	}
 }
 
-int assemble_DEX(int16_t bitflag)
+int assemble_DEX(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0xca;
@@ -222,7 +220,7 @@ int assemble_DEX(int16_t bitflag)
 	}
 }
 
-int assemble_DEY(int16_t bitflag)
+int assemble_DEY(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x88;
@@ -230,7 +228,7 @@ int assemble_DEY(int16_t bitflag)
 	}
 }
 
-int assemble_EOR(int16_t bitflag)
+int assemble_EOR(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0x49;
@@ -245,7 +243,7 @@ int assemble_EOR(int16_t bitflag)
 	}
 }
 
-int assemble_INC(int16_t bitflag)
+int assemble_INC(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ZERO_PAGE: return 0xe6;
@@ -256,7 +254,7 @@ int assemble_INC(int16_t bitflag)
 	}
 }
 
-int assemble_INX(int16_t bitflag)
+int assemble_INX(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0xe8;
@@ -264,7 +262,7 @@ int assemble_INX(int16_t bitflag)
 	}
 }
 
-int assemble_INY(int16_t bitflag)
+int assemble_INY(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0xc8;
@@ -272,7 +270,7 @@ int assemble_INY(int16_t bitflag)
 	}
 }
 
-int assemble_JMP(int16_t bitflag)
+int assemble_JMP(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ABSOLUTE: return 0x4c;
@@ -281,7 +279,7 @@ int assemble_JMP(int16_t bitflag)
 	}
 }
 
-int assemble_JSR(int16_t bitflag)
+int assemble_JSR(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ABSOLUTE: return 0x20;
@@ -289,7 +287,7 @@ int assemble_JSR(int16_t bitflag)
 	}
 }
 
-int assemble_LDA(int16_t bitflag)
+int assemble_LDA(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0xa9;
@@ -304,7 +302,7 @@ int assemble_LDA(int16_t bitflag)
 	}
 }
 
-int assemble_LDX(int16_t bitflag)
+int assemble_LDX(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0xa2;
@@ -316,7 +314,7 @@ int assemble_LDX(int16_t bitflag)
 	}
 }
 
-int assemble_LDY(int16_t bitflag)
+int assemble_LDY(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0xa0;
@@ -328,7 +326,7 @@ int assemble_LDY(int16_t bitflag)
 	}
 }
 
-int assemble_LSR(int16_t bitflag)
+int assemble_LSR(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ACCUMULATOR: return 0x4a;
@@ -340,7 +338,7 @@ int assemble_LSR(int16_t bitflag)
 	}
 }
 
-int assemble_NOP(int16_t bitflag)
+int assemble_NOP(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0xea;
@@ -348,7 +346,7 @@ int assemble_NOP(int16_t bitflag)
 	}
 }
 
-int assemble_ORA(int16_t bitflag)
+int assemble_ORA(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0x9;
@@ -363,7 +361,7 @@ int assemble_ORA(int16_t bitflag)
 	}
 }
 
-int assemble_PHA(int16_t bitflag)
+int assemble_PHA(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x48;
@@ -371,7 +369,7 @@ int assemble_PHA(int16_t bitflag)
 	}
 }
 
-int assemble_PHP(int16_t bitflag)
+int assemble_PHP(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x8;
@@ -379,7 +377,7 @@ int assemble_PHP(int16_t bitflag)
 	}
 }
 
-int assemble_PLA(int16_t bitflag)
+int assemble_PLA(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x68;
@@ -387,7 +385,7 @@ int assemble_PLA(int16_t bitflag)
 	}
 }
 
-int assemble_PLP(int16_t bitflag)
+int assemble_PLP(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x28;
@@ -395,7 +393,7 @@ int assemble_PLP(int16_t bitflag)
 	}
 }
 
-int assemble_ROL(int16_t bitflag)
+int assemble_ROL(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ACCUMULATOR: return 0x2a;
@@ -407,7 +405,7 @@ int assemble_ROL(int16_t bitflag)
 	}
 }
 
-int assemble_ROR(int16_t bitflag)
+int assemble_ROR(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ACCUMULATOR: return 0x6a;
@@ -419,7 +417,7 @@ int assemble_ROR(int16_t bitflag)
 	}
 }
 
-int assemble_RTI(int16_t bitflag)
+int assemble_RTI(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x40;
@@ -427,7 +425,7 @@ int assemble_RTI(int16_t bitflag)
 	}
 }
 
-int assemble_RTS(int16_t bitflag)
+int assemble_RTS(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x60;
@@ -435,7 +433,7 @@ int assemble_RTS(int16_t bitflag)
 	}
 }
 
-int assemble_SBC(int16_t bitflag)
+int assemble_SBC(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMMEDIATE: return 0xe9;
@@ -450,7 +448,7 @@ int assemble_SBC(int16_t bitflag)
 	}
 }
 
-int assemble_SEC(int16_t bitflag)
+int assemble_SEC(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x38;
@@ -458,7 +456,7 @@ int assemble_SEC(int16_t bitflag)
 	}
 }
 
-int assemble_SED(int16_t bitflag)
+int assemble_SED(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0xf8;
@@ -466,7 +464,7 @@ int assemble_SED(int16_t bitflag)
 	}
 }
 
-int assemble_SEI(int16_t bitflag)
+int assemble_SEI(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x78;
@@ -474,7 +472,7 @@ int assemble_SEI(int16_t bitflag)
 	}
 }
 
-int assemble_STA(int16_t bitflag)
+int assemble_STA(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ZERO_PAGE: return 0x85;
@@ -488,7 +486,7 @@ int assemble_STA(int16_t bitflag)
 	}
 }
 
-int assemble_STX(int16_t bitflag)
+int assemble_STX(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ZERO_PAGE: return 0x86;
@@ -498,7 +496,7 @@ int assemble_STX(int16_t bitflag)
 	}
 }
 
-int assemble_STY(int16_t bitflag)
+int assemble_STY(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ZERO_PAGE: return 0x84;
@@ -508,7 +506,7 @@ int assemble_STY(int16_t bitflag)
 	}
 }
 
-int assemble_TAX(int16_t bitflag)
+int assemble_TAX(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0xaa;
@@ -516,7 +514,7 @@ int assemble_TAX(int16_t bitflag)
 	}
 }
 
-int assemble_TAY(int16_t bitflag)
+int assemble_TAY(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0xa8;
@@ -524,7 +522,7 @@ int assemble_TAY(int16_t bitflag)
 	}
 }
 
-int assemble_TSX(int16_t bitflag)
+int assemble_TSX(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0xba;
@@ -532,7 +530,7 @@ int assemble_TSX(int16_t bitflag)
 	}
 }
 
-int assemble_TXA(int16_t bitflag)
+int assemble_TXA(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x8a;
@@ -540,7 +538,7 @@ int assemble_TXA(int16_t bitflag)
 	}
 }
 
-int assemble_TXS(int16_t bitflag)
+int assemble_TXS(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x9a;
@@ -548,7 +546,7 @@ int assemble_TXS(int16_t bitflag)
 	}
 }
 
-int assemble_TYA(int16_t bitflag)
+int assemble_TYA(int bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_IMPLIED: return 0x98;

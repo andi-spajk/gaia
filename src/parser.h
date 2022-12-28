@@ -36,8 +36,6 @@ LabelTree
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <stdint.h>
-
 #include "lexer.h"
 #include "opcode.h"
 #include "symbol_table.h"
@@ -59,10 +57,10 @@ int parse_label_operand(struct Token *operand, struct Instruction *instr,
 struct Token *find_operand(struct Lexer *lexer);
 int parse_operand(struct Lexer *lexer, struct Instruction *instr,
                   struct SymbolTable *symtab);
-int16_t apply_masks(struct Lexer *lexer, int16_t curr_field);
-int16_t parse_forward_reference_addr_mode(struct Lexer *lexer,
+int apply_masks(struct Lexer *lexer, int curr_field);
+int parse_forward_reference_addr_mode(struct Lexer *lexer,
                                           struct Instruction *instr);
-int16_t parse_addr_mode(int operand_status, struct Lexer *lexer,
+int parse_addr_mode(int operand_status, struct Lexer *lexer,
                         struct Instruction *instr);
 
 #endif
