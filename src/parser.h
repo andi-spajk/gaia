@@ -50,6 +50,7 @@ LabelTree
 int parse_instr_tree(struct Token **seq, int index);
 int parse_label_tree(struct Token **seq, int index);
 int parse_line(struct Lexer *lexer);
+
 int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
                             int pc);
 int parse_label_operand(struct Token *operand, struct Instruction *instr,
@@ -57,10 +58,11 @@ int parse_label_operand(struct Token *operand, struct Instruction *instr,
 struct Token *find_operand(struct Lexer *lexer);
 int parse_operand(struct Lexer *lexer, struct Instruction *instr,
                   struct SymbolTable *symtab);
+
 int apply_masks(struct Lexer *lexer, int curr_field);
 int parse_forward_reference_addr_mode(struct Lexer *lexer,
-                                          struct Instruction *instr);
+                                      struct Instruction *instr);
 int parse_addr_mode(int operand_status, struct Lexer *lexer,
-                        struct Instruction *instr);
+                    struct Instruction *instr);
 
 #endif

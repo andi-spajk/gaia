@@ -53,13 +53,15 @@ void test_generate_code(void)
 	49 DD           EOR     #$DD
 	61 EE           ADC     ($EE,X)
 	D1 FF           CMP     ($FF),Y
+	0A              ASL
 	*/
 	unsigned char expected_rom[] = {
 		0xE8, 0x05, 0xAA, 0xAD, 0x34,
 		0x12, 0xF5, 0xBB, 0xFE, 0x00,
 		0x10, 0x96, 0xCC, 0x99, 0xAD,
 		0xDE, 0x6C, 0xCE, 0xFA, 0x49,
-		0xDD, 0x61, 0xEE, 0xD1, 0xFF
+		0xDD, 0x61, 0xEE, 0xD1, 0xFF,
+		0x0A
 	};
 
 	int pc = 0;
@@ -164,9 +166,18 @@ void test_generate_code(void)
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
 
+	// ASL
+	operand->value = 0x1234;
+	instr->mnemonic = ASL;
+	instr->addr_bitfield = ASL_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ACCUMULATOR;
+	written = generate_code(f, instr, operand, pc);
+	TEST_ASSERT_EQUAL_INT(1, written);
+	pc += written;
+
 	fseek(f, 0, SEEK_SET);
-	// 25 bytes are expected
-	int exp_bytes = 25;
+	// 26 bytes are expected
+	int exp_bytes = 26;
 	unsigned char produced_rom[exp_bytes];
 	TEST_ASSERT_EQUAL_INT(exp_bytes, fread(produced_rom, sizeof(unsigned char), exp_bytes, f));
 

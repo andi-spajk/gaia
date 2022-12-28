@@ -46,13 +46,14 @@ int generate_code(FILE *f, struct Instruction *instr, struct Token *operand,
 	fseek(f, pc, SEEK_SET);
 
 	fputc(opcode, f);
-	if (instr->addr_bitflag != ADDR_MODE_IMPLIED &&
-	    instr->addr_bitflag != ADDR_MODE_ACCUMULATOR) {
+	if (instr->addr_bitflag & ADDR_MODE_IMPLIED ||
+	    instr->addr_bitflag & ADDR_MODE_ACCUMULATOR) {
+		return 1;
+	} else {
 		// little endian
 		fputc(operand_bytes & 0xFF, f);
 		if (operand_bytes >> 8)
 			fputc(operand_bytes >> 8, f);
 		return calc_num_bytes(operand_bytes);
 	}
-	return 1;
 }
