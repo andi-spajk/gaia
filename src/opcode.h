@@ -30,5 +30,6 @@ int is_branch(const enum Mnemonic mnemonic);
 int is_jump(const enum Mnemonic mnemonic);
 enum Mnemonic str_to_mnemonic(const char *str);
 int16_t get_addr_bitfield(const enum Mnemonic mnemonic);
+int get_opcode(struct Instruction *instr);
 
 #endif

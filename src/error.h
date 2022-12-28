@@ -23,6 +23,7 @@
 #define ERROR_LABEL_REDEFINITION        -12
 #define ERROR_ILLEGAL_FORWARD_REFERENCE -13
 #define ERROR_ILLEGAL_ADDRESSING_MODE   -14
+#define ERROR_ILLEGAL_MNEMONIC          -15
 /*
 ;       ;       ;       ;       ;       ;
 */

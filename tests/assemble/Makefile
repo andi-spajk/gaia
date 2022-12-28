@@ -13,7 +13,7 @@ test_assemble: $(DEP)
 	$(CC) $(CFLAGS) $^ $(UNITY) -lm -o test_assemble
 
 $(OBJ)/test_assemble.o: test_assemble.c
-	$(CC) $(CFLAGS) $^ -c
+	$(CC) $(CFLAGS) $< -c
 	mv test_assemble.o $(OBJ)
 
 $(OBJ)/%.o: $(SRC)/%.c $(SRC)/%.h

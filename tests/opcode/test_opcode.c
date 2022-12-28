@@ -1,5 +1,7 @@
 #include "../../unity/unity.h"
 
+#include "addressing_modes.h"
+#include "assemble.h"
 #include "bitfields.h"
 #include "error.h"
 #include "opcode.h"
@@ -151,6 +153,271 @@ void test_get_addr_bitfield(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_BITFIELD_NOT_FOUND, get_addr_bitfield(0xFFFF));
 }
 
+void test_get_opcode(void)
+{
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+
+	// absolute addr mode for EVERYTHING
+	// valid for:
+	// ADC
+	// AND
+	// ASL
+	// BIT
+	// CMP
+	// CPX
+	// CPY
+	// DEC
+	// EOR
+	// INC
+	// JMP
+	// JSR
+	// LDA
+	// LDX
+	// LDY
+	// LSR
+	// ORA
+	// ROL
+	// ROR
+	// SBC
+	// STA
+	// STX
+	// STY
+	instr->mnemonic = ADC;
+	instr->addr_bitfield = ADC_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x6D, get_opcode(instr));
+	instr->mnemonic = AND;
+	instr->addr_bitfield = AND_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x2D, get_opcode(instr));
+	instr->mnemonic = ASL;
+	instr->addr_bitfield = ASL_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x0E, get_opcode(instr));
+	instr->mnemonic = BCC;
+	instr->addr_bitfield = BCC_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = BCS;
+	instr->addr_bitfield = BCS_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = BEQ;
+	instr->addr_bitfield = BEQ_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = BIT;
+	instr->addr_bitfield = BIT_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x2C, get_opcode(instr));
+	instr->mnemonic = BMI;
+	instr->addr_bitfield = BMI_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = BNE;
+	instr->addr_bitfield = BNE_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = BPL;
+	instr->addr_bitfield = BPL_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = BRK;
+	instr->addr_bitfield = BRK_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = BVC;
+	instr->addr_bitfield = BVC_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = BVS;
+	instr->addr_bitfield = BVS_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = CLC;
+	instr->addr_bitfield = CLC_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = CLD;
+	instr->addr_bitfield = CLD_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = CLI;
+	instr->addr_bitfield = CLI_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = CLV;
+	instr->addr_bitfield = CLV_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = CMP;
+	instr->addr_bitfield = CMP_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0xCD, get_opcode(instr));
+	instr->mnemonic = CPX;
+	instr->addr_bitfield = CPX_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0xEC, get_opcode(instr));
+	instr->mnemonic = CPY;
+	instr->addr_bitfield = CPY_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0xCC, get_opcode(instr));
+	instr->mnemonic = DEC;
+	instr->addr_bitfield = DEC_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0xCE, get_opcode(instr));
+	instr->mnemonic = DEX;
+	instr->addr_bitfield = DEX_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = DEY;
+	instr->addr_bitfield = DEY_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = EOR;
+	instr->addr_bitfield = EOR_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x4D, get_opcode(instr));
+	instr->mnemonic = INC;
+	instr->addr_bitfield = INC_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0xEE, get_opcode(instr));
+	instr->mnemonic = INX;
+	instr->addr_bitfield = INX_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = INY;
+	instr->addr_bitfield = INY_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = JMP;
+	instr->addr_bitfield = JMP_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x4C, get_opcode(instr));
+	instr->mnemonic = JSR;
+	instr->addr_bitfield = JSR_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x20, get_opcode(instr));
+	instr->mnemonic = LDA;
+	instr->addr_bitfield = LDA_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0xAD, get_opcode(instr));
+	instr->mnemonic = LDX;
+	instr->addr_bitfield = LDX_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0xAE, get_opcode(instr));
+	instr->mnemonic = LDY;
+	instr->addr_bitfield = LDY_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0xAC, get_opcode(instr));
+	instr->mnemonic = LSR;
+	instr->addr_bitfield = LSR_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x4E, get_opcode(instr));
+	instr->mnemonic = NOP;
+	instr->addr_bitfield = NOP_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = ORA;
+	instr->addr_bitfield = ORA_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x0D, get_opcode(instr));
+	instr->mnemonic = PHA;
+	instr->addr_bitfield = PHA_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = PHP;
+	instr->addr_bitfield = PHP_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = PLA;
+	instr->addr_bitfield = PLA_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = PLP;
+	instr->addr_bitfield = PLP_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = ROL;
+	instr->addr_bitfield = ROL_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x2E, get_opcode(instr));
+	instr->mnemonic = ROR;
+	instr->addr_bitfield = ROR_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x7E, get_opcode(instr));
+	instr->mnemonic = RTI;
+	instr->addr_bitfield = RTI_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = RTS;
+	instr->addr_bitfield = RTS_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = SBC;
+	instr->addr_bitfield = SBC_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0xED, get_opcode(instr));
+	instr->mnemonic = SEC;
+	instr->addr_bitfield = SEC_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = SED;
+	instr->addr_bitfield = SED_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = SEI;
+	instr->addr_bitfield = SEI_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = STA;
+	instr->addr_bitfield = STA_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x8D, get_opcode(instr));
+	instr->mnemonic = STX;
+	instr->addr_bitfield = STX_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x8E, get_opcode(instr));
+	instr->mnemonic = STY;
+	instr->addr_bitfield = STY_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(0x8C, get_opcode(instr));
+	instr->mnemonic = TAX;
+	instr->addr_bitfield = TAX_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = TAY;
+	instr->addr_bitfield = TAY_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = TSX;
+	instr->addr_bitfield = TSX_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = TXA;
+	instr->addr_bitfield = TXA_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = TXS;
+	instr->addr_bitfield = TXS_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+	instr->mnemonic = TYA;
+	instr->addr_bitfield = TYA_BITFIELD;
+	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, get_opcode(instr));
+
+	instr->mnemonic = ILLEGAL_MNEMONIC;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_MNEMONIC, get_opcode(instr));
+	instr->mnemonic = 0xabcdef;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_MNEMONIC, get_opcode(instr));
+	instr->mnemonic = -1;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_MNEMONIC, get_opcode(instr));
+
+	destroy_instruction(instr);
+}
+
 int main(void)
 {
 	UNITY_BEGIN();
@@ -158,6 +425,7 @@ int main(void)
 	RUN_TEST(test_init_destroy_instr);
 	RUN_TEST(test_str_to_mnemonic);
 	RUN_TEST(test_get_addr_bitfield);
+	RUN_TEST(test_get_opcode);
 
 	return UNITY_END();
 }

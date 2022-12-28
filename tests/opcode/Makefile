@@ -6,7 +6,7 @@ SRC = ../../src
 CFLAGS += -I$(SRC)
 
 UNITY = ../../unity/unity.o
-DEP = $(OBJ)/test_opcode.o $(OBJ)/opcode.o
+DEP = $(OBJ)/test_opcode.o $(OBJ)/opcode.o $(OBJ)/assemble.o
 
 test_opcode: $(DEP)
 	$(CC) $(CFLAGS) $^ $(UNITY) -o test_opcode

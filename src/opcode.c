@@ -9,6 +9,7 @@ retrieve opcodes, addressing bit flags/fields, and mnemonics.
 #include <stdlib.h>
 #include <string.h>
 
+#include "assemble.h"
 #include "bitfields.h"
 #include "error.h"
 #include "opcode.h"
@@ -235,5 +236,68 @@ int16_t get_addr_bitfield(const enum Mnemonic mnemonic)
 	case TXS: return TXS_BITFIELD;
 	case TYA: return TYA_BITFIELD;
 	default: return ERROR_BITFIELD_NOT_FOUND;
+	}
+}
+
+int get_opcode(struct Instruction *instr)
+{
+	switch (instr->mnemonic) {
+	case ADC: return assemble_ADC(instr->addr_bitflag);
+	case AND: return assemble_AND(instr->addr_bitflag);
+	case ASL: return assemble_ASL(instr->addr_bitflag);
+	case BCC: return assemble_BCC(instr->addr_bitflag);
+	case BCS: return assemble_BCS(instr->addr_bitflag);
+	case BEQ: return assemble_BEQ(instr->addr_bitflag);
+	case BIT: return assemble_BIT(instr->addr_bitflag);
+	case BMI: return assemble_BMI(instr->addr_bitflag);
+	case BNE: return assemble_BNE(instr->addr_bitflag);
+	case BPL: return assemble_BPL(instr->addr_bitflag);
+	case BRK: return assemble_BRK(instr->addr_bitflag);
+	case BVC: return assemble_BVC(instr->addr_bitflag);
+	case BVS: return assemble_BVS(instr->addr_bitflag);
+	case CLC: return assemble_CLC(instr->addr_bitflag);
+	case CLD: return assemble_CLD(instr->addr_bitflag);
+	case CLI: return assemble_CLI(instr->addr_bitflag);
+	case CLV: return assemble_CLV(instr->addr_bitflag);
+	case CMP: return assemble_CMP(instr->addr_bitflag);
+	case CPX: return assemble_CPX(instr->addr_bitflag);
+	case CPY: return assemble_CPY(instr->addr_bitflag);
+	case DEC: return assemble_DEC(instr->addr_bitflag);
+	case DEX: return assemble_DEX(instr->addr_bitflag);
+	case DEY: return assemble_DEY(instr->addr_bitflag);
+	case EOR: return assemble_EOR(instr->addr_bitflag);
+	case INC: return assemble_INC(instr->addr_bitflag);
+	case INX: return assemble_INX(instr->addr_bitflag);
+	case INY: return assemble_INY(instr->addr_bitflag);
+	case JMP: return assemble_JMP(instr->addr_bitflag);
+	case JSR: return assemble_JSR(instr->addr_bitflag);
+	case LDA: return assemble_LDA(instr->addr_bitflag);
+	case LDX: return assemble_LDX(instr->addr_bitflag);
+	case LDY: return assemble_LDY(instr->addr_bitflag);
+	case LSR: return assemble_LSR(instr->addr_bitflag);
+	case NOP: return assemble_NOP(instr->addr_bitflag);
+	case ORA: return assemble_ORA(instr->addr_bitflag);
+	case PHA: return assemble_PHA(instr->addr_bitflag);
+	case PHP: return assemble_PHP(instr->addr_bitflag);
+	case PLA: return assemble_PLA(instr->addr_bitflag);
+	case PLP: return assemble_PLP(instr->addr_bitflag);
+	case ROL: return assemble_ROL(instr->addr_bitflag);
+	case ROR: return assemble_ROR(instr->addr_bitflag);
+	case RTI: return assemble_RTI(instr->addr_bitflag);
+	case RTS: return assemble_RTS(instr->addr_bitflag);
+	case SBC: return assemble_SBC(instr->addr_bitflag);
+	case SEC: return assemble_SEC(instr->addr_bitflag);
+	case SED: return assemble_SED(instr->addr_bitflag);
+	case SEI: return assemble_SEI(instr->addr_bitflag);
+	case STA: return assemble_STA(instr->addr_bitflag);
+	case STX: return assemble_STX(instr->addr_bitflag);
+	case STY: return assemble_STY(instr->addr_bitflag);
+	case TAX: return assemble_TAX(instr->addr_bitflag);
+	case TAY: return assemble_TAY(instr->addr_bitflag);
+	case TSX: return assemble_TSX(instr->addr_bitflag);
+	case TXA: return assemble_TXA(instr->addr_bitflag);
+	case TXS: return assemble_TXS(instr->addr_bitflag);
+	case TYA: return assemble_TYA(instr->addr_bitflag);
+	default: return ERROR_ILLEGAL_MNEMONIC;
 	}
 }
