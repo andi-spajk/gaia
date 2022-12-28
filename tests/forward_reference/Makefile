@@ -8,7 +8,7 @@ CFLAGS += -I$(SRC)
 UNITY = ../../unity/unity.o
 DEP = $(OBJ)/test_forward_reference.o $(OBJ)/forward_reference.o \
       $(OBJ)/opcode.o $(OBJ)/lexer.o $(OBJ)/parser.o \
-      $(OBJ)/symbol_table.o $(OBJ)/prime.o
+      $(OBJ)/symbol_table.o $(OBJ)/prime.o $(OBJ)/assemble.o
 
 test_forward_reference: $(DEP)
 	$(CC) $(CFLAGS) $^ $(UNITY) -lm -o test_forward_reference

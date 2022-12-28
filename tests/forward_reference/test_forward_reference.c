@@ -45,9 +45,9 @@ void test_create_forward_ref(void)
 	operand_status = parse_operand(lexer, instr, symtab);
 	TEST_ASSERT_EQUAL_INT(operand_status, JUMP_FORWARD_REFERENCE);
 
-	int16_t expected = NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD & ABSOLUTE_FIELD;
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
-	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
+	int expected = NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD & ABSOLUTE_FIELD;
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
 
 	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
 	TEST_ASSERT_NOT_NULL(ref);
@@ -58,7 +58,7 @@ void test_create_forward_ref(void)
 
 	TEST_ASSERT_EQUAL_INT(JMP, ref->instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(JMP_BITFIELD, ref->instr->addr_bitfield);
-	TEST_ASSERT_EQUAL_INT16(expected, ref->instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(expected, ref->instr->addr_bitflag);
 
 	TEST_ASSERT_EQUAL_STRING("\t\tJMP\tL21\t; comment", ref->source_line);
 	TEST_ASSERT_EQUAL_STRING("L21", ref->label);
@@ -75,8 +75,8 @@ void test_create_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(operand_status, BRANCH_FORWARD_REFERENCE);
 
 	expected = NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD & ADDR_MODE_RELATIVE;
-	TEST_ASSERT_EQUAL_INT16(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
-	TEST_ASSERT_EQUAL_INT16(expected, instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
 
 	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
 	TEST_ASSERT_NOT_NULL(ref);
@@ -87,7 +87,7 @@ void test_create_forward_ref(void)
 
 	TEST_ASSERT_EQUAL_INT(BNE, ref->instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(BNE_BITFIELD, ref->instr->addr_bitfield);
-	TEST_ASSERT_EQUAL_INT16(expected, ref->instr->addr_bitflag);
+	TEST_ASSERT_EQUAL_INT(expected, ref->instr->addr_bitflag);
 
 	TEST_ASSERT_EQUAL_STRING("             BNE LABEL1", ref->source_line);
 	TEST_ASSERT_EQUAL_STRING("LABEL1", ref->label);

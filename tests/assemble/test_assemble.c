@@ -34,7 +34,7 @@ void test_assembly(void)
 	int operand_status = parse_operand(lexer, instr, symtab);
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, operand_status);
 
-	int16_t addr_mask = parse_addr_mode(operand_status, lexer, instr);
+	int addr_mask = parse_addr_mode(operand_status, lexer, instr);
 	TEST_ASSERT_EQUAL_INT(ADDR_MODE_INDIRECT_Y_INDEXED, addr_mask);
 
 	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
