@@ -14,8 +14,8 @@ int assemble_ADC(int16_t bitflag)
 \tcase ADDR_MODE_ABSOLUTE: return 0x6D;
 \tcase ADDR_MODE_ABSOLUTE_X: return 0x7D;
 \tcase ADDR_MODE_ABSOLUTE_Y: return 0x79;
-\tcase ADDR_MODE_X_INDEX_INDIRECT: return 0x61;
-\tcase ADDR_MODE_INDIRECT_Y_INDEX: return 0x71;
+\tcase ADDR_MODE_X_INDEXED_INDIRECT: return 0x61;
+\tcase ADDR_MODE_INDIRECT_Y_INDEXED: return 0x71;
 \tdefault: return ERROR_ILLEGAL_ADDRESSING_MODE
 \t}
 }
@@ -85,11 +85,11 @@ def gen_functions():
             elif (addr_mode == "IMP"):
                 print(f"ADDR_MODE_IMPLIED: return 0x{opcode:x};")
             elif (addr_mode == "IND"):
-                print(f"ADDR_MODE_ABSOLUTE_INDIRECT: return 0x{opcode:x};")
+                print(f"ADDR_MODE_INDIRECT: return 0x{opcode:x};")
             elif (addr_mode == "INDX"):
-                print(f"ADDR_MODE_X_INDEX_INDIRECT: return 0x{opcode:x};")
+                print(f"ADDR_MODE_X_INDEXED_INDIRECT: return 0x{opcode:x};")
             elif (addr_mode == "INDY"):
-                print(f"ADDR_MODE_INDIRECT_Y_INDEX: return 0x{opcode:x};")
+                print(f"ADDR_MODE_INDIRECT_Y_INDEXED: return 0x{opcode:x};")
             elif (addr_mode == "REL"):
                 print(f"ADDR_MODE_RELATIVE: return 0x{opcode:x};")
             elif (addr_mode == "ZP"):

@@ -7,7 +7,7 @@ CFLAGS += -I$(SRC)
 
 UNITY = ../../unity/unity.o
 DEP = $(OBJ)/test_parser.o $(OBJ)/parser.o $(OBJ)/lexer.o $(OBJ)/opcode.o \
-      $(OBJ)/symbol_table.o $(OBJ)/prime.o
+      $(OBJ)/symbol_table.o $(OBJ)/prime.o $(OBJ)/assemble.o
 
 test_parser: $(DEP)
 	$(CC) $(CFLAGS) $^ $(UNITY) -lm -o test_parser

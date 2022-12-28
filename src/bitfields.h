@@ -4,7 +4,7 @@
 // Credit to the reference site:
 // https://www.masswerk.at/6502/6502_instruction_set.html
 
-// Auto-generated using /tests/opcode/gen/gen_bitfield.py
+// Auto-generated with /tests/opcode/gen/gen_bitfield.py
 #define ADC_BITFIELD 0b0010111011110
 #define AND_BITFIELD 0b0010111011110
 #define ASL_BITFIELD 0b1000110000110

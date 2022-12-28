@@ -4,7 +4,7 @@ Assemble the opcode for each mnemonic, given an Instruction bitflag. An error
 code is returned if the bitflag does not denote any valid addressing mode, ie
 the instruction and the addressing mode were not compatible.
 
-Auto-generated with tests/assemble/gen/gen_assemble.py
+Auto-generated with /tests/assemble/gen/gen_assemble.py
 
 */
 
@@ -22,8 +22,8 @@ int assemble_ADC(int16_t bitflag)
 	case ADDR_MODE_ABSOLUTE: return 0x6d;
 	case ADDR_MODE_ABSOLUTE_X: return 0x7d;
 	case ADDR_MODE_ABSOLUTE_Y: return 0x79;
-	case ADDR_MODE_X_INDEX_INDIRECT: return 0x61;
-	case ADDR_MODE_INDIRECT_Y_INDEX: return 0x71;
+	case ADDR_MODE_X_INDEXED_INDIRECT: return 0x61;
+	case ADDR_MODE_INDIRECT_Y_INDEXED: return 0x71;
 	default: return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 }
@@ -37,8 +37,8 @@ int assemble_AND(int16_t bitflag)
 	case ADDR_MODE_ABSOLUTE: return 0x2d;
 	case ADDR_MODE_ABSOLUTE_X: return 0x3d;
 	case ADDR_MODE_ABSOLUTE_Y: return 0x39;
-	case ADDR_MODE_X_INDEX_INDIRECT: return 0x21;
-	case ADDR_MODE_INDIRECT_Y_INDEX: return 0x31;
+	case ADDR_MODE_X_INDEXED_INDIRECT: return 0x21;
+	case ADDR_MODE_INDIRECT_Y_INDEXED: return 0x31;
 	default: return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 }
@@ -177,8 +177,8 @@ int assemble_CMP(int16_t bitflag)
 	case ADDR_MODE_ABSOLUTE: return 0xcd;
 	case ADDR_MODE_ABSOLUTE_X: return 0xdd;
 	case ADDR_MODE_ABSOLUTE_Y: return 0xd9;
-	case ADDR_MODE_X_INDEX_INDIRECT: return 0xc1;
-	case ADDR_MODE_INDIRECT_Y_INDEX: return 0xd1;
+	case ADDR_MODE_X_INDEXED_INDIRECT: return 0xc1;
+	case ADDR_MODE_INDIRECT_Y_INDEXED: return 0xd1;
 	default: return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 }
@@ -239,8 +239,8 @@ int assemble_EOR(int16_t bitflag)
 	case ADDR_MODE_ABSOLUTE: return 0x4d;
 	case ADDR_MODE_ABSOLUTE_X: return 0x5d;
 	case ADDR_MODE_ABSOLUTE_Y: return 0x59;
-	case ADDR_MODE_X_INDEX_INDIRECT: return 0x41;
-	case ADDR_MODE_INDIRECT_Y_INDEX: return 0x51;
+	case ADDR_MODE_X_INDEXED_INDIRECT: return 0x41;
+	case ADDR_MODE_INDIRECT_Y_INDEXED: return 0x51;
 	default: return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 }
@@ -276,7 +276,7 @@ int assemble_JMP(int16_t bitflag)
 {
 	switch (bitflag) {
 	case ADDR_MODE_ABSOLUTE: return 0x4c;
-	case ADDR_MODE_ABSOLUTE_INDIRECT: return 0x6c;
+	case ADDR_MODE_INDIRECT: return 0x6c;
 	default: return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 }
@@ -298,8 +298,8 @@ int assemble_LDA(int16_t bitflag)
 	case ADDR_MODE_ABSOLUTE: return 0xad;
 	case ADDR_MODE_ABSOLUTE_X: return 0xbd;
 	case ADDR_MODE_ABSOLUTE_Y: return 0xb9;
-	case ADDR_MODE_X_INDEX_INDIRECT: return 0xa1;
-	case ADDR_MODE_INDIRECT_Y_INDEX: return 0xb1;
+	case ADDR_MODE_X_INDEXED_INDIRECT: return 0xa1;
+	case ADDR_MODE_INDIRECT_Y_INDEXED: return 0xb1;
 	default: return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 }
@@ -357,8 +357,8 @@ int assemble_ORA(int16_t bitflag)
 	case ADDR_MODE_ABSOLUTE: return 0xd;
 	case ADDR_MODE_ABSOLUTE_X: return 0x1d;
 	case ADDR_MODE_ABSOLUTE_Y: return 0x19;
-	case ADDR_MODE_X_INDEX_INDIRECT: return 0x1;
-	case ADDR_MODE_INDIRECT_Y_INDEX: return 0x11;
+	case ADDR_MODE_X_INDEXED_INDIRECT: return 0x1;
+	case ADDR_MODE_INDIRECT_Y_INDEXED: return 0x11;
 	default: return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 }
@@ -444,8 +444,8 @@ int assemble_SBC(int16_t bitflag)
 	case ADDR_MODE_ABSOLUTE: return 0xed;
 	case ADDR_MODE_ABSOLUTE_X: return 0xfd;
 	case ADDR_MODE_ABSOLUTE_Y: return 0xf9;
-	case ADDR_MODE_X_INDEX_INDIRECT: return 0xe1;
-	case ADDR_MODE_INDIRECT_Y_INDEX: return 0xf1;
+	case ADDR_MODE_X_INDEXED_INDIRECT: return 0xe1;
+	case ADDR_MODE_INDIRECT_Y_INDEXED: return 0xf1;
 	default: return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 }
@@ -482,8 +482,8 @@ int assemble_STA(int16_t bitflag)
 	case ADDR_MODE_ABSOLUTE: return 0x8d;
 	case ADDR_MODE_ABSOLUTE_X: return 0x9d;
 	case ADDR_MODE_ABSOLUTE_Y: return 0x99;
-	case ADDR_MODE_X_INDEX_INDIRECT: return 0x81;
-	case ADDR_MODE_INDIRECT_Y_INDEX: return 0x91;
+	case ADDR_MODE_X_INDEXED_INDIRECT: return 0x81;
+	case ADDR_MODE_INDIRECT_Y_INDEXED: return 0x91;
 	default: return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 }
