@@ -489,7 +489,7 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 /* lex_line()
 	@buffer         ptr to source line of code
 	@lexer          ptr to Lexer struct
-	@tk             ptr to Token struct
+	@tk             ptr to running token
 	@instr          ptr to Instruction struct
 
 	@return         success or error code

@@ -37,7 +37,7 @@ LABEL1
                 JMP     LABEL1          ; jump
                 JSR     L3              ; jump forward ref
 LABEL2          BCC     LABEL1          ; label branch
-FORREF1         BVS     L19             ; label branch forward ref
+FORREF1         BVC     L19             ; label branch forward ref
 LABEL3          JSR     LABEL2          ; label jump
 FORREF2         JMP     L21             ; label jump forward ref
                 JMP     (WHERE)         ; indirect forward ref
@@ -100,7 +100,7 @@ const char *branch_forref =            "\t\tBVS\tL1\n";
 const char *jump =                     "\t\tJMP\tLABEL1\n";
 const char *jump_forref =              "\t\tJSR\tL3\n";
 const char *label_branch =       "LABEL2\t\tBCC\tLABEL1\n";
-const char *label_branch_forref="FORREF1\t\tBVS\tL19\n";
+const char *label_branch_forref="FORREF1\t\tBVC\tL19\n";
 const char *label_jump =         "LABEL3\t\tJSR\tLABEL2\n";
 const char *label_jump_forref = "FORREF2\t\tJMP\tL21\n";
 const char *ind_forref =               "\t\tJMP\t(WHERE)\n";

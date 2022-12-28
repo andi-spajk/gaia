@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "../../unity/unity.h"
 #include "addressing_modes.h"
@@ -37,7 +36,7 @@ void test_generate_code(void)
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
 
-	FILE *f = fopen("a.out", "w+b");
+	FILE *f = fopen("generate_code.out", "w+b");
 	TEST_ASSERT_NOT_NULL(f);
 
 	/*
@@ -63,6 +62,8 @@ void test_generate_code(void)
 		0xDD, 0x61, 0xEE, 0xD1, 0xFF,
 		0x0A
 	};
+	int exp_bytes = 23;
+	unsigned char produced_rom[exp_bytes];
 
 	int pc = 0;
 	int written = 0;
@@ -176,12 +177,8 @@ void test_generate_code(void)
 	pc += written;
 
 	fseek(f, 0, SEEK_SET);
-	// 26 bytes are expected
-	int exp_bytes = 26;
-	unsigned char produced_rom[exp_bytes];
 	TEST_ASSERT_EQUAL_INT(exp_bytes, fread(produced_rom, sizeof(unsigned char), exp_bytes, f));
-
-	TEST_ASSERT_EQUAL_INT(0, memcmp(expected_rom, produced_rom, exp_bytes));
+	TEST_ASSERT_EQUAL_INT8_ARRAY(expected_rom, produced_rom, exp_bytes);
 
 	destroy_token(operand);
 	destroy_instruction(instr);

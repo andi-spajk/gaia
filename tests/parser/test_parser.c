@@ -702,27 +702,27 @@ void test_parse_label_operand(void)
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_operand(find_operand(lexer), instr, symtab));
-/*
-;--------------------------------------
-; example program for parsing forward refs and branch/jumps
+	/*
+	;--------------------------------------
+	; example program for parsing forward refs and branch/jumps
 
-pc      LABEL1                                  ; 0 bytes
-0                       INX                     ; 1 byte, 1 total byte
-                        CPY     ADDRESS         ; illegal forward reference
-1       RANDOM_LABEL    DEY                     ; 1 byte, 2 total bytes
-2       BMI             LABEL1                  ; 2 bytes, 4 total bytes
-4       BVS             L1                      ; 2, 6
-6       JMP             LABEL1                  ; 3, 9
-9       JSR             L3                      ; 3, 12
-12      LABEL2          BCC     LABEL1          ; 2, 14
-14      FORREF1         BVS     L19             ; 2, 16
-16      LABEL3          JSR     LABEL2          ; 3, 19
-19      FORREF2         JMP     L21             ; 3, 22
-22      L2              STA     $AA             ; 2, 24
-24                      JMP     (WHERE)         ; 3, 27
-27      FORREF3         JMP     (WHERE)         ; 3, 30
-                                                ; 30
-*/
+	pc      LABEL1                                  ; 0 bytes
+	0                       INX                     ; 1 byte, 1 total byte
+	                        CPY     ADDRESS         ; illegal forward reference
+	1       RANDOM_LABEL    DEY                     ; 1 byte, 2 total bytes
+	2                       BMI     LABEL1          ; 2 bytes, 4 total bytes
+	4                       BVS     L1              ; 2, 6
+	6                       JMP     LABEL1          ; 3, 9
+	9                       JSR     L3              ; 3, 12
+	12      LABEL2          BCC     LABEL1          ; 2, 14
+	14      FORREF1         BVC     L19             ; 2, 16
+	16      LABEL3          JSR     LABEL2          ; 3, 19
+	19      FORREF2         JMP     L21             ; 3, 22
+	22      L2              STA     $AA             ; 2, 24
+	24                      JMP     (WHERE)         ; 3, 27
+	27      FORREF3         JMP     (WHERE)         ; 3, 30
+	                                                ; 30
+	*/
 	// the earlier tests already defined ADDRESS
 	// so we must reset the symbol table
 	destroy_symbol_table(symtab);
@@ -1298,7 +1298,7 @@ void test_parse_forward_reference_addr_mode(void)
 
 	// parse_forward_reference_addr_mode() doesn't recognize JSR with indirect label as
 	// an error
-	// this is due to the limited masks in apply_masks()
+	// this is due to the limited masks in parse_forward_reference_addr_mode()
 	// therefore this error handling will be redelegated to the code generator
 	// buffer = "JSR (LABEL)\n";
 	// TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));

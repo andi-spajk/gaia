@@ -8,7 +8,7 @@ CFLAGS += -I$(SRC)
 UNITY = ../../unity/unity.o
 DEP = $(OBJ)/test_error.o $(OBJ)/error.o $(OBJ)/lexer.o \
       $(OBJ)/opcode.o $(OBJ)/parser.o $(OBJ)/symbol_table.o \
-      $(OBJ)/prime.o
+      $(OBJ)/prime.o $(OBJ)/assemble.o
 
 test_error: $(DEP)
 	$(CC) $(CFLAGS) $^ $(UNITY) -lm -o test_error

@@ -215,6 +215,9 @@ int parse_label_operand(struct Token *operand, struct Instruction *instr,
 		// save value in both symtab and sequence token
 		// allows for faster lookup when we parse the addressing mode
 		operand->value = label_value;
+		// this assigment means that branch labels may contain an
+		// absolute address as its value.
+		// this gets fixed in resolve_label_ref() in generator.c
 		if (branch)
 			return BRANCH_OPERAND;
 		else if (jump)
@@ -223,7 +226,7 @@ int parse_label_operand(struct Token *operand, struct Instruction *instr,
 			return PARSER_SUCCESS;
 	} else {
 		// nonexistent symbol may be a forward reference
-		// no forward references to constant labels!
+		// no forward references to constants!
 		if (branch)
 			return BRANCH_FORWARD_REFERENCE;
 		else if (jump)
@@ -355,7 +358,7 @@ int apply_masks(struct Lexer *lexer, int curr_field)
 	all the source lines so we must preserve that info.
 */
 int parse_forward_reference_addr_mode(struct Lexer *lexer,
-                                          struct Instruction *instr)
+                                      struct Instruction *instr)
 {
 	int addr_mode = 0x1FFF;
 	addr_mode = apply_masks(lexer, addr_mode);
@@ -383,7 +386,7 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 	instruction bitfield that zero each other out.
 */
 int parse_addr_mode(int operand_status, struct Lexer *lexer,
-                        struct Instruction *instr)
+                    struct Instruction *instr)
 {
 	if (operand_status == BRANCH_FORWARD_REFERENCE ||
 	    operand_status == JUMP_FORWARD_REFERENCE)

@@ -5,15 +5,24 @@ opcodes/65C02ops.csv
 pseudocode/
 
 tests/symbol_table/test_symbol_table
+
 tests/prime/test_prime
+
 tests/lexer/test_lexer
+
 tests/opcode/test_opcode
 tests/opcode/gen/bitfields.h
+
 tests/parser/test_parser
+
 tests/forward_reference/test_forward_reference
+
 tests/error/test_error
+
 tests/assemble/test_assemble
 tests/assemble/gen/assemble.c
 tests/assemble/gen/assemble.h
+
 tests/generator/test_generator
-tests/generator/a.out
+tests/generator/generate_code.out
+tests/generator/resolve_label_ref.out
