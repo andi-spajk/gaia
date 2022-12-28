@@ -260,7 +260,7 @@ struct Token *find_operand(struct Lexer *lexer)
 }
 
 /* parse_operand()
-	@lexer          ptr to Lexer struct
+	@operand        ptr to operand token
 	@instr          ptr to Instruction struct
 	@symtab         ptr to symbol table
 
@@ -277,10 +277,9 @@ struct Token *find_operand(struct Lexer *lexer)
 	BRANCH_FORWARD_REFERENCE 4
 	JUMP_FORWARD_REFERENCE   5
 */
-int parse_operand(struct Lexer *lexer, struct Instruction *instr,
+int parse_operand(struct Token *operand, struct Instruction *instr,
                   struct SymbolTable *symtab)
 {
-	struct Token *operand = find_operand(lexer);
 	// implied operand or accumulator
 	if (!operand)
 		return PARSER_SUCCESS;
@@ -376,6 +375,7 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 /* parse_addr_mode()
 	@operand_status         whether operand is branch/jump and/or forward
 	                        reference
+	@operand                ptr to operand token
 	@lexer                  ptr to Lexer struct
 	@instr                  ptr to Instruction struct
 
@@ -385,14 +385,13 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 	Any invalid sequences will have incompatible bit masks and an
 	instruction bitfield that zero each other out.
 */
-int parse_addr_mode(int operand_status, struct Lexer *lexer,
-                    struct Instruction *instr)
+int parse_addr_mode(int operand_status, struct Token *operand,
+                    struct Lexer *lexer, struct Instruction *instr)
 {
 	if (operand_status == BRANCH_FORWARD_REFERENCE ||
 	    operand_status == JUMP_FORWARD_REFERENCE)
 		return parse_forward_reference_addr_mode(lexer, instr);
 
-	struct Token *operand = find_operand(lexer);
 	if (!operand) {
 		switch (instr->mnemonic) {
 		case ASL:
