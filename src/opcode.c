@@ -239,6 +239,15 @@ int16_t get_addr_bitfield(const enum Mnemonic mnemonic)
 	}
 }
 
+/* get_opcode()
+	@instr          ptr to Instruction struct
+
+	@return         opcode, or error code
+
+	Assemble a valid instruction into its corresponding opcode. An error
+	code is returned if the instruction mnemonic is not a valid 6502
+	mnemonic.
+*/
 int get_opcode(struct Instruction *instr)
 {
 	switch (instr->mnemonic) {

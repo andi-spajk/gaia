@@ -1,6 +1,8 @@
 /** assemble.c
 
-Assemble the opcode for each mnemonic, given an Instruction bitflag.
+Assemble the opcode for each mnemonic, given an Instruction bitflag. An error
+code is returned if the bitflag does not denote any valid addressing mode, ie
+the instruction and the addressing mode were not compatible.
 
 Auto-generated with tests/assemble/gen/gen_assemble.py
 
