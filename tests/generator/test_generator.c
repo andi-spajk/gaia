@@ -14,24 +14,6 @@
 void setUp(void) {}
 void tearDown(void) {}
 
-void test_calc_num_bytes(void)
-{
-	// lexical analyzer screens out any operands greater than 3 bytes
-	// so there is no need to check for those
-	TEST_ASSERT_EQUAL_INT(1, calc_num_bytes(0x0));
-	TEST_ASSERT_EQUAL_INT(1, calc_num_bytes(0x01));
-	TEST_ASSERT_EQUAL_INT(1, calc_num_bytes(0x0000000000000001));
-	TEST_ASSERT_EQUAL_INT(1, calc_num_bytes(0xFF));
-	TEST_ASSERT_EQUAL_INT(1, calc_num_bytes(0x7F));
-	TEST_ASSERT_EQUAL_INT(1, calc_num_bytes(0x80));
-	TEST_ASSERT_EQUAL_INT(2, calc_num_bytes(0x100));
-	TEST_ASSERT_EQUAL_INT(2, calc_num_bytes(0x0234));
-	TEST_ASSERT_EQUAL_INT(2, calc_num_bytes(0xAAAA));
-	TEST_ASSERT_EQUAL_INT(2, calc_num_bytes(0x00001000));
-	TEST_ASSERT_EQUAL_INT(2, calc_num_bytes(0x8000));
-	TEST_ASSERT_EQUAL_INT(2, calc_num_bytes(0xFF00));
-}
-
 void test_generate_code(void)
 {
 	struct Lexer *lexer = init_lexer();
@@ -524,7 +506,6 @@ int main(void)
 {
 	UNITY_BEGIN();
 
-	RUN_TEST(test_calc_num_bytes);
 	RUN_TEST(test_generate_code);
 	RUN_TEST(test_resolve_label_ref);
 	RUN_TEST(test_too_big_offset_no_forward_ref);

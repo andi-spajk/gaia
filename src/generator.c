@@ -15,20 +15,6 @@ references.
 #include "parser.h"
 #include "symbol_table.h"
 
-/* calc_num_bytes()
-	@operand_bytes          value of operand
-
-	@return                 number of bytes in @operand_bytes
-
-	Calculates the number of bytes in an operand's value.
-*/
-int calc_num_bytes(int operand_bytes)
-{
-	if (operand_bytes & 0xFF00)
-		return 2;
-	return 1;
-}
-
 /* generate_code()
 	@f              ptr to binary FILE
 	@instr          ptr to Instruction struct
@@ -61,7 +47,6 @@ int generate_code(FILE *f, struct Instruction *instr, struct Token *operand,
 		return 3;
 	}
 	return 2;
-
 }
 
 /* calc_branch_offset()

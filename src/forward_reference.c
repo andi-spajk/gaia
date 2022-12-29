@@ -104,14 +104,15 @@ struct ForwardRef *create_forward_ref(const char *buffer,
 	if (!ref)
 		return NULL;
 
-	const char *begin = buffer;
 	// save source line without trailing whitespace
 	// -1 to skip null terminator, -1 again to skip newline
 	const char *end = buffer + strlen(buffer) - 2;
 	while (*end == ' ' || *end == '\t')
 		end--;
-	size_t num_chars = end - begin + 1;
+	const char *begin = buffer;
 
+	// copy source line into forward ref
+	size_t num_chars = end - begin + 1;
 	ref->source_line = calloc(num_chars + 1, sizeof(char));
 	if (!ref->source_line)
 		return NULL;
