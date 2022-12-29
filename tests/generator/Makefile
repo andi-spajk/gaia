@@ -8,7 +8,7 @@ CFLAGS += -I$(SRC)
 UNITY = ../../unity/unity.o
 DEP = $(OBJ)/test_generator.o $(OBJ)/generator.o $(OBJ)/opcode.o \
       $(OBJ)/assemble.o $(OBJ)/lexer.o $(OBJ)/symbol_table.o \
-      $(OBJ)/prime.o
+      $(OBJ)/prime.o $(OBJ)/parser.o
 
 test_generator: $(DEP)
 	$(CC) $(CFLAGS) $^ $(UNITY) -lm -o test_generator

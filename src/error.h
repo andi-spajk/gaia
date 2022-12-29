@@ -24,6 +24,7 @@
 #define ERROR_ILLEGAL_FORWARD_REFERENCE -13
 #define ERROR_ILLEGAL_ADDRESSING_MODE   -14
 #define ERROR_ILLEGAL_MNEMONIC          -15
+#define ERROR_TOO_BIG_OFFSET            -16
 /*
 ;       ;       ;       ;       ;       ;
 */

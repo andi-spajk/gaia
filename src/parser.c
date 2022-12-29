@@ -406,10 +406,16 @@ int parse_addr_mode(int operand_status, struct Token *operand,
 
 	int addr_mode = 0x1FFF;
 	if (operand->value > 0xFF) {
-		addr_mode = ABSOLUTE_FIELD;
+		// see comment in parse_label_operand()
+		// operand value might be an absolute address, but a branch
+		// instruction always has an operand that fits in 1 byte
+		if (!is_branch(instr->mnemonic))
+			addr_mode = ABSOLUTE_FIELD;
+		else
+			addr_mode = ZERO_PAGE_FIELD;
 	} else {
-		// a jump label may have a zero page value but it's still
-		// absolute because we always write 3 bytes
+		// a jump label may have a value that fits in 1 byte, but it's
+		// still absolute because we always write 3 bytes for jumps
 		if (!is_jump(instr->mnemonic))
 			addr_mode = ZERO_PAGE_FIELD;
 		else
