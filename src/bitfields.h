@@ -1,10 +1,17 @@
+/** bitfields.h
+
+Bitfields denoting the valid addressing modes of every 6502 instruction.
+
+Auto-generated with /tests/opcode/gen/gen_bitfield.py
+
+*/
+
+
 #ifndef BITFIELDS_H
 #define BITFIELDS_H
 
-// Credit to the reference site:
+// This site was used as reference:
 // https://www.masswerk.at/6502/6502_instruction_set.html
-
-// Auto-generated with /tests/opcode/gen/gen_bitfield.py
 #define ADC_BITFIELD 0b0010111011110
 #define AND_BITFIELD 0b0010111011110
 #define ASL_BITFIELD 0b1000110000110

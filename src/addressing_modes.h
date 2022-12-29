@@ -1,3 +1,11 @@
+/** addressing_modes.h
+
+Bitflags and bitfields for each 6502 addressing mode. Flags denote a single
+addressing mode, and fields contain numerous modes grouped together under
+certain properties.
+
+*/
+
 /*
 Each bit represents a particular addressing mode
 If we figure out whether the operand is absolute or zero page,

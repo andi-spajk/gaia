@@ -1,3 +1,11 @@
+/** opcode.h
+
+Prototypes and structs that record and help determine the instruction's opcode,
+mnemonic, and addressing mode in a source line of code. Mnemonics are stored as
+enums.
+
+*/
+
 #ifndef OPCODE_H
 #define OPCODE_H
 

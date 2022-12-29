@@ -1,3 +1,10 @@
+/** symbol_table.h
+
+Prototypes and structs to manage a symbol table and insert/search symbols.
+There is no function to delete a symbol; the assembler does not need it.
+
+*/
+
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 

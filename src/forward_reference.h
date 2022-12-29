@@ -1,3 +1,10 @@
+/** forward_reference.h
+
+Prototypes and structs that init, save, resolve, and destroy forward references
+in a single Unresolved struct.
+
+*/
+
 #ifndef FORWARD_REFERENCE_H
 #define FORWARD_REFERENCE_H
 

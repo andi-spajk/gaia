@@ -1,3 +1,9 @@
+/** generator.h
+
+Prototypes for code generation and label resolution/assembly.
+
+*/
+
 #ifndef GENERATOR_H
 #define GENERATOR_H
 

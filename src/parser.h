@@ -1,3 +1,11 @@
+/** parser.h
+
+Prototypes that parse a sequence of tokens for syntax errors, determines
+addressing mode via bitmasks, insert labels into the symbol table, and locates
+forward references to be resolved later.
+
+*/
+
 /*
 TOKEN SEQUENCES:
 InstructionTree

@@ -1,3 +1,10 @@
+/** lexer.h
+
+Prototypes and structs that perform lexical analysis and save tokens into a
+Lexer struct. Types of tokens are represented as enums.
+
+*/
+
 #ifndef LEXER_H
 #define LEXER_H
 
