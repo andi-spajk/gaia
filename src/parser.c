@@ -198,13 +198,13 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 }
 
 /* parse_label_operand()
-	@operand        ptr to operand token in a Lexer sequence
 	@instr          ptr to Instruction struct
+	@operand        ptr to operand token in a Lexer sequence
 	@symtab         ptr to symbol table
 
 	@return         operand status, or error code
 */
-int parse_label_operand(struct Token *operand, struct Instruction *instr,
+int parse_label_operand(struct Instruction *instr, struct Token *operand,
                         struct SymbolTable *symtab)
 {
 	int label_value = search_symbol(symtab, operand->str);
@@ -260,8 +260,8 @@ struct Token *find_operand(struct Lexer *lexer)
 }
 
 /* parse_operand()
-	@operand        ptr to operand token
 	@instr          ptr to Instruction struct
+	@operand        ptr to operand token
 	@symtab         ptr to symbol table
 
 	@return         operand status, or error code
@@ -277,7 +277,7 @@ struct Token *find_operand(struct Lexer *lexer)
 	BRANCH_FORWARD_REFERENCE 4
 	JUMP_FORWARD_REFERENCE   5
 */
-int parse_operand(struct Token *operand, struct Instruction *instr,
+int parse_operand(struct Instruction *instr, struct Token *operand,
                   struct SymbolTable *symtab)
 {
 	// implied operand or accumulator
@@ -285,7 +285,7 @@ int parse_operand(struct Token *operand, struct Instruction *instr,
 		return PARSER_SUCCESS;
 
 	if (operand->type == TOKEN_LABEL) {
-		return parse_label_operand(operand, instr, symtab);
+		return parse_label_operand(instr, operand, symtab);
 	} else if (operand->type == TOKEN_LITERAL) {
 		// no need to do anything special to parse literal
 		// the lexer did everything necessary
@@ -373,11 +373,11 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 }
 
 /* parse_addr_mode()
-	@operand_status         whether operand is branch/jump and/or forward
-	                        reference
-	@operand                ptr to operand token
 	@lexer                  ptr to Lexer struct
 	@instr                  ptr to Instruction struct
+	@operand                ptr to operand token
+	@operand_status         whether operand is branch/jump and/or forward
+	                        reference
 
 	@return                 bitmask containing expressed addressing mode
 
@@ -385,8 +385,8 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 	Any invalid sequences will have incompatible bit masks and an
 	instruction bitfield that zero each other out.
 */
-int parse_addr_mode(int operand_status, struct Token *operand,
-                    struct Lexer *lexer, struct Instruction *instr)
+int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
+                    struct Token *operand, int operand_status)
 {
 	if (operand_status == BRANCH_FORWARD_REFERENCE ||
 	    operand_status == JUMP_FORWARD_REFERENCE)
