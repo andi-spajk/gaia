@@ -15,7 +15,6 @@ them to the array. Automatically resizes array when full.
 #include "forward_reference.h"
 #include "lexer.h"
 #include "opcode.h"
-#include "parser.h"
 
 #define BASE_SIZE 8
 
@@ -80,8 +79,9 @@ void destroy_unresolved(struct Unresolved *unresolved)
 
 /* create_forward_ref()
 	@buffer                 ptr to source line
-	@lexer                  ptr to Lexer struct
 	@instr                  ptr to Instruction struct
+	@operand                ptr to operand token with the forward-referenced
+	                        label
 	@operand_status         whether operand is branch/jmp and/or a forward
 	                        ref, from parse_operand()
 	@pc                     current program counter
@@ -95,9 +95,10 @@ void destroy_unresolved(struct Unresolved *unresolved)
 
 	The saved source line will have NO trailing whitespace.
 */
-struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
+struct ForwardRef *create_forward_ref(const char *buffer,
                                       struct Instruction *instr,
-                                      int operand_status, int pc, int line_num)
+                                      struct Token *operand, int operand_status,
+                                      int pc, int line_num)
 {
 	struct ForwardRef *ref = malloc(sizeof(struct ForwardRef));
 	if (!ref)
@@ -117,8 +118,6 @@ struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
 	// keep the comments in, no one cares
 	strncpy(ref->source_line, begin, num_chars);
 
-	// find label operand (function from parser.c)
-	struct Token *operand = find_operand(lexer);
 	// copy label string into forward ref's label
 	size_t label_length = strlen(operand->str) + 1;
 	ref->label = calloc(label_length, sizeof(char));
