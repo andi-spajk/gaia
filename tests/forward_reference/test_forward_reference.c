@@ -34,6 +34,7 @@ void test_create_forward_ref(void)
 	int line_num;
 	int operand_status;
 	struct ForwardRef *ref;
+	struct Token *operand;
 
 	// JMP L21
 	buffer = "\t\tJMP\tL21\t; comment\n";
@@ -42,11 +43,12 @@ void test_create_forward_ref(void)
 	pc = 0x0;
 	line_num = 1;
 
-	operand_status = parse_operand(lexer, instr, symtab);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(operand, instr, symtab);
 	TEST_ASSERT_EQUAL_INT(operand_status, JUMP_FORWARD_REFERENCE);
 
 	int expected = NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD & ABSOLUTE_FIELD;
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, operand, lexer, instr));
 	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
 
 	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
@@ -71,11 +73,12 @@ void test_create_forward_ref(void)
 	pc = 0x3;
 	line_num = 2;
 
-	operand_status = parse_operand(lexer, instr, symtab);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(operand, instr, symtab);
 	TEST_ASSERT_EQUAL_INT(operand_status, BRANCH_FORWARD_REFERENCE);
 
 	expected = NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD & ADDR_MODE_RELATIVE;
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, lexer, instr));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(operand_status, operand, lexer, instr));
 	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
 
 	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
@@ -116,6 +119,7 @@ void test_add_forward_ref(void)
 	int line_num;
 	int operand_status;
 	const char *buffer;
+	struct Token *operand;
 
 	// JSR FORREF
 	buffer = "\t\tJSR\tFORREF\n";
@@ -124,8 +128,9 @@ void test_add_forward_ref(void)
 	pc = 0x0;
 	line_num = 1;
 
-	operand_status = parse_operand(lexer, instr, symtab);
-	parse_addr_mode(operand_status, lexer, instr);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(operand, instr, symtab);
+	parse_addr_mode(operand_status, operand, lexer, instr);
 
 	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
 
@@ -147,8 +152,9 @@ void test_add_forward_ref(void)
 	pc = 0x3;
 	line_num = 2;
 
-	operand_status = parse_operand(lexer, instr, symtab);
-	parse_addr_mode(operand_status, lexer, instr);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(operand, instr, symtab);
+	parse_addr_mode(operand_status, operand, lexer, instr);
 
 	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
 	// we can reassign ref without freeing the previous ref because we
@@ -190,6 +196,7 @@ void test_resize_unresolved(void)
 	int line_num;
 	int operand_status;
 	const char *buffer;
+	struct Token *operand;
 
 	// JMP (FORREF)
 	buffer = "\t\tJMP\t(FORREF)\t;hi\n";
@@ -198,8 +205,9 @@ void test_resize_unresolved(void)
 	pc = 0x0;
 	line_num = 1;
 
-	operand_status = parse_operand(lexer, instr, symtab);
-	parse_addr_mode(operand_status, lexer, instr);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(operand, instr, symtab);
+	parse_addr_mode(operand_status, operand, lexer, instr);
 
 	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));

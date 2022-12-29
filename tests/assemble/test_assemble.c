@@ -23,6 +23,7 @@ void test_assembly(void)
 	struct SymbolTable *symtab = init_symbol_table();
 	TEST_ASSERT_NOT_NULL(symtab);
 	const char *buffer;
+	struct Token *operand;
 
 	const char *line = "\t\tSBC\t($AA),Y\n";
 	buffer = line;
@@ -31,10 +32,11 @@ void test_assembly(void)
 	TEST_ASSERT_EQUAL_INT(SBC, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(SBC_BITFIELD, instr->addr_bitfield);
 
-	int operand_status = parse_operand(lexer, instr, symtab);
+	operand = find_operand(lexer);
+	int operand_status = parse_operand(operand, instr, symtab);
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, operand_status);
 
-	int addr_mask = parse_addr_mode(operand_status, lexer, instr);
+	int addr_mask = parse_addr_mode(operand_status, operand, lexer, instr);
 	TEST_ASSERT_EQUAL_INT(ADDR_MODE_INDIRECT_Y_INDEXED, addr_mask);
 
 	instr->addr_bitflag = addr_mask & instr->addr_bitfield;

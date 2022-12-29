@@ -26,7 +26,7 @@ void test_print_error(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(line, lexer, tk, instr));
 	print_error(ERROR_ILLEGAL_CHAR, "prog.asm", 2, line);
 
-	line = "TEST = $FFFF0001";
+	line = "TEST = $FFFF0001\n";
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_line(line, lexer, tk, instr));
 	print_error(ERROR_TOO_BIG_LITERAL, "prog.asm", 3, line);
 
@@ -70,7 +70,7 @@ void test_print_error(void)
 	line = "\t\tCPY\tADDRESS\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_FORWARD_REFERENCE, parse_operand(lexer, instr, symtab));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_FORWARD_REFERENCE, parse_operand(find_operand(lexer), instr, symtab));
 	print_error(ERROR_ILLEGAL_FORWARD_REFERENCE, "prog.asm", 10, line);
 
 	destroy_lexer(lexer);
