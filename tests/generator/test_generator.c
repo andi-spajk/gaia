@@ -297,7 +297,7 @@ void test_resolve_label_ref(void)
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
 	TEST_ASSERT_EQUAL_INT(0x1000, operand->value);
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(0xFD, operand->value);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
@@ -309,7 +309,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
 
@@ -321,7 +321,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
 
@@ -333,7 +333,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
 
@@ -345,7 +345,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
 
@@ -356,7 +356,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
 
@@ -367,7 +367,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
 
@@ -383,7 +383,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, written);
 
 	destroy_lexer(lexer);
@@ -442,7 +442,7 @@ void test_too_big_offset_no_forward_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 
 	/*
@@ -461,7 +461,7 @@ void test_too_big_offset_no_forward_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, written);
 
 	/*
@@ -480,7 +480,7 @@ void test_too_big_offset_no_forward_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, symtab, pc, operand_status);
+	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, written);
 
 	destroy_lexer(lexer);

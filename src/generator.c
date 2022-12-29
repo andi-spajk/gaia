@@ -92,10 +92,10 @@ int calc_branch_offset(int curr_pc, int dest_pc)
 	@f                      ptr to binary FILE
 	@instr                  ptr to Instruction struct
 	@label                  ptr to token containing the label reference
-	@symtab                 symbol table
-	@pc                     current program counter location
 	@operand_status         whether @label is part of branch/jump
 	                        instruction
+	@symtab                 symbol table
+	@pc                     current program counter location
 
 	@return                 number of bytes written to @f, or error code
 
@@ -103,7 +103,7 @@ int calc_branch_offset(int curr_pc, int dest_pc)
 	CANNOT be resolved with this function.
 */
 int resolve_label_ref(FILE *f, struct Instruction *instr, struct Token *label,
-                      struct SymbolTable *symtab, int pc, int operand_status)
+                      int operand_status, struct SymbolTable *symtab, int pc)
 {
 	int dest_pc, offset;
 	if (label)

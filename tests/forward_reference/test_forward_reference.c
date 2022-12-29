@@ -51,7 +51,7 @@ void test_create_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(lexer, instr, operand, operand_status));
 	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
 
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 
 	TEST_ASSERT_EQUAL_INT(0x0, ref->pc);
@@ -81,7 +81,7 @@ void test_create_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(lexer, instr, operand, operand_status));
 	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
 
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 
 	TEST_ASSERT_EQUAL_INT(0x3, ref->pc);
@@ -132,7 +132,7 @@ void test_add_forward_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	parse_addr_mode(lexer, instr, operand, operand_status);
 
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 
@@ -156,7 +156,7 @@ void test_add_forward_ref(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	parse_addr_mode(lexer, instr, operand, operand_status);
 
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	// we can reassign ref without freeing the previous ref because we
 	// saved the previous ptr into unresolved->refs.
 	// destroy_unresolved() will free that memory for us
@@ -209,24 +209,24 @@ void test_resize_unresolved(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	parse_addr_mode(lexer, instr, operand, operand_status);
 
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 	TEST_ASSERT_EQUAL_INT(8, unresolved->size);
 	TEST_ASSERT_EQUAL_INT(7, unresolved->curr);
 
-	ref = create_forward_ref(buffer, lexer, instr, pc, line_num, operand_status);
+	ref = create_forward_ref(buffer, lexer, instr, operand_status, pc, line_num);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 	TEST_ASSERT_EQUAL_INT(16, unresolved->size);
 	TEST_ASSERT_EQUAL_INT(8, unresolved->curr);

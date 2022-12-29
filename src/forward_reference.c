@@ -82,10 +82,10 @@ void destroy_unresolved(struct Unresolved *unresolved)
 	@buffer                 ptr to source line
 	@lexer                  ptr to Lexer struct
 	@instr                  ptr to Instruction struct
-	@pc                     current program counter
-	@line_num               line number of @buffer
 	@operand_status         whether operand is branch/jmp and/or a forward
 	                        ref, from parse_operand()
+	@pc                     current program counter
+	@line_num               line number of @buffer
 
 	@return                 ptr to dynamically allocated ForwardRef, or
 	                        NULL if fail
@@ -96,8 +96,8 @@ void destroy_unresolved(struct Unresolved *unresolved)
 	The saved source line will have NO trailing whitespace.
 */
 struct ForwardRef *create_forward_ref(const char *buffer, struct Lexer *lexer,
-                                      struct Instruction *instr, int pc,
-                                      int line_num, int operand_status)
+                                      struct Instruction *instr,
+                                      int operand_status, int pc, int line_num)
 {
 	struct ForwardRef *ref = malloc(sizeof(struct ForwardRef));
 	if (!ref)
