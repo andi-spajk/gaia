@@ -623,9 +623,8 @@ void test_resolve_forward_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
 
-	for (int i = 0; i < unresolved->size; i++) {
-		if (unresolved->refs[i])
-			resolve_forward_ref(f, unresolved->refs[i], symtab);
+	for (int i = 0; unresolved->refs[i] != NULL; i++) {
+		resolve_forward_ref(f, unresolved->refs[i], symtab);
 	}
 
 	fseek(f, 0, SEEK_SET);
@@ -642,32 +641,147 @@ void test_resolve_forward_ref(void)
 
 void test_too_big_offset_with_forward_ref(void)
 {
+	struct Lexer *lexer = init_lexer();
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+	struct SymbolTable *symtab = init_symbol_table();
+	TEST_ASSERT_NOT_NULL(symtab);
+	struct Unresolved *unresolved = init_unresolved();
+	TEST_ASSERT_NOT_NULL(unresolved);
+
+	FILE *f = fopen("too_big_offset_with_forward_ref.out", "w+b");
+	TEST_ASSERT_NOT_NULL(f);
+
 	/*
 	max offset
 	LOC   CODE         LABEL     INSTRUCTION
-	0100                         * = $0100
-	0100  70 7F                  BVS FARAWAY
-	0181                         * = $0181
-	0181  C8           FARAWAY   INY
+	0000                         * = $0000
+	0000  50 7F                  BVC FARAWAY1
+	0081                         * = $0081
+	0081  C8           FARAWAY1  INY
 	*/
+	const char *buffer;
+	struct Token *operand;
+	int operand_status;
+	int addr_mask;
+	int pc;
+	struct ForwardRef *ref;
+	int written;
+
+	pc = 0x0;
+	buffer = "BVC FARAWAY\n";
+	lex_line(buffer, lexer, tk, instr);
+	parse_line(lexer);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(instr, operand, symtab);
+	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
+
+	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, 1);
+	TEST_ASSERT_NOT_NULL(ref);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	fputc(0x00, f);
+	fputc(0x00, f);
+
+	pc = 0x81;
+	buffer = "FARAWAY INY\n";
+	lex_line(buffer, lexer, tk, instr);
+	parse_line(lexer);
+	parse_label_declaration(lexer, symtab, pc);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(instr, operand, symtab);
+	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
+	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	written = generate_code(f, instr, operand, pc);
+	TEST_ASSERT_EQUAL_INT(1, written);
+
+	TEST_ASSERT_EQUAL_INT(2, resolve_forward_ref(f, unresolved->refs[0], symtab));
 
 	/*
 	edge case
 	LOC   CODE         LABEL     INSTRUCTION
-	0100                         * = $0100
-	0100                         BVS FARAWAY
-	0182                         * = $0182
-	0182               FARAWAY   INY
+	0000                         * = $0000
+	0000                         BCS FARAWAY2
+	0082                         * = $0082
+	0082               FARAWAY2  INY
 	*/
+
+	pc = 0x0;
+	buffer = "BVC FARAWAY2\n";
+	lex_line(buffer, lexer, tk, instr);
+	parse_line(lexer);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(instr, operand, symtab);
+	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
+
+	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, 1);
+	TEST_ASSERT_NOT_NULL(ref);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	fputc(0x00, f);
+	fputc(0x00, f);
+
+	pc = 0x82;
+	buffer = "FARAWAY2 INY\n";
+	lex_line(buffer, lexer, tk, instr);
+	parse_line(lexer);
+	parse_label_declaration(lexer, symtab, pc);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(instr, operand, symtab);
+	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
+	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	written = generate_code(f, instr, operand, pc);
+	TEST_ASSERT_EQUAL_INT(1, written);
+
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[1], symtab));
 
 	/*
 	definitely bad offset
 	LOC   CODE         LABEL     INSTRUCTION
+	0000                         * = $0000
+	0000                         BVS FARAWAY3
 	1000                         * = $1000
-	1000                         BVS FARAWAY
-	2000                         * = $2000
-	2000               FARAWAY   DEX
+	1000               FARAWAY3  DEX
 	*/
+
+	pc = 0x0;
+	buffer = "BVC FARAWAY3\n";
+	lex_line(buffer, lexer, tk, instr);
+	parse_line(lexer);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(instr, operand, symtab);
+	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
+
+	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, 1);
+	TEST_ASSERT_NOT_NULL(ref);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
+	fputc(0x00, f);
+	fputc(0x00, f);
+
+	pc = 0x1000;
+	buffer = "FARAWAY3 INY\n";
+	lex_line(buffer, lexer, tk, instr);
+	parse_line(lexer);
+	parse_label_declaration(lexer, symtab, pc);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(instr, operand, symtab);
+	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
+	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	written = generate_code(f, instr, operand, pc);
+	TEST_ASSERT_EQUAL_INT(1, written);
+
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[1], symtab));
+
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+	destroy_symbol_table(symtab);
+	destroy_unresolved(unresolved);
+	fclose(f);
 }
 
 int main(void)
@@ -678,7 +792,7 @@ int main(void)
 	RUN_TEST(test_resolve_label_ref);
 	RUN_TEST(test_too_big_offset_no_forward_ref);
 	RUN_TEST(test_resolve_forward_ref);
-	// RUN_TEST(test_too_big_offset_with_forward_ref);
+	RUN_TEST(test_too_big_offset_with_forward_ref);
 
 	return UNITY_END();
 }
