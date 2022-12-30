@@ -161,7 +161,7 @@ int insert_symbol(struct SymbolTable *symtab, const char *label,
                   const int value)
 {
 	// check load factor first
-	// why insert and then resize? wasted insertion
+	// if you insert first then you might have to hash it again -- waste!
 	int load = ((symtab->count + 1) * 100) / symtab->size;
 	if (load > 50) {
 		if (!resize_symbols(symtab))

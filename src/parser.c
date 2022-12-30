@@ -237,28 +237,6 @@ int parse_label_operand(struct Instruction *instr, struct Token *operand,
 	return ERROR_UNKNOWN;
 }
 
-/* find_operand()
-	@lexer          ptr to Lexer struct
-
-	@return         ptr to operand token in the lexer sequence, or NULL if
-	                not found
-
-	Find location of the operand token in a lexer's sequence of tokens.
-*/
-struct Token *find_operand(struct Lexer *lexer)
-{
-	struct Token *curr = lexer->sequence[1];
-	// start at 2nd token
-	// operand will always be 2nd or later
-	for (int i = 1; curr->type != TOKEN_NULL; i++) {
-		curr = lexer->sequence[i];
-		if (curr->type == TOKEN_LABEL ||
-		    curr->type == TOKEN_LITERAL)
-			return curr;
-	}
-	return NULL;
-}
-
 /* parse_operand()
 	@instr          ptr to Instruction struct
 	@operand        ptr to operand token
@@ -292,6 +270,28 @@ int parse_operand(struct Instruction *instr, struct Token *operand,
 		return PARSER_SUCCESS;
 	}
 	return ERROR_UNKNOWN;
+}
+
+/* find_operand()
+	@lexer          ptr to Lexer struct
+
+	@return         ptr to operand token in the lexer sequence, or NULL if
+	                not found
+
+	Find location of the operand token in a lexer's sequence of tokens.
+*/
+struct Token *find_operand(struct Lexer *lexer)
+{
+	struct Token *curr = lexer->sequence[1];
+	// start at 2nd token
+	// operand will always be 2nd or later
+	for (int i = 1; curr->type != TOKEN_NULL; i++) {
+		curr = lexer->sequence[i];
+		if (curr->type == TOKEN_LABEL ||
+		    curr->type == TOKEN_LITERAL)
+			return curr;
+	}
+	return NULL;
 }
 
 /* apply_masks()
@@ -366,9 +366,10 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 		instr->addr_bitflag = addr_mode & ADDR_MODE_RELATIVE;
 		return FORWARD_REFERENCE;
 	}
-	// two possible addressing modes for jumps, so we AND with the
-	// absolute FIELD!!!
-	instr->addr_bitflag = addr_mode & ABSOLUTE_FIELD;
+	if (instr->mnemonic == JMP)
+		instr->addr_bitflag = addr_mode & ABSOLUTE_FIELD;
+	else if (instr->mnemonic == JSR)
+		instr->addr_bitflag = addr_mode & ADDR_MODE_ABSOLUTE;
 	return FORWARD_REFERENCE;
 }
 

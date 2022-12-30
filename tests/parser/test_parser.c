@@ -1338,27 +1338,18 @@ void test_parse_forward_reference_addr_mode(void)
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
 	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
-	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 	buffer = "BVS (LABEL),Y\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
 	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
-	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 	buffer = "JMP #LABEL\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
 	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
-	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
-
-	// parse_forward_reference_addr_mode() doesn't recognize JSR with indirect label as
-	// an error
-	// this is due to the limited masks in parse_forward_reference_addr_mode()
-	// therefore this error handling will be redelegated to the code generator
-	// buffer = "JSR (LABEL)\n";
-	// TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
-	// TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
-	// TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
-	// TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
+	buffer = "JSR (LABEL)\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode(lexer, instr));
+	TEST_ASSERT_EQUAL_INT(expected, instr->addr_bitflag);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -1674,7 +1665,7 @@ void test_parse_addr_mode(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(lexer, instr, operand, operand_status));
 
-	// bad immediateS
+	// bad immediates
 	buffer = "JMP\t#000\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));

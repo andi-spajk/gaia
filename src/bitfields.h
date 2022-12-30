@@ -10,8 +10,10 @@ Auto-generated with /tests/opcode/gen/gen_bitfield.py
 #ifndef BITFIELDS_H
 #define BITFIELDS_H
 
-// This site was used as reference:
+// These sites were used as reference:
 // https://www.masswerk.at/6502/6502_instruction_set.html
+// .csv file was taken from:
+// https://github.com/kpmiller/emulator101/tree/master/6502Disassembler
 #define ADC_BITFIELD 0b0010111011110
 #define AND_BITFIELD 0b0010111011110
 #define ASL_BITFIELD 0b1000110000110
