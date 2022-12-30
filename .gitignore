@@ -27,3 +27,4 @@ tests/generator/test_generator
 tests/generator/generate_code.out
 tests/generator/resolve_label_ref.out
 tests/generator/too_big_offset_no_forward_ref.out
+tests/generator/resolve_forward_ref.out

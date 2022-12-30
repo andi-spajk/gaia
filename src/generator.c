@@ -10,6 +10,7 @@ references.
 
 #include "addressing_modes.h"
 #include "error.h"
+#include "forward_reference.h"
 #include "lexer.h"
 #include "opcode.h"
 #include "parser.h"
@@ -18,7 +19,7 @@ references.
 /* generate_code()
 	@f              ptr to binary FILE
 	@instr          ptr to Instruction struct
-	@operand        ptr to operand token in a Lexer sequence
+	@operand        ptr to operand token in a Lexer sequence, or NULL
 	@pc             current program counter location
 
 	@return         number of bytes written to @f
@@ -28,11 +29,10 @@ references.
 int generate_code(FILE *f, struct Instruction *instr, struct Token *operand,
                   int pc)
 {
-	unsigned char opcode = get_opcode(instr);
-	instr->opcode = opcode;
+	instr->opcode = get_opcode(instr);
 
 	fseek(f, pc, SEEK_SET);
-	fputc(opcode, f);
+	fputc(instr->opcode, f);
 
 	int operand_bytes;
 	if (operand)
@@ -103,6 +103,56 @@ int resolve_label_ref(FILE *f, struct Instruction *instr, struct Token *label,
 	} else if (operand_status == JUMP_OPERAND) {
 		label->value = dest_pc;
 		return generate_code(f, instr, label, pc);
+	}
+	return ERROR_UNKNOWN;
+}
+
+/* resolve_forward_ref()
+	@f              ptr to binary FILE
+	@instr          ptr to Instruction struct
+	@ref            ptr to ForwardRef struct
+	@symtab         symbol table
+	@pc             current program counter location
+
+	@return         number of bytes written to @f, or error code
+
+	Resolve a forward reference and assemble the code.
+
+	This function expects a valid forward reference, ie it is the caller's
+	responsibility to check if the label had been defined in the midst of
+	normal assembly.
+*/
+int resolve_forward_ref(FILE *f, struct ForwardRef *ref,
+                        struct SymbolTable *symtab)
+{
+	struct Instruction *instr = ref->instr;
+	int dest_pc, offset;
+	if (ref->label)
+		dest_pc = search_symbol(symtab, ref->label);
+
+	if (ref->operand_status == BRANCH_FORWARD_REFERENCE) {
+		offset = calc_branch_offset(ref->pc, dest_pc);
+		if (offset == ERROR_TOO_BIG_OFFSET)
+			return ERROR_TOO_BIG_OFFSET;
+
+		if (instr->addr_bitflag) {
+			instr->opcode = get_opcode(instr);
+			fseek(f, ref->pc, SEEK_SET);
+			fputc(instr->opcode, f);
+			fputc(offset & 0xFF, f);
+			return 2;
+		}
+		return ERROR_ILLEGAL_ADDRESSING_MODE;
+	} else if (ref->operand_status == JUMP_FORWARD_REFERENCE) {
+		if (instr->addr_bitflag) {
+			instr->opcode = get_opcode(instr);
+			fseek(f, ref->pc, SEEK_SET);
+			fputc(instr->opcode, f);
+			fputc(dest_pc & 0xFF, f);
+			fputc(dest_pc >> 8, f);
+			return 3;
+		}
+		return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 	return ERROR_UNKNOWN;
 }
