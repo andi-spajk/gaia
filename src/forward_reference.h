@@ -14,12 +14,12 @@ in a single Unresolved struct.
 #define FORWARD_REFERENCE_INSERTION_SUCCESS 1
 
 struct ForwardRef {
-	char *label;
-	char *source_line;
-	struct Instruction *instr;
-	int pc;
+	char *label;                // forward-referenced label
+	char *source_line;          // the full source line of code
+	struct Instruction *instr;  // the instruction of the line
+	int pc;                     // location of opcode in assembled binary
 	int line_num;
-	int operand_status;
+	int operand_status;         // whether instr is branch or jump
 };
 
 struct Unresolved {

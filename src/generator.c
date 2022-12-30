@@ -16,6 +16,11 @@ references.
 #include "parser.h"
 #include "symbol_table.h"
 
+// return statements will be more descriptive
+#define ONE_BYTE 1
+#define TWO_BYTES 2
+#define THREE_BYTES 3
+
 /* generate_code()
 	@f              ptr to binary FILE
 	@instr          ptr to Instruction struct
@@ -35,18 +40,19 @@ int generate_code(FILE *f, struct Instruction *instr, struct Token *operand,
 	fputc(instr->opcode, f);
 
 	int operand_bytes;
+	// nonexistent operand indicates accumulator or implied addr mode
 	if (operand)
 		operand_bytes = operand->value;
 	else
-		return 1;
+		return ONE_BYTE;
 
 	// little endian
 	fputc(operand_bytes & 0xFF, f);
 	if (instr->addr_bitflag & ABSOLUTE_FIELD) {
 		fputc(operand_bytes >> 8, f);
-		return 3;
+		return THREE_BYTES;
 	}
-	return 2;
+	return TWO_BYTES;
 }
 
 /* calc_branch_offset()
@@ -140,7 +146,7 @@ int resolve_forward_ref(FILE *f, struct ForwardRef *ref,
 			fseek(f, ref->pc, SEEK_SET);
 			fputc(instr->opcode, f);
 			fputc(offset & 0xFF, f);
-			return 2;
+			return TWO_BYTES;
 		}
 		return ERROR_ILLEGAL_ADDRESSING_MODE;
 	} else if (ref->operand_status == JUMP_FORWARD_REFERENCE) {
@@ -150,7 +156,7 @@ int resolve_forward_ref(FILE *f, struct ForwardRef *ref,
 			fputc(instr->opcode, f);
 			fputc(dest_pc & 0xFF, f);
 			fputc(dest_pc >> 8, f);
-			return 3;
+			return THREE_BYTES;
 		}
 		return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
