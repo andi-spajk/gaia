@@ -226,7 +226,8 @@ int parse_label_operand(struct Instruction *instr, struct Token *operand,
 			return PARSER_SUCCESS;
 	} else {
 		// nonexistent symbol may be a forward reference
-		// no forward references to constants!
+		// no forward references to constants! (except in indirect jump
+		// instructions)
 		if (branch)
 			return BRANCH_FORWARD_REFERENCE;
 		else if (jump)
@@ -352,9 +353,9 @@ int apply_masks(struct Lexer *lexer, int curr_field)
 	@return         FORWARD_REFERENCE signal code, used by assembler to
 	                delay writing bytes until label is resolved
 
-	Saves the information needed to parse a forward reference address when
-	we try to resolve the label later. Save info now because we do not save
-	all the source lines so we must preserve that info.
+	Apply bit masks and specialized checks to parse the addressing mode of a
+	forward reference. Saves this information in the instruction struct so
+	we can resolve the label later.
 */
 int parse_forward_reference_addr_mode(struct Lexer *lexer,
                                       struct Instruction *instr)
@@ -366,6 +367,7 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 		instr->addr_bitflag = addr_mode & ADDR_MODE_RELATIVE;
 		return FORWARD_REFERENCE;
 	}
+	// JMP has two modes, so we AND with the field. JSR has only one mode
 	if (instr->mnemonic == JMP)
 		instr->addr_bitflag = addr_mode & ABSOLUTE_FIELD;
 	else if (instr->mnemonic == JSR)
@@ -426,6 +428,9 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 	// branching is always relative
 	if (is_branch(instr->mnemonic))
 		addr_mode &= ADDR_MODE_RELATIVE;
+	// JSR is always absolute
+	else if (instr->mnemonic == JSR)
+		addr_mode &= ADDR_MODE_ABSOLUTE;
 	else
 		addr_mode &= ~ADDR_MODE_RELATIVE;
 

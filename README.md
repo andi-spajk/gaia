@@ -6,7 +6,7 @@ Gaia is a single-pass assembler for 6502 assembly.
 
 - Only supported on Linux or WSL.
 - No colons in labels.
-- You can forward reference a label as long as it's not a constant.
+- Forward references are only allowed in branch and jump instructions.
 - Maximum label length is 63 characters.
 - No assembler directives.
 - You cannot specify the accumulator as an operand, e.g. `ASL A` is illegal.

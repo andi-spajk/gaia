@@ -845,6 +845,7 @@ void test_parse_label_operand(void)
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, pc));
 	TEST_ASSERT_EQUAL_INT(27, search_symbol(symtab, "FORREF3"));
+	TEST_ASSERT_EQUAL_INT(JUMP_FORWARD_REFERENCE, parse_label_operand(instr, find_operand(lexer), symtab));
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -1689,6 +1690,13 @@ void test_parse_addr_mode(void)
 	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(lexer, instr, operand, operand_status));
 
 	buffer = "\t\tJSR\t(ADDRESS,X)\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand = find_operand(lexer);
+	operand_status = parse_operand(instr, operand, symtab);
+	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(lexer, instr, operand, operand_status));
+
+	buffer = "JSR (ADDRESS)\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand = find_operand(lexer);
