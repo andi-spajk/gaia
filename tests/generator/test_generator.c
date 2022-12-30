@@ -672,7 +672,7 @@ void test_too_big_offset_with_forward_ref(void)
 	int written;
 
 	pc = 0x0;
-	buffer = "BVC FARAWAY\n";
+	buffer = "BVC FARAWAY1\n";
 	lex_line(buffer, lexer, tk, instr);
 	parse_line(lexer);
 	operand = find_operand(lexer);
@@ -687,7 +687,7 @@ void test_too_big_offset_with_forward_ref(void)
 	fputc(0x00, f);
 
 	pc = 0x81;
-	buffer = "FARAWAY INY\n";
+	buffer = "FARAWAY1 INY\n";
 	lex_line(buffer, lexer, tk, instr);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
@@ -710,7 +710,7 @@ void test_too_big_offset_with_forward_ref(void)
 	*/
 
 	pc = 0x0;
-	buffer = "BVC FARAWAY2\n";
+	buffer = "BCS FARAWAY2\n";
 	lex_line(buffer, lexer, tk, instr);
 	parse_line(lexer);
 	operand = find_operand(lexer);
@@ -748,7 +748,7 @@ void test_too_big_offset_with_forward_ref(void)
 	*/
 
 	pc = 0x0;
-	buffer = "BVC FARAWAY3\n";
+	buffer = "BVS FARAWAY3\n";
 	lex_line(buffer, lexer, tk, instr);
 	parse_line(lexer);
 	operand = find_operand(lexer);
@@ -763,7 +763,7 @@ void test_too_big_offset_with_forward_ref(void)
 	fputc(0x00, f);
 
 	pc = 0x1000;
-	buffer = "FARAWAY3 INY\n";
+	buffer = "FARAWAY3 DEX\n";
 	lex_line(buffer, lexer, tk, instr);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
