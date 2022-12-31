@@ -5,15 +5,21 @@ OBJ = ../../obj
 SRC = ../../src
 CFLAGS += -I$(SRC)
 
-UNITY = ../../unity/unity.o
+UNITY_SRC = ../../unity
+UNITY_DEP = $(OBJ)/unity.o
 DEP = $(OBJ)/test_lexer.o $(OBJ)/lexer.o $(OBJ)/opcode.o $(OBJ)/assemble.o
+# separate DEP and UNITY_DEP because make clean need not delete unity.o
 
-test_lexer: $(DEP)
-	$(CC) $(CFLAGS) $^ $(UNITY) -o test_lexer
+test_lexer: $(DEP) $(UNITY_DEP)
+	$(CC) $(CFLAGS) $^ -o test_lexer
 
 $(OBJ)/test_lexer.o: test_lexer.c
-	$(CC) $(CFLAGS) $^ -c
+	$(CC) $(CFLAGS) $< -c
 	mv test_lexer.o $(OBJ)
+
+$(UNITY_DEP): $(UNITY_SRC)/unity.c
+	$(CC) $(CFLAGS) $< -c
+	mv unity.o $(OBJ)
 
 $(OBJ)/%.o: $(SRC)/%.c $(SRC)/%.h
 	$(CC) $(CFLAGS) $< -c

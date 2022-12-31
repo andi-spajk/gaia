@@ -5,15 +5,21 @@ OBJ = ../../obj
 SRC = ../../src
 CFLAGS += -I$(SRC)
 
-UNITY = ../../unity/unity.o
+UNITY_SRC = ../../unity
+UNITY_DEP = $(OBJ)/unity.o
 DEP = $(OBJ)/test_prime.o $(OBJ)/prime.o
+# separate DEP and UNITY_DEP because make clean need not delete unity.o
 
-test_prime: $(DEP)
-	$(CC) $(CFLAGS) $^ $(UNITY) -lm -o test_prime
+test_prime: $(DEP) $(UNITY_DEP)
+	$(CC) $(CFLAGS) $^ -lm -o test_prime
 
 $(OBJ)/test_prime.o: test_prime.c
-	$(CC) $(CFLAGS) $^ -c
+	$(CC) $(CFLAGS) $< -c
 	mv test_prime.o $(OBJ)
+
+$(UNITY_DEP): $(UNITY_SRC)/unity.c
+	$(CC) $(CFLAGS) $< -c
+	mv unity.o $(OBJ)
 
 $(OBJ)/%.o: $(SRC)/%.c $(SRC)/%.h
 	$(CC) $(CFLAGS) $< -c
