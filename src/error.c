@@ -8,13 +8,28 @@ Error-handling module for printing error messages.
 
 #include "error.h"
 
-void print_error(int error_code, char *file_name, int line_num,
+/* print_error()
+	@error_code     error code from error.h
+	@file_name      name of assembly program file
+	@line_num       line number where the error occurred
+	@line           line with the error
+
+	Prints a formatted error message.
+
+	Memory errors do not print lines and should pass in NULL for @line.
+	@line_num will be ignored in such cases.
+*/
+void print_error(int error_code, const char *file_name, int line_num,
                  const char *line)
 {
-	printf("%s:%i: ", file_name, line_num);
+	if (line)
+		printf("%s:%i: ", file_name, line_num);
+	else
+		printf("%s: ", file_name);
+
 	switch (error_code) {
 	case ERROR_MEMORY_ALLOCATION_FAIL:
-		printf("ERROR: could not allocate enough memory\n");
+		printf("ERROR: could not allocate enough memory during assembly\n");
 		printf("\n");
 		return;
 	// case ERROR_SYMBOL_NOT_FOUND:
@@ -58,5 +73,6 @@ void print_error(int error_code, char *file_name, int line_num,
 		break;
 	}
 
-	printf("%s\n", line);
+	if (line)
+		printf("%s\n", line);
 }

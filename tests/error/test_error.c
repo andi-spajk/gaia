@@ -22,8 +22,7 @@ void test_print_error(void)
 //                           0123 4567890123
 	const char *line = "\tLDA\t$800!!!!!!SDJGHJSDHFSDKVNSFULM\n";
 	// pretend memory allocation error
-	print_error(ERROR_MEMORY_ALLOCATION_FAIL, "prog.asm", line_num, line);
-	line_num++;
+	print_error(ERROR_MEMORY_ALLOCATION_FAIL, "prog.asm", 999999, NULL);
 
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(line, lexer, tk, instr));
 	print_error(ERROR_ILLEGAL_CHAR, "prog.asm", line_num, line);
@@ -97,11 +96,13 @@ void test_print_error(void)
 	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
 	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 	print_error(ERROR_ILLEGAL_ADDRESSING_MODE, "prog.asm", line_num, line);
+	line_num++;
 
 	line = "BCC BACK\n";
 	// test_generator.c already knows that the error code is returned correctly
 	// too lazy to repeat the test here
 	print_error(ERROR_TOO_BIG_OFFSET, "prog.asm", line_num, line);
+	line_num++;
 
 	destroy_lexer(lexer);
 	destroy_token(tk);

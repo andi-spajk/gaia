@@ -30,10 +30,12 @@ Error codes used by the assembler. Also a prototype to print error messages.
 #define ERROR_ILLEGAL_ADDRESSING_MODE   -14
 #define ERROR_ILLEGAL_MNEMONIC          -15
 #define ERROR_TOO_BIG_OFFSET            -16
+#define ERROR_FILE_NOT_FOUND            -17
+#define ERROR_FILE_OPEN_FAIL            -18
 /*
 ;       ;       ;       ;       ;       ;
 */
 
-void print_error(int error_code, char *file_name, int line_num,
+void print_error(int error_code, const char *file_name, int line_num,
                  const char *line);
 #endif
