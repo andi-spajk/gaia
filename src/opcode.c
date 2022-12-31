@@ -255,9 +255,6 @@ int get_addr_bitfield(const enum Mnemonic mnemonic)
 */
 int get_opcode(struct Instruction *instr)
 {
-	if (!instr)
-		return ERROR_NULL_ARGUMENT;
-
 	switch (instr->mnemonic) {
 	case ADC: return assemble_ADC(instr->addr_bitflag);
 	case AND: return assemble_AND(instr->addr_bitflag);

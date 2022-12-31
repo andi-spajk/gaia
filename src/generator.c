@@ -34,9 +34,6 @@ references.
 int generate_code(FILE *f, struct Instruction *instr, struct Token *operand,
                   int pc)
 {
-	if (!f || !instr)
-		return ERROR_NULL_ARGUMENT;
-
 	instr->opcode = get_opcode(instr);
 
 	fseek(f, pc, SEEK_SET);
@@ -99,9 +96,6 @@ int calc_branch_offset(int curr_pc, int dest_pc)
 int resolve_label_ref(FILE *f, struct Instruction *instr, struct Token *label,
                       int operand_status, struct SymbolTable *symtab, int pc)
 {
-	if (!f || !instr || !label || !symtab)
-		return ERROR_NULL_ARGUMENT;
-
 	int dest_pc, offset;
 	if (label)
 		dest_pc = search_symbol(symtab, label->str);
@@ -137,13 +131,9 @@ int resolve_label_ref(FILE *f, struct Instruction *instr, struct Token *label,
 int resolve_forward_ref(FILE *f, struct ForwardRef *ref,
                         struct SymbolTable *symtab)
 {
-	if (!f || !ref || !symtab)
-		return ERROR_NULL_ARGUMENT;
-
 	struct Instruction *instr = ref->instr;
 	int dest_pc, offset;
-	if (ref->label)
-		dest_pc = search_symbol(symtab, ref->label);
+	dest_pc = search_symbol(symtab, ref->label);
 
 	if (ref->operand_status == BRANCH_FORWARD_REFERENCE) {
 		offset = calc_branch_offset(ref->pc, dest_pc);

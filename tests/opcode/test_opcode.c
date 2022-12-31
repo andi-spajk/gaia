@@ -417,7 +417,6 @@ void test_get_opcode(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_MNEMONIC, get_opcode(instr));
 	instr->mnemonic = -1;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_MNEMONIC, get_opcode(instr));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, get_opcode(NULL));
 
 	destroy_instruction(instr);
 }

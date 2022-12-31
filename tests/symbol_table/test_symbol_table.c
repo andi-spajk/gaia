@@ -25,10 +25,6 @@ void test_insert_symbol(void)
 	struct SymbolTable *symtab = init_symbol_table();
 	TEST_ASSERT_NOT_NULL(symtab);
 
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, insert_symbol(NULL, NULL, 999));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, insert_symbol(symtab, NULL, 999));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, insert_symbol(NULL, "lol", 999));
-
 	TEST_ASSERT_EQUAL_INT(17, symtab->size);
 	TEST_ASSERT_EQUAL_INT(0, symtab->count);
 	// hash 8
@@ -95,10 +91,6 @@ void test_search_symbol(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_SYMBOL_NOT_FOUND, search_symbol(symtab, "SORT16"));
 	TEST_ASSERT_EQUAL_INT(ERROR_SYMBOL_NOT_FOUND, search_symbol(symtab, "!@#$%^&*()"));
 	TEST_ASSERT_EQUAL_INT(ERROR_SYMBOL_NOT_FOUND, search_symbol(symtab, "SETW"));
-
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, search_symbol(NULL, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, search_symbol(symtab, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, search_symbol(NULL, "lol"));
 
 	// hash 12
 	insert_symbol(symtab, "SORT16", 7);

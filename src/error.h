@@ -32,7 +32,6 @@ Error codes used by the assembler. Also a prototype to print error messages.
 #define ERROR_TOO_BIG_OFFSET            -16
 #define ERROR_FILE_NOT_FOUND            -17
 #define ERROR_FILE_OPEN_FAIL            -18
-#define ERROR_NULL_ARGUMENT             -19
 /*
 ;       ;       ;       ;       ;       ;
 */

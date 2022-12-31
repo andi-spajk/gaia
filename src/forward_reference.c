@@ -48,8 +48,6 @@ struct Unresolved *init_unresolved(void)
 */
 void destroy_forward_ref(struct ForwardRef *ref)
 {
-	if (!ref)
-		return;
 	if (ref->label)
 		free(ref->label);
 	if (ref->source_line)
@@ -101,9 +99,6 @@ struct ForwardRef *create_forward_ref(const char *buffer,
                                       struct Token *operand, int operand_status,
                                       int pc, int line_num)
 {
-	if (!buffer || !instr || !operand)
-		return NULL;
-
 	struct ForwardRef *ref = malloc(sizeof(struct ForwardRef));
 	if (!ref)
 		return NULL;
@@ -157,9 +152,6 @@ struct ForwardRef *create_forward_ref(const char *buffer,
 */
 struct Unresolved *resize_unresolved(struct Unresolved *unresolved)
 {
-	if (!unresolved)
-		return NULL;
-
 	size_t new_size = 2 * unresolved->size * sizeof(struct ForwardRef *);
 	unresolved->refs = realloc(unresolved->refs, new_size);
 	if (!unresolved->refs)
@@ -184,9 +176,6 @@ struct Unresolved *resize_unresolved(struct Unresolved *unresolved)
 */
 int add_forward_ref(struct Unresolved *unresolved, struct ForwardRef *ref)
 {
-	if (!unresolved || !ref)
-		return ERROR_NULL_ARGUMENT;
-
 	// array is full
 	if (unresolved->curr == unresolved->size - 1) {
 		if (!resize_unresolved(unresolved))

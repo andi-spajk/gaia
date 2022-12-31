@@ -236,8 +236,6 @@ void test_parse_line(void)
 	TEST_ASSERT_NOT_NULL(instr);
 	const char *buffer;
 
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, parse_line(NULL));
-
 	buffer = constant_addr;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
@@ -460,10 +458,6 @@ void test_parse_label_declaration(void)
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x2));
 	TEST_ASSERT_EQUAL_INT(0x2, search_symbol(symtab, lexer->sequence[0]->str));
 	TEST_ASSERT_EQUAL_INT(0x2, lexer->sequence[0]->value);
-
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, parse_label_declaration(NULL, NULL, 0x2));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, parse_label_declaration(lexer, NULL, 0x2));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, parse_label_declaration(NULL, symtab, 0x2));
 
 	const char *label_redefinition = "CONSTANT16\t\t=\t$1234\n";
 	buffer = label_redefinition;
@@ -893,10 +887,6 @@ void test_parse_operand(void)
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	operand = find_operand(lexer);
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_operand(instr, operand, symtab));
-
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, parse_operand(NULL, NULL, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, parse_operand(instr, NULL, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, parse_operand(NULL, NULL, symtab));
 
 	buffer = zp;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
@@ -1407,10 +1397,6 @@ void test_parse_addr_mode(void)
 	operand = find_operand(lexer);
 	operand_status = parse_operand(instr, operand, symtab);
 	TEST_ASSERT_EQUAL_INT(ADDR_MODE_IMPLIED, parse_addr_mode(lexer, instr, operand, operand_status));
-
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, parse_addr_mode(NULL, NULL, NULL, operand_status));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, parse_addr_mode(lexer, NULL, NULL, operand_status));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, parse_addr_mode(NULL, instr, NULL, operand_status));
 
 	// exhaustive_lines.h has exhaustive token sequences
 	// BUT NOT exhaustive addressing modes (missing accumulator)

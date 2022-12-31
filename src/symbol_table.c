@@ -165,9 +165,6 @@ static struct Symbol *init_symbol(const char *label, const int value)
 int insert_symbol(struct SymbolTable *symtab, const char *label,
                   const int value)
 {
-	if (!symtab || !label)
-		return ERROR_NULL_ARGUMENT;
-
 	// check load factor first
 	// if you insert first then you might have to hash it again -- waste!
 	int load = ((symtab->count + 1) * 100) / symtab->size;
@@ -203,9 +200,6 @@ int insert_symbol(struct SymbolTable *symtab, const char *label,
 */
 int search_symbol(const struct SymbolTable *symtab, const char *label)
 {
-	if (!symtab || !label)
-		return ERROR_NULL_ARGUMENT;
-
 	int hash = djb2_hash(label) % symtab->size;
 	struct Symbol *curr = symtab->symbols[hash];
 	while (curr) {

@@ -686,14 +686,6 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_STRING("SEARCH", lexer->sequence[0]->str);
 	TEST_ASSERT_EQUAL_STRING("BOARD", lexer->sequence[2]->str);
 
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(NULL, NULL, NULL, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(buffer, NULL, NULL, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(NULL, lexer, NULL, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(NULL, NULL, tk, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(NULL, NULL, NULL, instr));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(NULL, lexer, tk, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(buffer, NULL, tk, NULL));
-
 	const char *bad_line = "\t\tADC\tBCC\t; lol\n";
 	buffer = bad_line;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));

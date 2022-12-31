@@ -79,14 +79,6 @@ void test_generate_code(void)
 	TEST_ASSERT_EQUAL_INT(1, written);
 	pc += written;
 
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, generate_code(NULL, NULL, NULL, pc));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, generate_code(f, NULL, NULL, pc));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, generate_code(NULL, instr, NULL, pc));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, generate_code(NULL, NULL, operand, pc));
-	// this permutation is allowed!
-	// TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, generate_code(f, instr, NULL, pc));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, generate_code(NULL, instr, operand, pc));
-
 	buffer = "ORA $AA\n";
 	lex_line(buffer, lexer, tk, instr);
 	parse_line(lexer);
@@ -292,12 +284,6 @@ void test_resolve_label_ref(void)
 	TEST_ASSERT_EQUAL_INT(0xFD, operand->value);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
-
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, resolve_label_ref(NULL, NULL, NULL, operand_status, NULL, pc));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, resolve_label_ref(f, NULL, NULL, operand_status, NULL, pc));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, resolve_label_ref(NULL, instr, NULL, operand_status, NULL, pc));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, resolve_label_ref(f, NULL, operand, operand_status, NULL, pc));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, resolve_label_ref(f, instr, NULL, operand_status, symtab, pc));
 
 	buffer = "JMP LABEL1\n";
 	lex_line(buffer, lexer, tk, instr);
@@ -639,12 +625,6 @@ void test_resolve_forward_ref(void)
 
 	for (int i = 0; unresolved->refs[i] != NULL; i++)
 		resolve_forward_ref(f, unresolved->refs[i], symtab);
-
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, resolve_forward_ref(NULL, NULL, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, resolve_forward_ref(f, NULL, NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, resolve_forward_ref(NULL, unresolved->refs[0], NULL));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, resolve_forward_ref(NULL, NULL, symtab));
-	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, resolve_forward_ref(f, NULL, symtab));
 
 	fseek(f, 0, SEEK_SET);
 	TEST_ASSERT_EQUAL_INT(exp_bytes, fread(produced_rom, sizeof(unsigned char), exp_bytes, f));
