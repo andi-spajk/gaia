@@ -1703,6 +1703,15 @@ void test_parse_addr_mode(void)
 	operand_status = parse_operand(instr, operand, symtab);
 	TEST_ASSERT_EQUAL_INT(0, parse_addr_mode(lexer, instr, operand, operand_status));
 
+	// no operand
+	buffer = "\t\tSTA\t;lol\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	operand = find_operand(lexer);
+	operand_status = parse_operand(instr, operand, symtab);
+	TEST_ASSERT_EQUAL_INT(ADDR_MODE_IMPLIED, parse_addr_mode(lexer, instr, operand, operand_status));
+	TEST_ASSERT_EQUAL_INT(0, ADDR_MODE_IMPLIED & instr->addr_bitfield);
+
 	destroy_lexer(lexer);
 	destroy_token(tk);
 	destroy_instruction(instr);
