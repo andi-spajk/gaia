@@ -17,34 +17,47 @@ void test_print_error(void)
 	TEST_ASSERT_NOT_NULL(instr);
 	struct SymbolTable *symtab = init_symbol_table();
 	TEST_ASSERT_NOT_NULL(symtab);
+	int line_num = 1;
 
 //                           0123 4567890123
 	const char *line = "\tLDA\t$800!!!!!!SDJGHJSDHFSDKVNSFULM\n";
 	// pretend memory allocation error
-	print_error(ERROR_MEMORY_ALLOCATION_FAIL, "prog.asm", 1, line);
+	print_error(ERROR_MEMORY_ALLOCATION_FAIL, "prog.asm", line_num, line);
+	line_num++;
 
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(line, lexer, tk, instr));
-	print_error(ERROR_ILLEGAL_CHAR, "prog.asm", 2, line);
+	print_error(ERROR_ILLEGAL_CHAR, "prog.asm", line_num, line);
+	line_num++;
+
+	line = "LDX\t%10021010\n";
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(line, lexer, tk, instr));
+	print_error(ERROR_ILLEGAL_CHAR, "prog.asm", line_num, line);
+	line_num++;
 
 	line = "TEST = $FFFF0001\n";
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_line(line, lexer, tk, instr));
-	print_error(ERROR_TOO_BIG_LITERAL, "prog.asm", 3, line);
+	print_error(ERROR_TOO_BIG_LITERAL, "prog.asm", line_num, line);
+	line_num++;
 
 //               0 1234 56
 	line = "\t\tJMP\ta2345678b2345678c2345678d2345678e2345678f2345678g2345678h2345678\n";
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_LONG_LABEL, lex_line(line, lexer, tk, instr));
-	print_error(ERROR_TOO_LONG_LABEL, "prog.asm", 5, line);
+	print_error(ERROR_TOO_LONG_LABEL, "prog.asm", line_num, line);
+	line_num++;
 
 	line = "LABEL\t\tADC\t((PLACE,X),Y)\t;lolwtf\n";
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_TOKENS, lex_line(line, lexer, tk, instr));
-	print_error(ERROR_TOO_MANY_TOKENS, "prog.asm", 6, line);
+	print_error(ERROR_TOO_MANY_TOKENS, "prog.asm", line_num, line);
+	line_num++;
 
-	print_error(ERROR_UNKNOWN, "prog.asm", 7, line);
+	print_error(ERROR_UNKNOWN, "prog.asm", line_num, line);
+	line_num++;
 
 	line = "INC     (LOL,),\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_line(lexer));
-	print_error(ERROR_ILLEGAL_SEQUENCE, "prog.asm", 8, line);
+	print_error(ERROR_ILLEGAL_SEQUENCE, "prog.asm", line_num, line);
+	line_num++;
 
 	line = "SYMBOL = $1234\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr));
@@ -54,7 +67,8 @@ void test_print_error(void)
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(ERROR_LABEL_REDEFINITION, parse_label_declaration(lexer, symtab, 0));
-	print_error(ERROR_LABEL_REDEFINITION, "prog.asm", 9, line);
+	print_error(ERROR_LABEL_REDEFINITION, "prog.asm", line_num, line);
+	line_num++;
 
 	line = "LOOP ADC $01\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr));
@@ -65,13 +79,29 @@ void test_print_error(void)
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(ERROR_LABEL_REDEFINITION, parse_label_declaration(lexer, symtab, 2));
 	TEST_ASSERT_EQUAL_INT(0, search_symbol(symtab, lexer->sequence[0]->str));
-	print_error(ERROR_LABEL_REDEFINITION, "prog.asm", 10, line);
+	print_error(ERROR_LABEL_REDEFINITION, "prog.asm", line_num, line);
+	line_num++;
 
 	line = "\t\tCPY\tADDRESS\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_FORWARD_REFERENCE, parse_operand(instr, find_operand(lexer), symtab));
-	print_error(ERROR_ILLEGAL_FORWARD_REFERENCE, "prog.asm", 10, line);
+	print_error(ERROR_ILLEGAL_FORWARD_REFERENCE, "prog.asm", line_num, line);
+	line_num++;
+
+	line = "SBC ($ABCD)\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_operand(instr, find_operand(lexer), symtab));
+	int addr_mask = parse_addr_mode(lexer, instr, find_operand(lexer), PARSER_SUCCESS);
+	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
+	print_error(ERROR_ILLEGAL_ADDRESSING_MODE, "prog.asm", line_num, line);
+
+	line = "BCC BACK\n";
+	// test_generator.c already knows that the error code is returned correctly
+	// too lazy to repeat the test here
+	print_error(ERROR_TOO_BIG_OFFSET, "prog.asm", line_num, line);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);

@@ -50,6 +50,12 @@ void print_error(int error_code, char *file_name, int line_num,
 	case ERROR_ILLEGAL_FORWARD_REFERENCE:
 		printf("ERROR: illegal forward reference\n");
 		break;
+	case ERROR_ILLEGAL_ADDRESSING_MODE:
+		printf("ERROR: illegal addressing mode\n");
+		break;
+	case ERROR_TOO_BIG_OFFSET:
+		printf("ERROR: branch offset too far away\n");
+		break;
 	}
 
 	printf("%s\n", line);
