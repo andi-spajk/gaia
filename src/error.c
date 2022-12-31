@@ -22,6 +22,9 @@ Error-handling module for printing error messages.
 void print_error(int error_code, const char *file_name, int line_num,
                  const char *line)
 {
+	if (!file_name)
+		return;
+
 	if (line)
 		printf("%s:%i: ", file_name, line_num);
 	else

@@ -17,14 +17,15 @@ struct ForwardRef {
 	char *label;                // forward-referenced label
 	char *source_line;          // the full source line of code
 	struct Instruction *instr;  // the instruction of the line
-	int pc;                     // location of opcode in assembled binary
+	int pc;                     // location of instruction's opcode in the
+	                            // assembled binary file
 	int line_num;
 	int operand_status;         // whether instr is branch or jump
 };
 
 struct Unresolved {
-	struct ForwardRef **refs;
-	int curr;  // first open index in refs[]
+	struct ForwardRef **refs;  // linear array of ForwardRef
+	int curr;                  // first open index in refs[]
 	int size;
 };
 

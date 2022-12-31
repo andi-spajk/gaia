@@ -19,6 +19,8 @@ void test_print_error(void)
 	TEST_ASSERT_NOT_NULL(symtab);
 	int line_num = 1;
 
+	print_error(-999, NULL, 100000, "LDA #$01\n");
+
 //                           0123 4567890123
 	const char *line = "\tLDA\t$800!!!!!!SDJGHJSDHFSDKVNSFULM\n";
 	// pretend memory allocation error

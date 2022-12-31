@@ -11,6 +11,10 @@ label constants, missing label declarations, or illegal forward references.
 
 See parser.h for full diagram of valid token sequences.
 
+The user need only call parse_line(), parse_label_declaration(), find_operand(),
+parse_operand(), and parse_addr_mode(). Therefore all other functions do not
+check for invalid ptr arguments.
+
 */
 
 #include <stddef.h>
@@ -147,6 +151,9 @@ int parse_label_tree(struct Token **seq, int index)
 */
 int parse_line(struct Lexer *lexer)
 {
+	if (!lexer)
+		return ERROR_NULL_ARGUMENT;
+
 	int index = 0;
 	struct Token **seq = lexer->sequence;
 	if (seq[index]->type == TOKEN_INSTRUCTION)
@@ -170,6 +177,9 @@ int parse_line(struct Lexer *lexer)
 int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
                             int pc)
 {
+	if (!lexer || !symtab)
+		return ERROR_NULL_ARGUMENT;
+
 	struct Token **seq = lexer->sequence;
 	struct Token *label = seq[0];
 	int found = search_symbol(symtab, label->str);
@@ -259,6 +269,9 @@ int parse_label_operand(struct Instruction *instr, struct Token *operand,
 int parse_operand(struct Instruction *instr, struct Token *operand,
                   struct SymbolTable *symtab)
 {
+	if (!instr || !symtab)
+		return ERROR_NULL_ARGUMENT;
+
 	// implied operand or accumulator
 	if (!operand)
 		return PARSER_SUCCESS;
@@ -283,6 +296,9 @@ int parse_operand(struct Instruction *instr, struct Token *operand,
 */
 struct Token *find_operand(struct Lexer *lexer)
 {
+	if (!lexer)
+		return NULL;
+
 	struct Token *curr = lexer->sequence[1];
 	// start at 2nd token
 	// operand will always be 2nd or later
@@ -378,7 +394,7 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 /* parse_addr_mode()
 	@lexer                  ptr to Lexer struct
 	@instr                  ptr to Instruction struct
-	@operand                ptr to operand token
+	@operand                ptr to operand token (can be NULL)
 	@operand_status         whether operand is branch/jump and/or forward
 	                        reference
 
@@ -391,6 +407,9 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
                     struct Token *operand, int operand_status)
 {
+	if (!lexer || !instr)
+		return ERROR_NULL_ARGUMENT;
+
 	if (operand_status == BRANCH_FORWARD_REFERENCE ||
 	    operand_status == JUMP_FORWARD_REFERENCE)
 		return parse_forward_reference_addr_mode(lexer, instr);

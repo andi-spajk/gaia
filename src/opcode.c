@@ -41,6 +41,9 @@ struct Instruction *init_instruction(void)
 */
 void reset_instruction(struct Instruction *instr)
 {
+	if (!instr)
+		return;
+
 	instr->mnemonic = NULL_MNEMONIC;
 	instr->addr_bitfield = 0;
 	instr->addr_bitflag = 0;
@@ -108,6 +111,9 @@ int is_jump(const enum Mnemonic mnemonic)
 */
 enum Mnemonic str_to_mnemonic(const char *str)
 {
+	if (!str)
+		return ILLEGAL_MNEMONIC;
+
 	if (!strcmp("ADC", str)) return ADC;
 	else if (!strcmp("AND", str)) return AND;
 	else if (!strcmp("ASL", str)) return ASL;
@@ -249,6 +255,9 @@ int get_addr_bitfield(const enum Mnemonic mnemonic)
 */
 int get_opcode(struct Instruction *instr)
 {
+	if (!instr)
+		return ERROR_NULL_ARGUMENT;
+
 	switch (instr->mnemonic) {
 	case ADC: return assemble_ADC(instr->addr_bitflag);
 	case AND: return assemble_AND(instr->addr_bitflag);

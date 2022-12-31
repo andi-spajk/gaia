@@ -9,6 +9,10 @@ The lexer detects lexical errors such as illegal characters and labels over the
 maximum character length. It also checks if literal operands are over 2 bytes,
 which is always an error.
 
+The user need only call the init/destroy functions and lex_line(). Therefore,
+other lexing functions do not check for invalid ptr arguments. Only lex_line()
+will check.
+
 */
 
 #include <ctype.h>
@@ -89,6 +93,9 @@ struct Lexer *init_lexer(void)
 */
 void reset_lexer(struct Lexer *lexer)
 {
+	if (!lexer)
+		return;
+
 	for (int i = 0; i < MAX_TOKENS; i++) {
 		lexer->sequence[i]->type = TOKEN_NULL;
 		lexer->sequence[i]->value = 0;
@@ -121,6 +128,9 @@ void destroy_token(struct Token *tk)
 */
 void destroy_lexer(struct Lexer *lexer)
 {
+	if (!lexer)
+		return;
+
 	struct Token *curr;
 	for (int i = 0; i < MAX_TOKENS; i++) {
 		curr = lexer->sequence[i];
@@ -273,6 +283,7 @@ static int is_end_of_token(const char c)
 	case ' ':
 	case '\t':
 	case '\n':
+	case '\0':
 	case ',':
 	case '(':
 	case ')':
@@ -284,7 +295,7 @@ static int is_end_of_token(const char c)
 
 /* lex_literal()
 	@tk             ptr to Token in the lexer sequence
-	@literal           ptr to first char of the literal token
+	@literal        ptr to first char of the literal token
 
 	@return         number of chars read, or error code
 
@@ -505,6 +516,9 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
              struct Instruction *instr)
 {
+	if (!buffer || !lexer || !tk || !instr)
+		return ERROR_NULL_ARGUMENT;
+
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
@@ -515,7 +529,7 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 
 	// tokenize and perform lexical analysis on token
 	int num_chars;
-	while (*curr != '\n' && *curr != ';') {
+	while (*curr != '\n' && *curr != ';' && *curr != '\0') {
 		num_chars = lex(curr, tk, instr);
 		// negative returns indicate an error code
 		if (num_chars < 0)

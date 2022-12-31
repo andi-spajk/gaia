@@ -20,6 +20,7 @@ void test_init_destroy_instr(void)
 	TEST_ASSERT_EQUAL_INT(0, instr->opcode);
 
 	destroy_instruction(instr);
+	destroy_instruction(NULL);
 }
 
 void test_str_to_mnemonic(void)
@@ -87,6 +88,8 @@ void test_str_to_mnemonic(void)
 	TEST_ASSERT_EQUAL_INT(ILLEGAL_MNEMONIC, str_to_mnemonic("KDSJFLSFJSKFJKSLJ"));
 	TEST_ASSERT_EQUAL_INT(ILLEGAL_MNEMONIC, str_to_mnemonic("JANUS"));
 	TEST_ASSERT_EQUAL_INT(ILLEGAL_MNEMONIC, str_to_mnemonic("STLOOP"));
+	TEST_ASSERT_EQUAL_INT(ILLEGAL_MNEMONIC, str_to_mnemonic(NULL));
+	TEST_ASSERT_EQUAL_INT(ILLEGAL_MNEMONIC, str_to_mnemonic(""));
 }
 
 void test_get_addr_bitfield(void)
@@ -414,6 +417,7 @@ void test_get_opcode(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_MNEMONIC, get_opcode(instr));
 	instr->mnemonic = -1;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_MNEMONIC, get_opcode(instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, get_opcode(NULL));
 
 	destroy_instruction(instr);
 }

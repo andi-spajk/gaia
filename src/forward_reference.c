@@ -42,19 +42,21 @@ struct Unresolved *init_unresolved(void)
 }
 
 /* destroy_forward_ref()
-	@forward_ref    ptr to ForwardRef struct
+	@ref            ptr to forward reference
 
 	Free the memory used by a dynamically allocated ForwardRef struct.
 */
-void destroy_forward_ref(struct ForwardRef *forward_ref)
+void destroy_forward_ref(struct ForwardRef *ref)
 {
-	if (forward_ref->label)
-		free(forward_ref->label);
-	if (forward_ref->source_line)
-		free(forward_ref->source_line);
-	if (forward_ref->instr)
-		destroy_instruction(forward_ref->instr);
-	free(forward_ref);
+	if (!ref)
+		return;
+	if (ref->label)
+		free(ref->label);
+	if (ref->source_line)
+		free(ref->source_line);
+	if (ref->instr)
+		destroy_instruction(ref->instr);
+	free(ref);
 }
 
 /* destroy_unresolved()
@@ -69,10 +71,9 @@ void destroy_unresolved(struct Unresolved *unresolved)
 	if (!unresolved->refs)
 		return;
 
-	for (int i = 0; i < unresolved->size; i++) {
-		if (unresolved->refs[i])
-			destroy_forward_ref(unresolved->refs[i]);
-	}
+	// all forwardrefs are stored linearly
+	for (int i = 0; unresolved->refs[i] != NULL; i++)
+		destroy_forward_ref(unresolved->refs[i]);
 	free(unresolved->refs);
 	free(unresolved);
 }
@@ -100,6 +101,9 @@ struct ForwardRef *create_forward_ref(const char *buffer,
                                       struct Token *operand, int operand_status,
                                       int pc, int line_num)
 {
+	if (!buffer || !instr || !operand)
+		return NULL;
+
 	struct ForwardRef *ref = malloc(sizeof(struct ForwardRef));
 	if (!ref)
 		return NULL;
@@ -153,6 +157,9 @@ struct ForwardRef *create_forward_ref(const char *buffer,
 */
 struct Unresolved *resize_unresolved(struct Unresolved *unresolved)
 {
+	if (!unresolved)
+		return NULL;
+
 	size_t new_size = 2 * unresolved->size * sizeof(struct ForwardRef *);
 	unresolved->refs = realloc(unresolved->refs, new_size);
 	if (!unresolved->refs)
@@ -177,6 +184,9 @@ struct Unresolved *resize_unresolved(struct Unresolved *unresolved)
 */
 int add_forward_ref(struct Unresolved *unresolved, struct ForwardRef *ref)
 {
+	if (!unresolved || !ref)
+		return ERROR_NULL_ARGUMENT;
+
 	// array is full
 	if (unresolved->curr == unresolved->size - 1) {
 		if (!resize_unresolved(unresolved))

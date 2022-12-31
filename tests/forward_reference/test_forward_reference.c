@@ -1,6 +1,7 @@
 #include "../../unity/unity.h"
 #include "addressing_modes.h"
 #include "bitfields.h"
+#include "error.h"
 #include "forward_reference.h"
 #include "lexer.h"
 #include "opcode.h"
@@ -17,6 +18,7 @@ void test_init_destroy_unresolved(void)
 	TEST_ASSERT_EQUAL_INT(0, unresolved->curr);
 	TEST_ASSERT_EQUAL_INT(8, unresolved->size);
 	destroy_unresolved(unresolved);
+	destroy_unresolved(NULL);
 }
 
 void test_create_forward_ref(void)
@@ -36,12 +38,16 @@ void test_create_forward_ref(void)
 	struct ForwardRef *ref;
 	struct Token *operand;
 
+	TEST_ASSERT_NULL(create_forward_ref(NULL, NULL, NULL, JUMP_FORWARD_REFERENCE, 999, 999));
+
 	// JMP L21
 	buffer = "\t\tJMP\tL21\t; comment\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	pc = 0x0;
 	line_num = 1;
+
+	TEST_ASSERT_NULL(create_forward_ref(buffer, instr, NULL, JUMP_FORWARD_REFERENCE, pc, line_num));
 
 	operand = find_operand(lexer);
 	operand_status = parse_operand(instr, operand, symtab);
@@ -133,6 +139,8 @@ void test_add_forward_ref(void)
 	parse_addr_mode(lexer, instr, operand, operand_status);
 
 	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
+	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, add_forward_ref(NULL, ref));
+	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, add_forward_ref(unresolved, NULL));
 
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 

@@ -21,6 +21,7 @@ void test_init_destroy_lexer(void)
 		TEST_ASSERT_EQUAL_INT(0U, lexer->sequence[i]->value);
 	}
 	destroy_lexer(lexer);
+	destroy_lexer(NULL);
 }
 
 void test_token_strcpy(void)
@@ -659,12 +660,13 @@ void test_lex_line(void)
 	TEST_ASSERT_NOT_NULL(tk);
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
+	const char *buffer;
 
 	// lex_line() resets the lexer and instr for us, so we will not need to
 	// call the resets ourselves
 
 	const char *source_line = "SEARCH\t\tLDA\tBOARD,X\n";
-	const char *buffer = source_line;
+	buffer = source_line;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	// 5 tokens from index [0,4], so lexer->curr should be index 5
 	TEST_ASSERT_EQUAL_INT(5, lexer->curr);
@@ -683,6 +685,14 @@ void test_lex_line(void)
 
 	TEST_ASSERT_EQUAL_STRING("SEARCH", lexer->sequence[0]->str);
 	TEST_ASSERT_EQUAL_STRING("BOARD", lexer->sequence[2]->str);
+
+	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(NULL, NULL, NULL, NULL));
+	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(buffer, NULL, NULL, NULL));
+	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(NULL, lexer, NULL, NULL));
+	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(NULL, NULL, tk, NULL));
+	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(NULL, NULL, NULL, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(NULL, lexer, tk, NULL));
+	TEST_ASSERT_EQUAL_INT(ERROR_NULL_ARGUMENT, lex_line(buffer, NULL, tk, NULL));
 
 	const char *bad_line = "\t\tADC\tBCC\t; lol\n";
 	buffer = bad_line;
@@ -745,7 +755,8 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_STRING("ADDRESS", lexer->sequence[0]->str);
 	TEST_ASSERT_EQUAL_INT(0x1234, lexer->sequence[2]->value);
 
-	const char *indy = "L20\t\tSTA\t($FF),Y\n";
+	// null-terminated string instead of newline-terminated
+	const char *indy = "L20\t\tSTA\t($FF),Y";
 	buffer = indy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(7, lexer->curr);
