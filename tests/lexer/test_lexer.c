@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -498,6 +499,18 @@ void test_lex_text(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	TEST_ASSERT_EQUAL_STRING("YNOTREGISTER", tk->str);
 
+	char *eof_test = malloc(5 * sizeof(char));
+	if (eof_test) {
+		strncpy(eof_test, "EOF\n", 5);
+		eof_test[3] = EOF;
+		buffer = eof_test;
+		TEST_ASSERT_EQUAL_INT(3, lex_text(buffer, tk, instr));
+		TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+		TEST_ASSERT_EQUAL_STRING("EOF", tk->str);
+		TEST_ASSERT_EQUAL_INT(EOF, buffer[3]);
+		free(eof_test);
+	}
+
 	buffer = "LDA#$01\n";
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_text(buffer, tk, instr));
 
@@ -747,7 +760,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_STRING("ADDRESS", lexer->sequence[0]->str);
 	TEST_ASSERT_EQUAL_INT(0x1234, lexer->sequence[2]->value);
 
-	// null-terminated string instead of newline-terminated
+	// null-terminated string instead of newline and then null-terminated
 	const char *indy = "L20\t\tSTA\t($FF),Y";
 	buffer = indy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
@@ -767,6 +780,32 @@ void test_lex_line(void)
 
 	TEST_ASSERT_EQUAL_STRING("L20", lexer->sequence[0]->str);
 	TEST_ASSERT_EQUAL_INT(0xFF, lexer->sequence[3]->value);
+
+	// EOF and then null-terminated
+	char *eof_test = malloc(17 * sizeof(char));
+	if (eof_test) {
+		strncpy(eof_test, "EOFTEST LSR $0A", 17);
+		eof_test[15] = EOF;
+		buffer = eof_test;
+		TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+		TEST_ASSERT_EQUAL_INT(3, lexer->curr);
+
+		TEST_ASSERT_EQUAL_INT(LSR, instr->mnemonic);
+		TEST_ASSERT_EQUAL_INT(LSR_BITFIELD, instr->addr_bitfield);
+
+		TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[0]->type);
+		TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[1]->type);
+		TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, lexer->sequence[2]->type);
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[3]->type);
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[4]->type);
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
+
+		TEST_ASSERT_EQUAL_STRING("EOFTEST", lexer->sequence[0]->str);
+		TEST_ASSERT_EQUAL_INT(0xA, lexer->sequence[2]->value);
+		free(eof_test);
+	}
 
 	destroy_lexer(lexer);
 	destroy_token(tk);

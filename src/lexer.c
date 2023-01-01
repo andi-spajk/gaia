@@ -12,6 +12,7 @@ which is always an error.
 */
 
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -281,6 +282,7 @@ static int is_end_of_token(const char c)
 	case '(':
 	case ')':
 	case ';':
+	case EOF:
 		return 1;
 	}
 	return 0;
@@ -490,6 +492,25 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 	return ERROR_ILLEGAL_CHAR;
 }
 
+/* end_line_lexing()
+	@c      current char to check
+
+	Check if the current character in a line of source code is a signal to
+	end the lexical analysis. Newlines, comments, null terminators, and EOF
+	are all signals that the source code has ended.
+*/
+static int end_line_lexing(char c)
+{
+	switch (c) {
+	case '\n':
+	case ';':
+	case '\0':
+	case EOF:
+		return 1;
+	}
+	return 0;
+}
+
 /* lex_line()
 	@buffer         ptr to source line of code
 	@lexer          ptr to Lexer struct
@@ -517,9 +538,9 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 	while (*curr == ' ' || *curr == '\t')
 		curr++;
 
-	// tokenize and perform lexical analysis on token
+	// tokenize and perform lexical analysis on every token
 	int num_chars;
-	while (*curr != '\n' && *curr != ';' && *curr != '\0') {
+	while (!end_line_lexing(*curr)) {
 		num_chars = lex(curr, tk, instr);
 		// negative returns indicate an error code
 		if (num_chars < 0)
