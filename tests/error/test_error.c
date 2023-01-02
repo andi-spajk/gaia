@@ -19,13 +19,14 @@ void test_print_error(void)
 	TEST_ASSERT_NOT_NULL(symtab);
 	int line_num = 1;
 
-	print_error(-999, NULL, 100000, "LDA #$01\n");
+	// we can only pretend for these errors
+	// line number is ignored in these cases
+	print_error(ERROR_MEMORY_ALLOCATION_FAIL, "prog.asm", 999999, NULL);
+	print_error(ERROR_INVALID_CMDLINE_ARGS, NULL, 12345, NULL);
+	print_error(ERROR_BINARY_FILE_CREATION_FAIL, "prog.asm", -1, NULL);
 
 //                           0123 4567890123
 	const char *line = "\tLDA\t$800!!!!!!SDJGHJSDHFSDKVNSFULM\n";
-	// pretend memory allocation error
-	print_error(ERROR_MEMORY_ALLOCATION_FAIL, "prog.asm", 999999, NULL);
-
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(line, lexer, tk, instr));
 	print_error(ERROR_ILLEGAL_CHAR, "prog.asm", line_num, line);
 	line_num++;

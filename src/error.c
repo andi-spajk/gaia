@@ -12,23 +12,24 @@ Error-handling module for printing error messages.
 	@error_code     error code from error.h
 	@file_name      name of assembly program file
 	@line_num       line number where the error occurred
-	@line           line with the error
+	@line           source line with the error
 
 	Prints a formatted error message.
 
-	Memory errors do not print lines and should pass in NULL for @line.
-	@line_num will be ignored in such cases.
+	Memory errors, file open erros, and invalid cmdline args do not print
+	source lines. Both cases should pass in NULL for @line, and the latter
+	should pass in NULL for @file_name. @line_num will be ignored in such
+	cases.
 */
 void print_error(int error_code, const char *file_name, int line_num,
                  const char *line)
 {
-	if (!file_name)
-		return;
-
-	if (line)
-		printf("%s:%i: ", file_name, line_num);
-	else
-		printf("%s: ", file_name);
+	if (file_name) {
+		if (line)
+			printf("%s:%i: ", file_name, line_num);
+		else
+			printf("%s: ", file_name);
+	}
 
 	switch (error_code) {
 	case ERROR_MEMORY_ALLOCATION_FAIL:
@@ -53,7 +54,7 @@ void print_error(int error_code, const char *file_name, int line_num,
 		printf("ERROR: label exceeds 63 characters\n");
 		break;
 	case ERROR_TOO_MANY_TOKENS:
-		printf("ERROR: invalid token sequence\n");
+		printf("ERROR: illegal sequence\n");
 		break;
 	case ERROR_UNKNOWN:
 		printf("ERROR: unknown\n");
@@ -73,6 +74,13 @@ void print_error(int error_code, const char *file_name, int line_num,
 		break;
 	case ERROR_TOO_BIG_OFFSET:
 		printf("ERROR: branch offset too far away\n");
+		break;
+	case ERROR_FILE_OPEN_FAIL:
+		printf("ERROR: program file could not be opened\n");
+		break;
+	case ERROR_BINARY_FILE_CREATION_FAIL:
+		printf("ERROR: assembled binary file could not be created\n");
+		printf("\n");
 		break;
 	}
 
