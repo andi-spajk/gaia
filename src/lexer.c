@@ -38,6 +38,7 @@ struct Token *init_token(void)
 	if (!tk->str)
 		return NULL;
 	tk->value = 0U;
+	tk->error_char = NULL;
 	return tk;
 }
 
@@ -79,13 +80,14 @@ struct Lexer *init_lexer(void)
 		return NULL;
 
 	lexer->curr = 0;
+	lexer->error_tk = -1;
 	return lexer;
 }
 
 /* reset_lexer()
 	@lexer          ptr to Lexer struct
 
-	Reset all tokens in @lexer sequence to null tokens. This prepares the
+	Reset the @lexer and all its tokens to null tokens. This prepares the
 	lexer for the next source line.
 */
 void reset_lexer(struct Lexer *lexer)
@@ -93,10 +95,12 @@ void reset_lexer(struct Lexer *lexer)
 	for (int i = 0; i < MAX_TOKENS; i++) {
 		lexer->sequence[i]->type = TOKEN_NULL;
 		lexer->sequence[i]->value = 0;
+		lexer->sequence[i]->error_char = NULL;
 		// no need to wipe the string's contents
 		// lexing functions will do that automatically without trouble
 	}
 	lexer->curr = 0;
+	lexer->error_tk = -1;
 }
 
 /* destroy_token()
@@ -322,6 +326,7 @@ int lex_literal(struct Token *tk, const char *literal)
 		base = 10;
 		converter_func = converters[2];
 	} else {
+		tk->error_char = curr;
 		return ERROR_ILLEGAL_CHAR;
 	}
 
@@ -338,6 +343,7 @@ int lex_literal(struct Token *tk, const char *literal)
 		} else if (!is_end_of_token(*curr)) {
 			// illegal char but not the end of token
 			// so it's a char that's incompatible with the base
+			tk->error_char = curr;
 			return ERROR_ILLEGAL_CHAR;
 		} else {
 			// illegal and end of token
@@ -346,13 +352,18 @@ int lex_literal(struct Token *tk, const char *literal)
 	}
 
 	// no valid chars were found
-	if (num_chars == 0)
+	if (num_chars == 0) {
+		tk->error_char = curr;
 		return ERROR_ILLEGAL_CHAR;
-	else if (num_chars == 1 && (base == 2 || base == 16))
+	} else if (num_chars == 1 && (base == 2 || base == 16)) {
+		tk->error_char = curr;
 		return ERROR_ILLEGAL_CHAR;
+	}
 
-	if (total > 0xFFFF)
+	if (total > 0xFFFF) {
+		tk->error_char = literal;
 		return ERROR_TOO_BIG_LITERAL;
+	}
 
 	tk->type = TOKEN_LITERAL;
 	tk->value = (unsigned int)total;
@@ -417,15 +428,18 @@ int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 	int num_chars;
 	for (num_chars = 0; num_chars < MAX_TOKEN_STR_LEN; num_chars++) {
 		c = buffer[num_chars];
-		if (is_end_of_token(c))
+		if (is_end_of_token(c)) {
 			break;
-		else if (!is_valid_token_char(c))
+		} else if (!is_valid_token_char(c)) {
+			tk->error_char = &buffer[num_chars];
 			return ERROR_ILLEGAL_CHAR;
+		}
 	}
 
 	if (num_chars == MAX_TOKEN_STR_LEN) {
 		// the for loop ran its entire course which means there is no
 		// space for the null terminator
+		tk->error_char = buffer;
 		return ERROR_TOO_LONG_LABEL;
 	}
 
@@ -489,6 +503,7 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 		return lex_text(buffer, tk, instr);
 	else if (c == '$' || c == '%' || (c >= '0' && c <= '9'))
 		return lex_literal(tk, buffer);
+	tk->error_char = buffer;
 	return ERROR_ILLEGAL_CHAR;
 }
 
@@ -545,8 +560,11 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 		// negative returns indicate an error code
 		if (num_chars < 0)
 			return num_chars;
-		if (add_token(lexer, tk)  == ERROR_TOO_MANY_TOKENS)
+		if (add_token(lexer, tk)  == ERROR_TOO_MANY_TOKENS) {
+			// don't set lexer->error_tk
+			// the parser will pinpoint the bad tokens
 			return ERROR_TOO_MANY_TOKENS;
+		}
 
 		curr += num_chars;
 		// skip whitespace AFTER A TOKEN
