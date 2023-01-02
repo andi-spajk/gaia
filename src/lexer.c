@@ -39,6 +39,7 @@ struct Token *init_token(void)
 		return NULL;
 	tk->value = 0U;
 	tk->error_char = NULL;
+	tk->buffer_location = NULL;
 	return tk;
 }
 
@@ -80,7 +81,7 @@ struct Lexer *init_lexer(void)
 		return NULL;
 
 	lexer->curr = 0;
-	lexer->error_tk = -1;
+	lexer->error_tk = NULL;
 	return lexer;
 }
 
@@ -96,11 +97,12 @@ void reset_lexer(struct Lexer *lexer)
 		lexer->sequence[i]->type = TOKEN_NULL;
 		lexer->sequence[i]->value = 0;
 		lexer->sequence[i]->error_char = NULL;
+		lexer->sequence[i]->buffer_location = NULL;
 		// no need to wipe the string's contents
 		// lexing functions will do that automatically without trouble
 	}
 	lexer->curr = 0;
-	lexer->error_tk = -1;
+	lexer->error_tk = NULL;
 }
 
 /* destroy_token()
@@ -214,6 +216,9 @@ int add_token(struct Lexer *lexer, const struct Token *tk)
 		new->type = tk->type;
 		token_strcpy(new, tk->str);
 		new->value = tk->value;
+		// no need to transfer error_char
+		// we'll never add tokens that have lexical errors
+		new->buffer_location = tk->buffer_location;
 		lexer->curr++;
 		return TOKEN_INSERTION_SUCCESS;
 	}
@@ -476,6 +481,7 @@ int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 {
 	char c = buffer[0];
+	tk->buffer_location = buffer;
 	switch (c) {
 	case '#':
 		tk->type = TOKEN_IMMEDIATE;

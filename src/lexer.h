@@ -34,14 +34,15 @@ struct Token {
 	enum TokenType type;
 	char *str;
 	unsigned int value;
-	const char *error_char;  // location of any possible lexical error
+	const char *error_char;       // location of lexical error
+	const char *buffer_location;  // location of token in source line
 };
 
 struct Lexer {
 	struct Token **sequence;
-	int curr;      // first open index in sequence[]
-	int error_tk;  // index of token with lexical error
-	               // only determined by parser.c
+	int curr;                // first open index in sequence[]
+	struct Token *error_tk;  // ptr to token with syntax error
+	                         // only determined by parser.c
 };
 
 struct Token *init_token(void);

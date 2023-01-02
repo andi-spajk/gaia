@@ -724,6 +724,7 @@ void test_lex_line(void)
 	// lex_line() resets the lexer and instr for us, so we will not need to
 	// call the resets ourselves
 
+//                                 012345 6 7890 12345678
 	const char *source_line = "SEARCH\t\tLDA\tBOARD,X\n";
 	buffer = source_line;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
@@ -734,17 +735,26 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(LDA_BITFIELD, instr->addr_bitfield);
 
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[0]), lexer->sequence[0]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[8]), lexer->sequence[1]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[2]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[12]), lexer->sequence[2]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_COMMA, lexer->sequence[3]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[17]), lexer->sequence[3]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, lexer->sequence[4]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[18]), lexer->sequence[4]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);
+	TEST_ASSERT_EQUAL_PTR(NULL, lexer->sequence[5]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
+	TEST_ASSERT_EQUAL_PTR(NULL, lexer->sequence[6]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
+	TEST_ASSERT_EQUAL_PTR(NULL, lexer->sequence[7]->buffer_location);
 
 	TEST_ASSERT_EQUAL_STRING("SEARCH", lexer->sequence[0]->str);
 	TEST_ASSERT_EQUAL_STRING("BOARD", lexer->sequence[2]->str);
 
+//                               0 1234 5678 901234
 	const char *bad_line = "\t\tADC\tBCC\t; lol\n";
 	buffer = bad_line;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
@@ -755,7 +765,9 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(BCC_BITFIELD, instr->addr_bitfield);
 
 	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[2]), lexer->sequence[0]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[6]), lexer->sequence[1]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[2]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[3]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[4]->type);
@@ -770,6 +782,7 @@ void test_lex_line(void)
 
 	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, lexer->sequence[7]->type);
 
+//                                        01234 5 6789 01234
 	const char *y_register_example = "ELOOP\t\tCMP\tBK,Y\n";
 	buffer = y_register_example;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
@@ -779,14 +792,20 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(CMP_BITFIELD, instr->addr_bitfield);
 
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[0]), lexer->sequence[0]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[7]), lexer->sequence[1]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[2]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[11]), lexer->sequence[2]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_COMMA, lexer->sequence[3]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[13]), lexer->sequence[3]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, lexer->sequence[4]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[14]), lexer->sequence[4]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
 
+//                              0123456 78 901234 5
 	const char *constant = "address\t=\t$1234\n";
 	buffer = constant;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
@@ -795,8 +814,11 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
 
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[0]), lexer->sequence[0]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_EQUAL_SIGN, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[8]), lexer->sequence[1]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, lexer->sequence[2]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[10]), lexer->sequence[2]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[3]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[4]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);
@@ -807,6 +829,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(0x1234, lexer->sequence[2]->value);
 
 	// null-terminated string instead of newline and then null-terminated
+	//                  012 3 4567 89012345
 	const char *indy = "L20\t\tSTA\t($FF),Y";
 	buffer = indy;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
@@ -816,12 +839,19 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(STA_BITFIELD, instr->addr_bitfield);
 
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[0]), lexer->sequence[0]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[5]), lexer->sequence[1]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_OPEN_PARENTHESIS, lexer->sequence[2]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[9]), lexer->sequence[2]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, lexer->sequence[3]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[10]), lexer->sequence[3]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_CLOSE_PARENTHESIS, lexer->sequence[4]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[13]), lexer->sequence[4]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_COMMA, lexer->sequence[5]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[14]), lexer->sequence[5]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, lexer->sequence[6]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[15]), lexer->sequence[6]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
 
 	TEST_ASSERT_EQUAL_STRING("L20", lexer->sequence[0]->str);
@@ -830,6 +860,7 @@ void test_lex_line(void)
 	// EOF and then null-terminated
 	char *eof_test = malloc(17 * sizeof(char));
 	if (eof_test) {
+		//                 01234567890123
 		strncpy(eof_test, "EOFTEST LSR $0A", 17);
 		eof_test[15] = EOF;
 		buffer = eof_test;
@@ -840,8 +871,11 @@ void test_lex_line(void)
 		TEST_ASSERT_EQUAL_INT(LSR_BITFIELD, instr->addr_bitfield);
 
 		TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[0]->type);
+		TEST_ASSERT_EQUAL_PTR(&(buffer[0]), lexer->sequence[0]->buffer_location);
 		TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[1]->type);
+		TEST_ASSERT_EQUAL_PTR(&(buffer[8]), lexer->sequence[1]->buffer_location);
 		TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, lexer->sequence[2]->type);
+		TEST_ASSERT_EQUAL_PTR(&(buffer[12]), lexer->sequence[2]->buffer_location);
 		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[3]->type);
 		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[4]->type);
 		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);
@@ -858,8 +892,9 @@ void test_lex_line(void)
 	buffer = lexical_errors;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
 	// when lexing stops, tk contains the last token that lexer tried to lex
-	// so in this case, the '#' char
+	// so in this case, $#100
 	TEST_ASSERT_EQUAL_PTR(&(buffer[5]), tk->error_char);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[4]), tk->buffer_location);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
