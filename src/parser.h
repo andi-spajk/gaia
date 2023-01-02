@@ -61,10 +61,10 @@ int parse_line(struct Lexer *lexer);
 
 int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
                             int pc);
-int parse_label_operand(struct Instruction *instr, struct Token *operand,
-                        struct SymbolTable *symtab);
-int parse_operand(struct Instruction *instr, struct Token *operand,
-                  struct SymbolTable *symtab);
+int parse_label_operand(struct Lexer *lexer, struct Instruction *instr,
+                        struct Token *operand, struct SymbolTable *symtab);
+int parse_operand(struct Lexer *lexer, struct Instruction *instr,
+                  struct Token *operand, struct SymbolTable *symtab);
 struct Token *find_operand(struct Lexer *lexer);
 
 int apply_masks(struct Lexer *lexer, int curr_field);

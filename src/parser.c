@@ -223,14 +223,19 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 }
 
 /* parse_label_operand()
+	@lexer          ptr to Lexer struct
 	@instr          ptr to Instruction struct
 	@operand        ptr to operand token in a Lexer sequence
 	@symtab         ptr to symbol table
 
 	@return         operand status, or error code
+
+	Determine whether the operand is a branch/jump instruction and whether
+	it is a forward reference. Operands which are neither are ignored.
+	Illegal forward references or label references cause errors.
 */
-int parse_label_operand(struct Instruction *instr, struct Token *operand,
-                        struct SymbolTable *symtab)
+int parse_label_operand(struct Lexer *lexer, struct Instruction *instr,
+                        struct Token *operand, struct SymbolTable *symtab)
 {
 	int label_value = search_symbol(symtab, operand->str);
 	int branch = is_branch(instr->mnemonic);
@@ -253,17 +258,20 @@ int parse_label_operand(struct Instruction *instr, struct Token *operand,
 		// nonexistent symbol may be a forward reference
 		// no forward references to constants! (except in indirect jump
 		// instructions)
-		if (branch)
+		if (branch) {
 			return BRANCH_FORWARD_REFERENCE;
-		else if (jump)
+		} else if (jump) {
 			return JUMP_FORWARD_REFERENCE;
-		else
+		} else {
+			lexer->error_tk = operand;
 			return ERROR_ILLEGAL_FORWARD_REFERENCE;
+		}
 	}
 	return ERROR_UNKNOWN;
 }
 
 /* parse_operand()
+	@lexer          ptr to Lexer struct
 	@instr          ptr to Instruction struct
 	@operand        ptr to operand token (can be NULL)
 	@symtab         ptr to symbol table
@@ -281,15 +289,15 @@ int parse_label_operand(struct Instruction *instr, struct Token *operand,
 	BRANCH_FORWARD_REFERENCE 4
 	JUMP_FORWARD_REFERENCE   5
 */
-int parse_operand(struct Instruction *instr, struct Token *operand,
-                  struct SymbolTable *symtab)
+int parse_operand(struct Lexer *lexer, struct Instruction *instr,
+                  struct Token *operand, struct SymbolTable *symtab)
 {
 	// implied operand or accumulator
 	if (!operand)
 		return PARSER_SUCCESS;
 
 	if (operand->type == TOKEN_LABEL) {
-		return parse_label_operand(instr, operand, symtab);
+		return parse_label_operand(lexer, instr, operand, symtab);
 	} else if (operand->type == TOKEN_LITERAL) {
 		// no need to do anything special to parse literal
 		// the lexer did everything necessary
