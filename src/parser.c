@@ -23,118 +23,140 @@ See parser.h for full diagram of valid token sequences.
 #include "symbol_table.h"
 
 /* parse_indirect_operand_tree()
-	@seq            ptr to sequence of tokens from a lexer
+	@lexer          ptr to Lexer struct
 	@index          index of operand token
 
 	@return         success or error code
 
 	Parse the indirect operand for syntax errors.
 */
-int parse_indirect_operand_tree(struct Token **seq, int index)
+int parse_indirect_operand_tree(struct Lexer *lexer, int index)
 {
+	struct Token **seq = lexer->sequence;
+	index++;
 	// ,
-	if (seq[index+1]->type == TOKEN_COMMA) {
+	if (seq[index]->type == TOKEN_COMMA) {
+		index++;
 		// ,X
-		if (seq[index+2]->type == TOKEN_X_REGISTER) {
+		if (seq[index]->type == TOKEN_X_REGISTER) {
+			index++;
 			// ,X)
-			if (seq[index+3]->type == TOKEN_CLOSE_PARENTHESIS) {
-				if (seq[index+4]->type == TOKEN_NULL)
+			if (seq[index]->type == TOKEN_CLOSE_PARENTHESIS) {
+				index++;
+				if (seq[index]->type == TOKEN_NULL)
 					return PARSER_SUCCESS;
 			}
 		}
 	}
 	// )
-	else if (seq[index+1]->type == TOKEN_CLOSE_PARENTHESIS) {
+	else if (seq[index]->type == TOKEN_CLOSE_PARENTHESIS) {
+		index++;
 		// ),
-		if (seq[index+2]->type == TOKEN_COMMA) {
+		if (seq[index]->type == TOKEN_COMMA) {
+			index++;
 			// ),Y
-			if (seq[index+3]->type == TOKEN_Y_REGISTER) {
-				if (seq[index+4]->type == TOKEN_NULL)
+			if (seq[index]->type == TOKEN_Y_REGISTER) {
+				index++;
+				if (seq[index]->type == TOKEN_NULL)
 					return PARSER_SUCCESS;
 			}
 		}
 		// )
-		else if (seq[index+2]->type == TOKEN_NULL) {
+		else if (seq[index]->type == TOKEN_NULL) {
 			return PARSER_SUCCESS;
 		}
 	}
+	lexer->error_tk = lexer->sequence[index];
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
 /* parse_instr_tree()
-	@seq            ptr to sequence of tokens from a lexer
+	@lexer          ptr to Lexer struct
 	@index          index of instruction token
 
 	@return         success or error code
 
 	Parse the instruction token and its operand for syntax errors.
 */
-int parse_instr_tree(struct Token **seq, int index)
+int parse_instr_tree(struct Lexer *lexer, int index)
 {
+	struct Token **seq = lexer->sequence;
+	index++;
 	// (
-	if (seq[index+1]->type == TOKEN_OPEN_PARENTHESIS) {
+	if (seq[index]->type == TOKEN_OPEN_PARENTHESIS) {
+		index++;
 		// (OPERAND
-		if (seq[index+2]->type == TOKEN_LABEL ||
-		    seq[index+2]->type == TOKEN_LITERAL)
-			return parse_indirect_operand_tree(seq, index+2);
+		if (seq[index]->type == TOKEN_LABEL ||
+		    seq[index]->type == TOKEN_LITERAL)
+			return parse_indirect_operand_tree(lexer, index);
 	}
 	// OPERAND
-	else if (seq[index+1]->type == TOKEN_LABEL ||
-	         seq[index+1]->type == TOKEN_LITERAL) {
-		if (seq[index+2]->type == TOKEN_NULL) {
+	else if (seq[index]->type == TOKEN_LABEL ||
+	         seq[index]->type == TOKEN_LITERAL) {
+		index++;
+		if (seq[index]->type == TOKEN_NULL) {
 			return PARSER_SUCCESS;
 		}
 		// OPERAND,
-		else if (seq[index+2]->type == TOKEN_COMMA) {
+		else if (seq[index]->type == TOKEN_COMMA) {
+			index++;
 			// OPERAND,X
 			// OPERAND,Y
-			if (seq[index+3]->type == TOKEN_X_REGISTER ||
-			    seq[index+3]->type == TOKEN_Y_REGISTER)
+			if (seq[index]->type == TOKEN_X_REGISTER ||
+			    seq[index]->type == TOKEN_Y_REGISTER)
 				return PARSER_SUCCESS;
 		}
 	}
 	// #
-	else if (seq[index+1]->type == TOKEN_IMMEDIATE) {
+	else if (seq[index]->type == TOKEN_IMMEDIATE) {
+		index++;
 		// #OPERAND
 		// immediate labels are also legal
-		if (seq[index+2]->type == TOKEN_LITERAL ||
-		    seq[index+2]->type == TOKEN_LABEL) {
-			if (seq[index+3]->type == TOKEN_NULL)
+		if (seq[index]->type == TOKEN_LITERAL ||
+		    seq[index]->type == TOKEN_LABEL) {
+			index++;
+			if (seq[index]->type == TOKEN_NULL)
 				return PARSER_SUCCESS;
 		}
 	}
-	else if (seq[index+1]->type == TOKEN_NULL) {
+	else if (seq[index]->type == TOKEN_NULL) {
 		return PARSER_SUCCESS;
 	}
+	lexer->error_tk = lexer->sequence[index];
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
 /* parse_label_tree()
-	@seq            ptr to sequence of tokens from a lexer
+	@lexer          ptr to Lexer struct
 	@index          index of label token
 
 	@return         success or error code
 
 	Parse the label line and detect syntax errors.
 */
-int parse_label_tree(struct Token **seq, int index)
+int parse_label_tree(struct Lexer *lexer, int index)
 {
+	struct Token **seq = lexer->sequence;
+	index++;
 	// =
-	if (seq[index+1]->type == TOKEN_EQUAL_SIGN) {
+	if (seq[index]->type == TOKEN_EQUAL_SIGN) {
+		index++;
 		// = $A0
-		if (seq[index+2]->type == TOKEN_LITERAL) {
-			if (seq[index+3]->type == TOKEN_NULL)
+		if (seq[index]->type == TOKEN_LITERAL) {
+			index++;
+			if (seq[index]->type == TOKEN_NULL)
 				return PARSER_SUCCESS;
 		}
 	}
 	// LDA
-	else if (seq[index+1]->type == TOKEN_INSTRUCTION) {
-		return parse_instr_tree(seq, index+1);
+	else if (seq[index]->type == TOKEN_INSTRUCTION) {
+		return parse_instr_tree(lexer, index);
 	}
 	// just a declaration of label
-	else if (seq[index+1]->type == TOKEN_NULL) {
+	else if (seq[index]->type == TOKEN_NULL) {
 		return PARSER_SUCCESS;
 	}
+	lexer->error_tk = lexer->sequence[index];
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
@@ -150,9 +172,10 @@ int parse_line(struct Lexer *lexer)
 	int index = 0;
 	struct Token **seq = lexer->sequence;
 	if (seq[index]->type == TOKEN_INSTRUCTION)
-		return parse_instr_tree(seq, index);
+		return parse_instr_tree(lexer, index);
 	else if (seq[index]->type == TOKEN_LABEL)
-		return parse_label_tree(seq, index);
+		return parse_label_tree(lexer, index);
+	lexer->error_tk = lexer->sequence[index];
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
@@ -178,6 +201,7 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 		// address label
 		// might be lone label or a label and instr
 		if (found != ERROR_SYMBOL_NOT_FOUND) {
+			lexer->error_tk = label;
 			return ERROR_LABEL_REDEFINITION;
 		} else {
 			label->value = pc;
@@ -186,6 +210,7 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 	} else if (seq[1]->type == TOKEN_EQUAL_SIGN) {
 		// constant label
 		if (found != ERROR_SYMBOL_NOT_FOUND) {
+			lexer->error_tk = label;
 			return ERROR_LABEL_REDEFINITION;
 		} else {
 			// 0     1 2

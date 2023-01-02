@@ -55,8 +55,8 @@ LabelTree
 #define JUMP_FORWARD_REFERENCE   5
 #define FORWARD_REFERENCE        0xFFFF
 
-int parse_instr_tree(struct Token **seq, int index);
-int parse_label_tree(struct Token **seq, int index);
+int parse_instr_tree(struct Lexer *lexer, int index);
+int parse_label_tree(struct Lexer *lexer, int index);
 int parse_line(struct Lexer *lexer);
 
 int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
