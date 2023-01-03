@@ -67,6 +67,8 @@ int parse_indirect_operand_tree(struct Lexer *lexer, int index)
 		}
 	}
 	lexer->error_tk = lexer->sequence[index];
+	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
+	            lexer->error_tk->buffer_location);
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
@@ -123,6 +125,8 @@ int parse_instr_tree(struct Lexer *lexer, int index)
 		return PARSER_SUCCESS;
 	}
 	lexer->error_tk = lexer->sequence[index];
+	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
+	            lexer->error_tk->buffer_location);
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
@@ -157,6 +161,8 @@ int parse_label_tree(struct Lexer *lexer, int index)
 		return PARSER_SUCCESS;
 	}
 	lexer->error_tk = lexer->sequence[index];
+	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
+	            lexer->error_tk->buffer_location);
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
@@ -176,6 +182,8 @@ int parse_line(struct Lexer *lexer)
 	else if (seq[index]->type == TOKEN_LABEL)
 		return parse_label_tree(lexer, index);
 	lexer->error_tk = lexer->sequence[index];
+	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
+	            lexer->error_tk->buffer_location);
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 

@@ -82,6 +82,7 @@ struct Lexer *init_lexer(void)
 
 	lexer->curr = 0;
 	lexer->error_tk = NULL;
+	lexer->line = NULL;
 	return lexer;
 }
 
@@ -103,6 +104,7 @@ void reset_lexer(struct Lexer *lexer)
 	}
 	lexer->curr = 0;
 	lexer->error_tk = NULL;
+	lexer->line = NULL;
 }
 
 /* destroy_token()
@@ -586,5 +588,6 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 		lexer->sequence[curr_token]->type = TOKEN_NULL;
 		curr_token++;
 	}
+	lexer->line = buffer;
 	return LEXER_SUCCESS;
 }
