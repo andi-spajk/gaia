@@ -7,7 +7,8 @@ CFLAGS += -I$(SRC)
 
 UNITY_SRC = ../../unity
 UNITY_DEP = $(OBJ)/unity.o
-DEP = $(OBJ)/test_lexer.o $(OBJ)/lexer.o $(OBJ)/opcode.o $(OBJ)/assemble.o
+DEP = $(OBJ)/test_lexer.o $(OBJ)/lexer.o $(OBJ)/opcode.o $(OBJ)/assemble.o \
+      $(OBJ)/error.o
 # separate DEP and UNITY_DEP because make clean need not delete unity.o
 
 test_lexer: $(DEP) $(UNITY_DEP)

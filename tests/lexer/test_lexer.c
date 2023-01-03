@@ -887,7 +887,8 @@ void test_lex_line(void)
 		free(eof_test);
 	}
 
-//                                    012345
+	// printing errors
+	//                            012345
 	const char *lexical_errors = "INX $#100\n";
 	buffer = lexical_errors;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
@@ -895,6 +896,33 @@ void test_lex_line(void)
 	// so in this case, $#100
 	TEST_ASSERT_EQUAL_PTR(&(buffer[5]), tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[4]), tk->buffer_location);
+
+//                                  0 1234 56789012 3
+	const char *bad_literal = "\t\tJMP\t$LABELLOL\t";
+	buffer = bad_literal;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_PTR(&(buffer[7]), tk->error_char);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[6]), tk->buffer_location);
+
+	char *eof_bad_literal = malloc(16 * sizeof(char));
+	if (eof_bad_literal) {
+		//                         0123 4567890123
+		strncpy(eof_bad_literal, "\tLDY\t%10012010", 16);
+		eof_bad_literal[14] = EOF;
+		buffer = eof_bad_literal;
+		TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
+		TEST_ASSERT_EQUAL_PTR(&(buffer[10]), tk->error_char);
+		TEST_ASSERT_EQUAL_PTR(&(buffer[5]), tk->buffer_location);
+		free(eof_bad_literal);
+	}
+
+//                                          012345678901234567890123456789012345 6
+	const char *totally_illegal_char = "        EOR     @WTF    ; comment       \n\n\n\n\n";
+	// add lots of spaces/newlines to test how print_error() strips trailing whitespace
+	buffer = totally_illegal_char;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->error_char);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->buffer_location);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);

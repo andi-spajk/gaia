@@ -5,14 +5,14 @@ Error-handling module for printing error messages.
 */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "error.h"
 
 /* print_error()
-	@error_code     error code from error.h
-	@file_name      name of assembly program file
-	@line_num       line number where the error occurred
 	@line           source line with the error
+	@error_code     error code from error.h
+	@bad_char       ptr to beginning of error
 
 	Prints a formatted error message.
 
@@ -20,17 +20,14 @@ Error-handling module for printing error messages.
 	source lines. Both cases should pass in NULL for @line, and the latter
 	should pass in NULL for @file_name. @line_num will be ignored in such
 	cases.
-*/
-void print_error(int error_code, const char *file_name, int line_num,
-                 const char *line)
-{
-	if (file_name) {
-		if (line)
-			printf("%s:%i: ", file_name, line_num);
-		else
-			printf("%s: ", file_name);
-	}
 
+	removed, maybe add back later:
+	@file_name      name of assembly program file
+	@line_num       line number where the error occurred
+
+*/
+void print_error(const char *line, int error_code, const char *bad_char)
+{
 	switch (error_code) {
 	case ERROR_MEMORY_ALLOCATION_FAIL:
 		printf("ERROR: could not allocate enough memory during assembly\n");
@@ -84,6 +81,31 @@ void print_error(int error_code, const char *file_name, int line_num,
 		break;
 	}
 
-	if (line)
-		printf("%s\n", line);
+	// skip trailing whitespace
+	const char *end = line + strlen(line) - 1;
+	while (*end == ' ' || *end == '\t' || *end == '\n' || *end == EOF)
+		end--;
+	for (const char *start = line; start <= end; start++)
+		putchar(*start);
+	printf("\n");
+
+	int num_spaces = 0;
+	int tab_tracker = 0;
+	for (const char *tmp = line; tmp != bad_char; tmp++) {
+		if (tab_tracker == 8) {
+			tab_tracker = 0;
+		}
+		if (*tmp == '\t') {
+			for (int i = 0; i < (8 - tab_tracker); i++)
+				num_spaces++;
+			tab_tracker = 0;
+		} else {
+			num_spaces++;
+			tab_tracker++;
+		}
+	}
+
+	for (int i = 0; i < num_spaces; i++)
+		printf(" ");
+	printf("^~~~~~\n");
 }

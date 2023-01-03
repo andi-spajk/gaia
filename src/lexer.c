@@ -564,11 +564,13 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 	while (!end_line_lexing(*curr)) {
 		num_chars = lex(curr, tk, instr);
 		// negative returns indicate an error code
-		if (num_chars < 0)
+		if (num_chars < 0) {
+			print_error(buffer, num_chars, tk->error_char);
 			return num_chars;
+		}
 		if (add_token(lexer, tk)  == ERROR_TOO_MANY_TOKENS) {
-			// don't set lexer->error_tk
-			// the parser will pinpoint the bad tokens
+			// don't set lexer->error_tk or call print_error()
+			// the parser will pinpoint the first bad token
 			return ERROR_TOO_MANY_TOKENS;
 		}
 

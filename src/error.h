@@ -36,7 +36,6 @@ Error codes used by the assembler. Also a prototype to print error messages.
 ;       ;       ;       ;       ;       ;
 */
 
-void print_error(int error_code, const char *file_name, int line_num,
-                 const char *line);
+void print_error(const char *line, int error_code, const char *bad_char);
 
 #endif
