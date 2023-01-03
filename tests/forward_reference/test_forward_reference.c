@@ -45,7 +45,7 @@ void test_create_forward_ref(void)
 	line_num = 1;
 
 	operand = find_operand(lexer);
-	operand_status = parse_operand(instr, operand, symtab);
+	operand_status = parse_operand(lexer, instr, operand, symtab);
 	TEST_ASSERT_EQUAL_INT(operand_status, JUMP_FORWARD_REFERENCE);
 
 	int expected = NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD & ABSOLUTE_FIELD;
@@ -75,7 +75,7 @@ void test_create_forward_ref(void)
 	line_num = 2;
 
 	operand = find_operand(lexer);
-	operand_status = parse_operand(instr, operand, symtab);
+	operand_status = parse_operand(lexer, instr, operand, symtab);
 	TEST_ASSERT_EQUAL_INT(operand_status, BRANCH_FORWARD_REFERENCE);
 
 	expected = NOT_INDIRECT_FIELD & NOT_REGISTER_FIELD & ADDR_MODE_RELATIVE;
@@ -130,7 +130,7 @@ void test_add_forward_ref(void)
 	line_num = 1;
 
 	operand = find_operand(lexer);
-	operand_status = parse_operand(instr, operand, symtab);
+	operand_status = parse_operand(lexer, instr, operand, symtab);
 	parse_addr_mode(lexer, instr, operand, operand_status);
 
 	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
@@ -153,7 +153,7 @@ void test_add_forward_ref(void)
 	line_num = 2;
 
 	operand = find_operand(lexer);
-	operand_status = parse_operand(instr, operand, symtab);
+	operand_status = parse_operand(lexer, instr, operand, symtab);
 	parse_addr_mode(lexer, instr, operand, operand_status);
 
 	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
@@ -206,7 +206,7 @@ void test_resize_unresolved(void)
 	line_num = 1;
 
 	operand = find_operand(lexer);
-	operand_status = parse_operand(instr, operand, symtab);
+	operand_status = parse_operand(lexer, instr, operand, symtab);
 	parse_addr_mode(lexer, instr, operand, operand_status);
 
 	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);

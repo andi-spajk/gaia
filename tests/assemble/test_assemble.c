@@ -33,7 +33,7 @@ void test_assembly(void)
 	TEST_ASSERT_EQUAL_INT(SBC_BITFIELD, instr->addr_bitfield);
 
 	operand = find_operand(lexer);
-	int operand_status = parse_operand(instr, operand, symtab);
+	int operand_status = parse_operand(lexer, instr, operand, symtab);
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, operand_status);
 
 	int addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);

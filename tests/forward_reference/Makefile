@@ -9,7 +9,7 @@ UNITY_SRC = ../../unity
 UNITY_DEP = $(OBJ)/unity.o
 DEP = $(OBJ)/test_forward_reference.o $(OBJ)/forward_reference.o \
       $(OBJ)/opcode.o $(OBJ)/lexer.o $(OBJ)/parser.o $(OBJ)/symbol_table.o \
-      $(OBJ)/prime.o $(OBJ)/assemble.o
+      $(OBJ)/prime.o $(OBJ)/assemble.o $(OBJ)/error.o
 # separate DEP and UNITY_DEP because make clean need not delete unity.o
 
 test_forward_reference: $(DEP) $(UNITY_DEP)

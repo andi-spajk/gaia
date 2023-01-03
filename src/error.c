@@ -81,6 +81,9 @@ void print_error(const char *line, int error_code, const char *bad_char)
 		break;
 	}
 
+	if (!line || !bad_char)
+		return;
+
 	// skip trailing whitespace
 	const char *end = line + strlen(line) - 1;
 	while (*end == ' ' || *end == '\t' || *end == '\n' || *end == EOF)
@@ -88,6 +91,11 @@ void print_error(const char *line, int error_code, const char *bad_char)
 	for (const char *start = line; start <= end; start++)
 		putchar(*start);
 	printf("\n");
+
+	if (error_code == ERROR_UNKNOWN) {
+		printf("\n");
+		return;
+	}
 
 	int num_spaces = 0;
 	int tab_tracker = 0;
@@ -107,5 +115,5 @@ void print_error(const char *line, int error_code, const char *bad_char)
 
 	for (int i = 0; i < num_spaces; i++)
 		printf(" ");
-	printf("^~~~~~\n");
+	printf("^~~~~~\n\n");
 }
