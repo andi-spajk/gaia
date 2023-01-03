@@ -28,4 +28,4 @@ $(OBJ)/%.o: $(SRC)/%.c $(SRC)/%.h
 	mv *.o $(OBJ)
 
 clean:
-	rm -f test_generator $(DEP)
+	rm -f test_generator $(DEP) *.out

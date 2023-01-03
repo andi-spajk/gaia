@@ -93,8 +93,9 @@ int calc_branch_offset(int curr_pc, int dest_pc)
 	Resolve a label reference and then assemble the line. Forward references
 	CANNOT be resolved with this function.
 */
-int resolve_label_ref(FILE *f, struct Instruction *instr, struct Token *label,
-                      int operand_status, struct SymbolTable *symtab, int pc)
+int resolve_label_ref(FILE *f, struct Lexer *lexer, struct Instruction *instr,
+                      struct Token *label, int operand_status,
+                      struct SymbolTable *symtab, int pc)
 {
 	int dest_pc, offset;
 	if (label)
@@ -102,8 +103,11 @@ int resolve_label_ref(FILE *f, struct Instruction *instr, struct Token *label,
 
 	if (operand_status == BRANCH_OPERAND) {
 		offset = calc_branch_offset(pc, dest_pc);
-		if (offset == ERROR_TOO_BIG_OFFSET)
+		if (offset == ERROR_TOO_BIG_OFFSET) {
+			print_error(lexer->line, ERROR_TOO_BIG_OFFSET,
+			            label->buffer_location);
 			return ERROR_TOO_BIG_OFFSET;
+		}
 		label->value = (unsigned int)offset;
 		return generate_code(f, instr, label, pc);
 	} else if (operand_status == JUMP_OPERAND) {
@@ -137,8 +141,11 @@ int resolve_forward_ref(FILE *f, struct ForwardRef *ref,
 
 	if (ref->operand_status == BRANCH_FORWARD_REFERENCE) {
 		offset = calc_branch_offset(ref->pc, dest_pc);
-		if (offset == ERROR_TOO_BIG_OFFSET)
+		if (offset == ERROR_TOO_BIG_OFFSET) {
+			print_error(ref->source_line, ERROR_TOO_BIG_OFFSET,
+			            ref->operand_location);
 			return ERROR_TOO_BIG_OFFSET;
+		}
 
 		if (instr->addr_bitflag) {
 			instr->opcode = get_opcode(instr);

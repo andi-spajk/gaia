@@ -12,7 +12,7 @@ Error-handling module for printing error messages.
 /* print_error()
 	@line           source line with the error
 	@error_code     error code from error.h
-	@bad_char       ptr to beginning of error
+	@bad_char       ptr to beginning of error in @line
 
 	Prints a formatted error message.
 

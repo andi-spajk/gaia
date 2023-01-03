@@ -38,6 +38,7 @@ void test_create_forward_ref(void)
 	struct Token *operand;
 
 	// JMP L21
+	//         0 1234 5678 90123
 	buffer = "\t\tJMP\tL21\t; comment\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
@@ -55,19 +56,22 @@ void test_create_forward_ref(void)
 	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 
-	TEST_ASSERT_EQUAL_INT(0x0, ref->pc);
-	TEST_ASSERT_EQUAL_INT(1, ref->line_num);
-	TEST_ASSERT_EQUAL_INT(JUMP_FORWARD_REFERENCE, ref->operand_status);
+	TEST_ASSERT_EQUAL_STRING("L21", ref->label);
+	TEST_ASSERT_EQUAL_STRING("\t\tJMP\tL21\t; comment", ref->source_line);
 
 	TEST_ASSERT_EQUAL_INT(JMP, ref->instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(JMP_BITFIELD, ref->instr->addr_bitfield);
 	TEST_ASSERT_EQUAL_INT(expected, ref->instr->addr_bitflag);
 
-	TEST_ASSERT_EQUAL_STRING("\t\tJMP\tL21\t; comment", ref->source_line);
-	TEST_ASSERT_EQUAL_STRING("L21", ref->label);
+	TEST_ASSERT_EQUAL_INT(0x0, ref->pc);
+	TEST_ASSERT_EQUAL_INT(1, ref->line_num);
+	TEST_ASSERT_EQUAL_INT(JUMP_FORWARD_REFERENCE, ref->operand_status);
+	TEST_ASSERT_EQUAL_PTR(&(ref->source_line[6]), ref->operand_location);
+
 	destroy_forward_ref(ref);
 
 	// BNE LABEL1
+	//        012345678901234567890123 4
 	buffer = "             BNE LABEL1 \t\t\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
@@ -85,16 +89,17 @@ void test_create_forward_ref(void)
 	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 
-	TEST_ASSERT_EQUAL_INT(0x3, ref->pc);
-	TEST_ASSERT_EQUAL_INT(2, ref->line_num);
-	TEST_ASSERT_EQUAL_INT(BRANCH_FORWARD_REFERENCE, ref->operand_status);
+	TEST_ASSERT_EQUAL_STRING("LABEL1", ref->label);
+	TEST_ASSERT_EQUAL_STRING("             BNE LABEL1", ref->source_line);
 
 	TEST_ASSERT_EQUAL_INT(BNE, ref->instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(BNE_BITFIELD, ref->instr->addr_bitfield);
 	TEST_ASSERT_EQUAL_INT(expected, ref->instr->addr_bitflag);
 
-	TEST_ASSERT_EQUAL_STRING("             BNE LABEL1", ref->source_line);
-	TEST_ASSERT_EQUAL_STRING("LABEL1", ref->label);
+	TEST_ASSERT_EQUAL_INT(0x3, ref->pc);
+	TEST_ASSERT_EQUAL_INT(2, ref->line_num);
+	TEST_ASSERT_EQUAL_INT(BRANCH_FORWARD_REFERENCE, ref->operand_status);
+	TEST_ASSERT_EQUAL_PTR(&(ref->source_line[17]), ref->operand_location);
 
 	destroy_forward_ref(ref);
 	destroy_lexer(lexer);
@@ -123,6 +128,7 @@ void test_add_forward_ref(void)
 	struct Token *operand;
 
 	// JSR FORREF
+	//         0 1234 5678
 	buffer = "\t\tJSR\tFORREF\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
@@ -144,8 +150,10 @@ void test_add_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(0, ref->pc);
 	TEST_ASSERT_EQUAL_INT(1, ref->line_num);
 	TEST_ASSERT_EQUAL_INT(JUMP_FORWARD_REFERENCE, ref->operand_status);
+	TEST_ASSERT_EQUAL_PTR(&(ref->source_line[6]), ref->operand_location);
 
 	// BMI FORREF2
+	//        0123456789012345678901234567890
 	buffer = "             BMI        FORREF2\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
@@ -160,7 +168,6 @@ void test_add_forward_ref(void)
 	// we can reassign ref without freeing the previous ref because we
 	// saved the previous ptr into unresolved->refs.
 	// destroy_unresolved() will free that memory for us
-
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 
 	ref = unresolved->refs[1];
@@ -171,6 +178,7 @@ void test_add_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(3, ref->pc);
 	TEST_ASSERT_EQUAL_INT(2, ref->line_num);
 	TEST_ASSERT_EQUAL_INT(BRANCH_FORWARD_REFERENCE, ref->operand_status);
+	TEST_ASSERT_EQUAL_PTR(&(ref->source_line[24]), ref->operand_location);
 
 	destroy_unresolved(unresolved);
 	destroy_lexer(lexer);

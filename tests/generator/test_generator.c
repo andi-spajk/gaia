@@ -280,7 +280,7 @@ void test_resolve_label_ref(void)
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
 	TEST_ASSERT_EQUAL_INT(0x1000, operand->value);
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(0xFD, operand->value);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
@@ -292,7 +292,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
 
@@ -304,7 +304,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
 
@@ -316,7 +316,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
 
@@ -328,7 +328,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
 
@@ -339,7 +339,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
 
@@ -350,7 +350,7 @@ void test_resolve_label_ref(void)
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
 
@@ -359,14 +359,14 @@ void test_resolve_label_ref(void)
 	TEST_ASSERT_EQUAL_INT8_ARRAY(expected_rom, produced_rom, exp_bytes);
 
 	insert_symbol(symtab, "FARAWAY", 0xF000);
-	buffer = "BMI FARAWAY\n";
+	buffer = "\t\tBMI\tFARAWAY\n";
 	lex_line(buffer, lexer, tk, instr);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, written);
 
 	destroy_lexer(lexer);
@@ -425,7 +425,7 @@ void test_too_big_offset_no_forward_ref(void)
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 
 	/*
@@ -437,14 +437,14 @@ void test_too_big_offset_no_forward_ref(void)
 	007F                         BCC BACK
 	*/
 	pc = 0x7F;
-	buffer = "BCC BACK\n";
+	buffer = "BCC\tBACK\n";
 	lex_line(buffer, lexer, tk, instr);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, written);
 
 	/*
@@ -456,14 +456,14 @@ void test_too_big_offset_no_forward_ref(void)
 	0ABC                         BCC BACK
 	*/
 	pc = 0xABC;
-	buffer = "BCC BACK\n";
+	buffer = "                BCC     BACK\n";
 	lex_line(buffer, lexer, tk, instr);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
-	written = resolve_label_ref(f, instr, operand, operand_status, symtab, pc);
+	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, written);
 
 	destroy_lexer(lexer);
@@ -697,7 +697,9 @@ void test_too_big_offset_with_forward_ref(void)
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 
-	TEST_ASSERT_EQUAL_INT(2, resolve_forward_ref(f, unresolved->refs[0], symtab));
+	int curr_forward_ref = 0;
+	TEST_ASSERT_EQUAL_INT(2, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], symtab));
+	curr_forward_ref++;
 
 	/*
 	edge case
@@ -709,7 +711,7 @@ void test_too_big_offset_with_forward_ref(void)
 	*/
 
 	pc = 0x0;
-	buffer = "BCS FARAWAY2\n";
+	buffer = "\t\tBCS\tFARAWAY2\n";
 	lex_line(buffer, lexer, tk, instr);
 	parse_line(lexer);
 	operand = find_operand(lexer);
@@ -735,7 +737,8 @@ void test_too_big_offset_with_forward_ref(void)
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[1], symtab));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], symtab));
+	curr_forward_ref++;
 
 	/*
 	definitely bad offset
@@ -773,7 +776,8 @@ void test_too_big_offset_with_forward_ref(void)
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[1], symtab));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], symtab));
+	curr_forward_ref++;
 
 	destroy_lexer(lexer);
 	destroy_token(tk);

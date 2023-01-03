@@ -139,6 +139,14 @@ struct ForwardRef *create_forward_ref(const char *buffer,
 	ref->line_num = line_num;
 	ref->operand_status = operand_status;
 
+	// DO NOT SET operand_location TO operand->buffer_location !!!!!
+	// we need operand_location and source_line to share memory space so
+	// error.c can print the errow arrow correctly
+	// source_line is dynamically allocated and is thus different memory
+	// from @operand's string
+	size_t dist_to_operand = operand->buffer_location - buffer;
+	ref->operand_location = ref->source_line + dist_to_operand;
+
 	return ref;
 }
 
