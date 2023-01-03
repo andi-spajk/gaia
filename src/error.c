@@ -1,6 +1,7 @@
 /** error.c
 
-Error-handling module for printing error messages.
+Error-handling module for printing error messages. An arrow is also (not always)
+printed, which is aligned to the error in the source line.
 
 */
 
@@ -31,8 +32,7 @@ void print_error(const char *line, int error_code, const char *bad_char)
 	switch (error_code) {
 	case ERROR_MEMORY_ALLOCATION_FAIL:
 		printf("ERROR: could not allocate enough memory during assembly\n");
-		putchar('\n');
-		return;
+		break;
 	case ERROR_ILLEGAL_CHAR:
 		printf("ERROR: illegal character\n");
 		break;
@@ -52,7 +52,6 @@ void print_error(const char *line, int error_code, const char *bad_char)
 		printf("ERROR: unknown\n");
 		break;
 	case ERROR_ILLEGAL_SEQUENCE:
-		// happens in parser.c so it must be syntax issue
 		printf("ERROR: illegal syntax\n");
 		break;
 	case ERROR_LABEL_REDEFINITION:
@@ -72,12 +71,13 @@ void print_error(const char *line, int error_code, const char *bad_char)
 		break;
 	case ERROR_BINARY_FILE_CREATION_FAIL:
 		printf("ERROR: assembled binary file could not be created\n");
-		putchar('\n');
 		break;
 	}
 
-	if (!line)
+	if (!line) {
+		putchar('\n');
 		return;
+	}
 
 	// skip trailing whitespace
 	const char *end = line + strlen(line) - 1;

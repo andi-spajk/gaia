@@ -41,8 +41,8 @@ struct Token {
 struct Lexer {
 	struct Token **sequence;
 	int curr;                // first open index in sequence[]
-	struct Token *error_tk;  // ptr to token with syntax error
-	                         // only determined by parser.c
+	struct Token *error_tk;  // ptr to token with syntax error, only
+	                         // determined by parser.c
 	const char *line;        // ptr to original source line of code
 };
 
