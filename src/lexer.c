@@ -23,7 +23,8 @@ which is always an error.
 #define MAX_TOKEN_STR_LEN 64
 
 /* init_token()
-	@return         ptr to dynamically allocated Token struct
+	@return         ptr to dynamically allocated Token struct, or NULL if
+	                fail
 
 	Dynamically allocates a Token struct and initializes its members.
 */

@@ -17,10 +17,11 @@ printed, which is aligned to the error in the source line.
 
 	Prints a formatted error message.
 
-	Memory errors, file open erros, and invalid cmdline args do not print
-	source lines. Both cases should pass in NULL for @line, and the latter
-	should pass in NULL for @file_name. @line_num will be ignored in such
-	cases.
+	The following do not print source lines or the error arrow:
+		ERROR_MEMORY_ALLOCATION_FAIL
+		ERROR_FILE_OPEN_FAIL
+		ERROR_BINARY_FILE_CREATION_FAIL
+	These cases should pass in NULL for @line and @bad_char.
 
 	removed, maybe add back later:
 	@file_name      name of assembly program file
@@ -72,6 +73,8 @@ void print_error(const char *line, int error_code, const char *bad_char)
 	case ERROR_BINARY_FILE_CREATION_FAIL:
 		printf("ERROR: assembled binary file could not be created\n");
 		break;
+	default:
+		return;
 	}
 
 	if (!line) {

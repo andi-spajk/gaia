@@ -100,6 +100,9 @@ void test_print_error(void)
 	print_error(NULL, ERROR_FILE_OPEN_FAIL, NULL);
 	print_error(NULL, ERROR_BINARY_FILE_CREATION_FAIL, NULL);
 
+	// should do nothing
+	print_error(line, -999, &(line[0]));
+
 	destroy_lexer(lexer);
 	destroy_token(tk);
 	destroy_instruction(instr);
