@@ -31,19 +31,14 @@ void print_error(const char *line, int error_code, const char *bad_char)
 	switch (error_code) {
 	case ERROR_MEMORY_ALLOCATION_FAIL:
 		printf("ERROR: could not allocate enough memory during assembly\n");
-		printf("\n");
+		putchar('\n');
 		return;
-	// case ERROR_SYMBOL_NOT_FOUND:
-	// 	break;
 	case ERROR_ILLEGAL_CHAR:
 		printf("ERROR: illegal character\n");
 		break;
 	case ERROR_TOO_BIG_LITERAL:
 		printf("ERROR: value of literal exceeds 2 bytes\n");
 		break;
-	// case ERROR_TOO_MANY_INSTRUCTIONS:
-	// 	printf("ERROR: invalid token sequence\n");
-	// 	break;
 	case ERROR_BITFIELD_NOT_FOUND:
 		printf("ERROR: bad mnemonic\n");
 		break;
@@ -77,11 +72,11 @@ void print_error(const char *line, int error_code, const char *bad_char)
 		break;
 	case ERROR_BINARY_FILE_CREATION_FAIL:
 		printf("ERROR: assembled binary file could not be created\n");
-		printf("\n");
+		putchar('\n');
 		break;
 	}
 
-	if (!line || !bad_char)
+	if (!line)
 		return;
 
 	// skip trailing whitespace
@@ -90,30 +85,31 @@ void print_error(const char *line, int error_code, const char *bad_char)
 		end--;
 	for (const char *start = line; start <= end; start++)
 		putchar(*start);
-	printf("\n");
+	putchar('\n');
 
-	if (error_code == ERROR_UNKNOWN) {
-		printf("\n");
+	// unknown errors and addr mode errors do not print error arrow
+	if (!bad_char) {
+		putchar('\n');
 		return;
 	}
 
 	int num_spaces = 0;
-	int tab_tracker = 0;
+	int tab_align = 0;
 	for (const char *tmp = line; tmp != bad_char; tmp++) {
-		if (tab_tracker == 8) {
-			tab_tracker = 0;
+		if (tab_align == 8) {
+			tab_align = 0;
 		}
 		if (*tmp == '\t') {
-			for (int i = 0; i < (8 - tab_tracker); i++)
+			for (int i = 0; i < (8 - tab_align); i++)
 				num_spaces++;
-			tab_tracker = 0;
+			tab_align = 0;
 		} else {
 			num_spaces++;
-			tab_tracker++;
+			tab_align++;
 		}
 	}
 
 	for (int i = 0; i < num_spaces; i++)
-		printf(" ");
+		putchar(' ');
 	printf("^~~~~~\n\n");
 }

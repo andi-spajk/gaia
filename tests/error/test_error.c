@@ -44,13 +44,13 @@ void test_print_error(void)
 
 	line = "LABEL\t\tADC\t((PLACE,X),Y)\t;lolwtf\n";
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_TOKENS, lex_line(line, lexer, tk, instr));
-	// print_error(line, ERROR_TOO_MANY_TOKENS, /**/);
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_line(lexer));
 	line_num++;
 
+	// pretend
 	print_error(line, ERROR_UNKNOWN, line);
 	line_num++;
 
-/*
 	line = "INC     (LOL,),\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_line(lexer));
@@ -66,11 +66,11 @@ void test_print_error(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_LABEL_REDEFINITION, parse_label_declaration(lexer, symtab, 0));
 	line_num++;
 
-	line = "LOOP ADC $01\n";
+	line = "\t\tLOOP\tADC\t$01\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0));
-	line = "LOOP JMP BYE\n";
+	line = "\t\tLOOP\tJMP\tBYE\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(ERROR_LABEL_REDEFINITION, parse_label_declaration(lexer, symtab, 2));
@@ -91,7 +91,7 @@ void test_print_error(void)
 	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
 	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 	line_num++;
-
+/*
 	line = "BCC BACK\n";
 	// test_generator.c already knows that the error code and error_tk are set correctly
 	// too lazy to repeat that here

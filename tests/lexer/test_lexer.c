@@ -782,7 +782,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_TOKENS, lex_line(buffer, lexer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(8, lexer->curr);
 	// lexer->line does not get set if we had error during lexing
-	TEST_ASSERT_EQUAL_PTR(NULL, lexer->line);
+	TEST_ASSERT_EQUAL_PTR(really_bad_line, lexer->line);
 
 	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, lexer->sequence[7]->type);
 
@@ -900,7 +900,7 @@ void test_lex_line(void)
 	const char *lexical_errors = "INX $#100\n";
 	buffer = lexical_errors;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_PTR(NULL, lexer->line);
+	TEST_ASSERT_EQUAL_PTR(buffer, lexer->line);
 	// when lexing stops, tk contains the last token that lexer tried to lex,
 	// and that would be the error token
 	// so in this case, $#100
@@ -911,7 +911,7 @@ void test_lex_line(void)
 	const char *bad_literal = "\t\tJMP\t$LABELLOL\t";
 	buffer = bad_literal;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_PTR(NULL, lexer->line);
+	TEST_ASSERT_EQUAL_PTR(buffer, lexer->line);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[7]), tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[6]), tk->buffer_location);
 
@@ -922,18 +922,18 @@ void test_lex_line(void)
 		eof_bad_literal[14] = EOF;
 		buffer = eof_bad_literal;
 		TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
-		TEST_ASSERT_EQUAL_PTR(NULL, lexer->line);
+		TEST_ASSERT_EQUAL_PTR(buffer, lexer->line);
 		TEST_ASSERT_EQUAL_PTR(&(buffer[10]), tk->error_char);
 		TEST_ASSERT_EQUAL_PTR(&(buffer[5]), tk->buffer_location);
 		free(eof_bad_literal);
 	}
 
-//                                          012345678901234567890123456789012345 6
+//                                          012345678901234567890123456789012345
 	const char *totally_illegal_char = "        EOR     @WTF    ; comment       \n\n\n\n\n";
 	// add lots of spaces/newlines to test how print_error() strips trailing whitespace
 	buffer = totally_illegal_char;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
-	TEST_ASSERT_EQUAL_PTR(NULL, lexer->line);
+	TEST_ASSERT_EQUAL_PTR(buffer, lexer->line);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->buffer_location);
 

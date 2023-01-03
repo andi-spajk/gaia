@@ -15,7 +15,6 @@ Error codes used by the assembler. Also a prototype to print error messages.
 
 #define ERROR_ILLEGAL_CHAR              -3
 #define ERROR_TOO_BIG_LITERAL           -4
-#define ERROR_TOO_MANY_INSTRUCTIONS     -5
 
 // internal error; no error message
 #define ERROR_INSTRUCTION_NOT_FOUND     -6
@@ -28,7 +27,10 @@ Error codes used by the assembler. Also a prototype to print error messages.
 #define ERROR_LABEL_REDEFINITION        -12
 #define ERROR_ILLEGAL_FORWARD_REFERENCE -13
 #define ERROR_ILLEGAL_ADDRESSING_MODE   -14
+
+// internal error; should never happen
 #define ERROR_ILLEGAL_MNEMONIC          -15
+
 #define ERROR_TOO_BIG_OFFSET            -16
 #define ERROR_FILE_OPEN_FAIL            -17
 #define ERROR_BINARY_FILE_CREATION_FAIL -18

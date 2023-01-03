@@ -556,6 +556,8 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
+	lexer->line = buffer;
+
 	// skip whitespace at BEGINNING OF LINE
 	const char *curr = buffer;
 	while (*curr == ' ' || *curr == '\t')
@@ -588,6 +590,5 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 		lexer->sequence[curr_token]->type = TOKEN_NULL;
 		curr_token++;
 	}
-	lexer->line = buffer;
 	return LEXER_SUCCESS;
 }
