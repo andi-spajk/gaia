@@ -13,8 +13,10 @@ void tearDown(void) {}
 
 void test_init_destroy_lexer(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_init_destroy_lexer.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
+	TEST_ASSERT_NOT_NULL(lexer->file_name);
+	TEST_ASSERT_EQUAL_STRING("test_init_destroy_lexer.asm", lexer->file_name);
 	for (int i = 0; i < MAX_TOKENS; i++) {
 		TEST_ASSERT_NOT_NULL(lexer->sequence[i]);
 		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[i]->type);
@@ -124,8 +126,9 @@ void test_token_strncpy(void)
 
 void test_add_token(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_add_token.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
+	TEST_ASSERT_NOT_NULL(lexer->file_name);
 	TEST_ASSERT_EQUAL_INT(0, lexer->curr);
 
 	struct Token *tk = init_token();
@@ -713,13 +716,15 @@ void test_lex(void)
 
 void test_lex_line(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_lex_line.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
+	TEST_ASSERT_NOT_NULL(lexer->file_name);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
 	const char *buffer;
+	int line_num = 0;
 
 	// lex_line() resets the lexer and instr for us, so we will not need to
 	// call the resets ourselves
@@ -727,7 +732,8 @@ void test_lex_line(void)
 //                                 012345 6 7890 12345678
 	const char *source_line = "SEARCH\t\tLDA\tBOARD,X\n";
 	buffer = source_line;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
 	// 5 tokens from index [0,4], so lexer->curr should be index 5
 	TEST_ASSERT_EQUAL_INT(5, lexer->curr);
 	TEST_ASSERT_EQUAL_PTR(source_line, lexer->line);
@@ -758,7 +764,8 @@ void test_lex_line(void)
 //                               0 1234 5678 901234
 	const char *bad_line = "\t\tADC\tBCC\t; lol\n";
 	buffer = bad_line;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
 	TEST_ASSERT_EQUAL_INT(2, lexer->curr);
 	TEST_ASSERT_EQUAL_PTR(bad_line, lexer->line);
 
@@ -779,7 +786,8 @@ void test_lex_line(void)
 
 	const char *really_bad_line = "LABEL LABEL2 JMP ADC (LMAO,X)\n";
 	buffer = really_bad_line;
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_TOKENS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_TOKENS, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
 	TEST_ASSERT_EQUAL_INT(8, lexer->curr);
 	// lexer->line does not get set if we had error during lexing
 	TEST_ASSERT_EQUAL_PTR(really_bad_line, lexer->line);
@@ -789,7 +797,8 @@ void test_lex_line(void)
 //                                        01234 5 6789 01234
 	const char *y_register_example = "ELOOP\t\tCMP\tBK,Y\n";
 	buffer = y_register_example;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
 	TEST_ASSERT_EQUAL_INT(5, lexer->curr);
 	TEST_ASSERT_EQUAL_PTR(y_register_example, lexer->line);
 
@@ -813,7 +822,8 @@ void test_lex_line(void)
 //                              0123456 78 901234 5
 	const char *constant = "address\t=\t$1234\n";
 	buffer = constant;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
 	TEST_ASSERT_EQUAL_INT(3, lexer->curr);
 	TEST_ASSERT_EQUAL_PTR(constant, lexer->line);
 
@@ -838,7 +848,8 @@ void test_lex_line(void)
 	//                  012 3 4567 89012345
 	const char *indy = "L20\t\tSTA\t($FF),Y";
 	buffer = indy;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
 	TEST_ASSERT_EQUAL_INT(7, lexer->curr);
 	TEST_ASSERT_EQUAL_PTR(indy, lexer->line);
 
@@ -871,7 +882,8 @@ void test_lex_line(void)
 		strncpy(eof_test, "EOFTEST LSR $0A", 17);
 		eof_test[15] = EOF;
 		buffer = eof_test;
-		TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+		TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+		line_num++;
 		TEST_ASSERT_EQUAL_INT(3, lexer->curr);
 		TEST_ASSERT_EQUAL_PTR(eof_test, lexer->line);
 
@@ -899,7 +911,8 @@ void test_lex_line(void)
 	//                            012345
 	const char *lexical_errors = "INX $#100\n";
 	buffer = lexical_errors;
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
 	TEST_ASSERT_EQUAL_PTR(buffer, lexer->line);
 	// when lexing stops, tk contains the last token that lexer tried to lex,
 	// and that would be the error token
@@ -910,7 +923,8 @@ void test_lex_line(void)
 //                                  0 1234 56789012 3
 	const char *bad_literal = "\t\tJMP\t$LABELLOL\t";
 	buffer = bad_literal;
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
 	TEST_ASSERT_EQUAL_PTR(buffer, lexer->line);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[7]), tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[6]), tk->buffer_location);
@@ -921,7 +935,8 @@ void test_lex_line(void)
 		strncpy(eof_bad_literal, "\tLDY\t%10012010", 16);
 		eof_bad_literal[14] = EOF;
 		buffer = eof_bad_literal;
-		TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
+		TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));
+		line_num++;
 		TEST_ASSERT_EQUAL_PTR(buffer, lexer->line);
 		TEST_ASSERT_EQUAL_PTR(&(buffer[10]), tk->error_char);
 		TEST_ASSERT_EQUAL_PTR(&(buffer[5]), tk->buffer_location);
@@ -932,7 +947,8 @@ void test_lex_line(void)
 	const char *totally_illegal_char = "        EOR     @WTF    ; comment       \n\n\n\n\n";
 	// add lots of spaces/newlines to test how print_error() strips trailing whitespace
 	buffer = totally_illegal_char;
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
 	TEST_ASSERT_EQUAL_PTR(buffer, lexer->line);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->buffer_location);

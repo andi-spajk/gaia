@@ -71,7 +71,7 @@ static struct Token **init_sequence(void)
 
 	Dynamically allocates a Lexer struct and its array of tokens.
 */
-struct Lexer *init_lexer(void)
+struct Lexer *init_lexer(const char *file_name)
 {
 	struct Lexer *lexer = malloc(sizeof(struct Lexer));
 	if (!lexer)
@@ -84,6 +84,7 @@ struct Lexer *init_lexer(void)
 	lexer->curr = 0;
 	lexer->error_tk = NULL;
 	lexer->line = NULL;
+	lexer->file_name = file_name;
 	return lexer;
 }
 
@@ -106,6 +107,7 @@ void reset_lexer(struct Lexer *lexer)
 	lexer->curr = 0;
 	lexer->error_tk = NULL;
 	lexer->line = NULL;
+	lexer->line_num = -1;
 }
 
 /* destroy_token()
@@ -552,12 +554,13 @@ static int end_line_lexing(char c)
 	wiped before proceeding to the lexical analysis.
 */
 int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
-             struct Instruction *instr)
+             struct Instruction *instr, int line_num)
 {
 	reset_lexer(lexer);
 	reset_instruction(instr);
 
 	lexer->line = buffer;
+	lexer->line_num = line_num;
 
 	// skip whitespace at BEGINNING OF LINE
 	const char *curr = buffer;
@@ -570,7 +573,8 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 		num_chars = lex(curr, tk, instr);
 		// negative returns indicate an error code
 		if (num_chars < 0) {
-			print_error(buffer, num_chars, tk->error_char);
+			print_error(buffer, num_chars, tk->error_char,
+			            lexer->file_name, lexer->line_num);
 			return num_chars;
 		}
 		if (add_token(lexer, tk)  == ERROR_TOO_MANY_TOKENS) {

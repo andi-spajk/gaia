@@ -22,14 +22,13 @@ printed, which is aligned to the error in the source line.
 		ERROR_FILE_OPEN_FAIL
 		ERROR_BINARY_FILE_CREATION_FAIL
 	These cases should pass in NULL for @line and @bad_char.
-
-	removed, maybe add back later:
-	@file_name      name of assembly program file
-	@line_num       line number where the error occurred
-
 */
-void print_error(const char *line, int error_code, const char *bad_char)
+void print_error(const char *line, int error_code, const char *bad_char,
+                 const char *file_name, int line_num)
 {
+	if (line)
+		printf("%s:%d: ", file_name, line_num);
+
 	switch (error_code) {
 	case ERROR_MEMORY_ALLOCATION_FAIL:
 		printf("ERROR: could not allocate enough memory during assembly\n");

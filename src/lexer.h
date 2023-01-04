@@ -44,12 +44,14 @@ struct Lexer {
 	struct Token *error_tk;  // ptr to token with syntax error, only
 	                         // determined by parser.c
 	const char *line;        // ptr to original source line of code
+	int line_num;
+	const char *file_name;
 };
 
 struct Token *init_token(void);
 int token_strcpy(struct Token *tk, const char *str);
 int token_strncpy(struct Token *tk, const char *buffer, int length);
-struct Lexer *init_lexer(void);
+struct Lexer *init_lexer(const char *file_name);
 void reset_lexer(struct Lexer *lexer);
 
 void destroy_token(struct Token *tk);
@@ -62,6 +64,6 @@ int lex_instruction(struct Token *tk, struct Instruction *instr);
 int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr);
 int lex(const char *buffer, struct Token *tk, struct Instruction *instr);
 int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
-             struct Instruction *instr);
+             struct Instruction *instr, int line_num);
 
 #endif
