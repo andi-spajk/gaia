@@ -13,7 +13,8 @@ tests/lexer/test_lexer
 tests/opcode/test_opcode
 tests/opcode/gen/bitfields.h
 
-tests/parser/test_parser
+tests/parser/test_parser1
+tests/parser/test_parser2
 
 tests/forward_reference/test_forward_reference
 
