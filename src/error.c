@@ -14,6 +14,8 @@ printed, which is aligned to the error in the source line.
 	@line           source line with the error
 	@error_code     error code from error.h
 	@bad_char       ptr to beginning of error in @line
+	@file_name      name of assembly source file
+	@line_num       line number of @line
 
 	Prints a formatted error message.
 

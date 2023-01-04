@@ -67,6 +67,8 @@ static struct Token **init_sequence(void)
 }
 
 /* init_lexer()
+	@file_name      name of assembly source file
+
 	@return         ptr to dynamically allocated Lexer, or NULL if fail
 
 	Dynamically allocates a Lexer struct and its array of tokens.
@@ -91,8 +93,8 @@ struct Lexer *init_lexer(const char *file_name)
 /* reset_lexer()
 	@lexer          ptr to Lexer struct
 
-	Reset the @lexer and all its tokens to null tokens. This prepares the
-	lexer for the next source line.
+	Reset the @lexer, its members, and all its tokens to null tokens.
+	This prepares the lexer for the next source line.
 */
 void reset_lexer(struct Lexer *lexer)
 {

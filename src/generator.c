@@ -25,18 +25,18 @@ references.
 	@f              ptr to binary FILE
 	@instr          ptr to Instruction struct
 	@operand        ptr to operand token (can be NULL)
-	@pc             current program counter location
+	@curr_pc        current program counter location
 
 	@return         number of bytes written to @f
 
 	Assemble a line of code and write the bytes to a binary file.
 */
 int generate_code(FILE *f, struct Instruction *instr, struct Token *operand,
-                  int pc)
+                  int curr_pc)
 {
 	instr->opcode = get_opcode(instr);
 
-	fseek(f, pc, SEEK_SET);
+	fseek(f, curr_pc, SEEK_SET);
 	fputc(instr->opcode, f);
 
 	int operand_bytes;
@@ -76,17 +76,18 @@ int calc_branch_offset(int curr_pc, int dest_pc)
 		if (offset > 127)
 			return ERROR_TOO_BIG_OFFSET;
 	}
-	return 0xFF & (dest_pc - curr_pc - 2);
+	return 0xFF & offset;
 }
 
 /* resolve_label_ref()
 	@f                      ptr to binary FILE
+	@lexer          ptr to Lexer struct
 	@instr                  ptr to Instruction struct
 	@label                  ptr to token containing the label reference
 	@operand_status         whether @label is part of branch/jump
 	                        instruction
 	@symtab                 symbol table
-	@pc                     current program counter location
+	@curr_pc                current program counter location
 
 	@return                 number of bytes written to @f, or error code
 
@@ -95,14 +96,14 @@ int calc_branch_offset(int curr_pc, int dest_pc)
 */
 int resolve_label_ref(FILE *f, struct Lexer *lexer, struct Instruction *instr,
                       struct Token *label, int operand_status,
-                      struct SymbolTable *symtab, int pc)
+                      struct SymbolTable *symtab, int curr_pc)
 {
 	int dest_pc, offset;
 	if (label)
 		dest_pc = search_symbol(symtab, label->str);
 
 	if (operand_status == BRANCH_OPERAND) {
-		offset = calc_branch_offset(pc, dest_pc);
+		offset = calc_branch_offset(curr_pc, dest_pc);
 		if (offset == ERROR_TOO_BIG_OFFSET) {
 			print_error(lexer->line, ERROR_TOO_BIG_OFFSET,
 			            label->buffer_location, lexer->file_name,
@@ -110,20 +111,19 @@ int resolve_label_ref(FILE *f, struct Lexer *lexer, struct Instruction *instr,
 			return ERROR_TOO_BIG_OFFSET;
 		}
 		label->value = (unsigned int)offset;
-		return generate_code(f, instr, label, pc);
+		return generate_code(f, instr, label, curr_pc);
 	} else if (operand_status == JUMP_OPERAND) {
 		label->value = dest_pc;
-		return generate_code(f, instr, label, pc);
+		return generate_code(f, instr, label, curr_pc);
 	}
 	return ERROR_UNKNOWN;
 }
 
 /* resolve_forward_ref()
 	@f              ptr to binary FILE
-	@instr          ptr to Instruction struct
 	@ref            ptr to ForwardRef struct
+	@lexer          ptr to Lexer struct
 	@symtab         symbol table
-	@pc             current program counter location
 
 	@return         number of bytes written to @f, or error code
 
