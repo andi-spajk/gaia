@@ -68,7 +68,8 @@ int parse_indirect_operand_tree(struct Lexer *lexer, int index)
 	}
 	lexer->error_tk = lexer->sequence[index];
 	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
-	            lexer->error_tk->buffer_location);
+	            lexer->error_tk->buffer_location, lexer->file_name,
+	            lexer->line_num);
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
@@ -126,7 +127,8 @@ int parse_instr_tree(struct Lexer *lexer, int index)
 	}
 	lexer->error_tk = lexer->sequence[index];
 	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
-	            lexer->error_tk->buffer_location);
+	            lexer->error_tk->buffer_location, lexer->file_name,
+	            lexer->line_num);
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
@@ -162,7 +164,8 @@ int parse_label_tree(struct Lexer *lexer, int index)
 	}
 	lexer->error_tk = lexer->sequence[index];
 	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
-	            lexer->error_tk->buffer_location);
+	            lexer->error_tk->buffer_location, lexer->file_name,
+	            lexer->line_num);
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
@@ -183,7 +186,8 @@ int parse_line(struct Lexer *lexer)
 		return parse_label_tree(lexer, index);
 	lexer->error_tk = lexer->sequence[index];
 	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
-	            lexer->error_tk->buffer_location);
+	            lexer->error_tk->buffer_location, lexer->file_name,
+	            lexer->line_num);
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
@@ -211,7 +215,8 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 		if (found != ERROR_SYMBOL_NOT_FOUND) {
 			lexer->error_tk = label;
 			print_error(lexer->line, ERROR_LABEL_REDEFINITION,
-			            lexer->error_tk->buffer_location);
+			            lexer->error_tk->buffer_location,
+			            lexer->file_name, lexer->line_num);
 			return ERROR_LABEL_REDEFINITION;
 		} else {
 			label->value = pc;
@@ -222,7 +227,8 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 		if (found != ERROR_SYMBOL_NOT_FOUND) {
 			lexer->error_tk = label;
 			print_error(lexer->line, ERROR_LABEL_REDEFINITION,
-			            lexer->error_tk->buffer_location);
+			            lexer->error_tk->buffer_location,
+			            lexer->file_name, lexer->line_num);
 			return ERROR_LABEL_REDEFINITION;
 		} else {
 			// 0     1 2
@@ -278,7 +284,8 @@ int parse_label_operand(struct Lexer *lexer, struct Instruction *instr,
 			lexer->error_tk = operand;
 			print_error(lexer->line,
 			            ERROR_ILLEGAL_FORWARD_REFERENCE,
-			            lexer->error_tk->buffer_location);
+			            lexer->error_tk->buffer_location,
+			            lexer->file_name, lexer->line_num);
 			return ERROR_ILLEGAL_FORWARD_REFERENCE;
 		}
 	}
@@ -494,6 +501,7 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 
 	addr_mode = apply_masks(lexer, addr_mode);
 	if (!(addr_mode & instr->addr_bitfield))
-		print_error(lexer->line, ERROR_ILLEGAL_ADDRESSING_MODE, NULL);
+		print_error(lexer->line, ERROR_ILLEGAL_ADDRESSING_MODE, NULL,
+		            lexer->file_name, lexer->line_num);
 	return addr_mode;
 }
