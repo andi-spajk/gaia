@@ -724,7 +724,7 @@ void test_lex_line(void)
 	struct Instruction *instr = init_instruction();
 	TEST_ASSERT_NOT_NULL(instr);
 	const char *buffer;
-	int line_num = 0;
+	int line_num = 1;
 
 	// lex_line() resets the lexer and instr for us, so we will not need to
 	// call the resets ourselves

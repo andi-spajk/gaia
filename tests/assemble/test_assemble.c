@@ -14,7 +14,7 @@ void tearDown(void) {}
 
 void test_assembly(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_assembly.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
@@ -27,7 +27,7 @@ void test_assembly(void)
 
 	const char *line = "\t\tSBC\t($AA),Y\n";
 	buffer = line;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, 1));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(SBC, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(SBC_BITFIELD, instr->addr_bitfield);

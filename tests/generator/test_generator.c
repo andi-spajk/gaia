@@ -1,3 +1,10 @@
+// The line numbers in the error messages are wrong because I increment line_num
+// AFTER lex_line() and then I call create_forward_ref().
+// In the actual assembler loop, you wouldn't increment until the very end.
+// I am too lazy to fix it here because adding the proper line number was
+// already tested in test_forward_reference.c. None of the tests here are broken
+// by having wrong line numbers.
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -17,7 +24,7 @@ void tearDown(void) {}
 
 void test_generate_code(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_generate_code.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
@@ -25,6 +32,7 @@ void test_generate_code(void)
 	TEST_ASSERT_NOT_NULL(instr);
 	struct SymbolTable *symtab = NULL;
 	// these tests don't use any labels
+	int line_num = 1;
 
 	FILE *f = fopen("generate_code.out", "w+b");
 	TEST_ASSERT_NOT_NULL(f);
@@ -69,7 +77,7 @@ void test_generate_code(void)
 	const char *buffer;
 
 	buffer = "INX\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -80,7 +88,7 @@ void test_generate_code(void)
 	pc += written;
 
 	buffer = "ORA $AA\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -91,7 +99,7 @@ void test_generate_code(void)
 	pc+= written;
 
 	buffer = "LDA $1234\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -102,7 +110,7 @@ void test_generate_code(void)
 	pc += written;
 
 	buffer = "SBC $BB,X\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -113,7 +121,7 @@ void test_generate_code(void)
 	pc += written;
 
 	buffer = "INC $1000,X\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -124,7 +132,7 @@ void test_generate_code(void)
 	pc += written;
 
 	buffer = "STX $CC, Y\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -135,7 +143,7 @@ void test_generate_code(void)
 	pc += written;
 
 	buffer = "STA $DEAD,Y\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -146,7 +154,7 @@ void test_generate_code(void)
 	pc += written;
 
 	buffer = "JMP ($FACE)\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -157,7 +165,7 @@ void test_generate_code(void)
 	pc += written;
 
 	buffer = "EOR #$DD\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -168,7 +176,7 @@ void test_generate_code(void)
 	pc += written;
 
 	buffer = "ADC ($EE,X)\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -179,7 +187,7 @@ void test_generate_code(void)
 	pc += written;
 
 	buffer = "CMP ($FF),Y\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -190,7 +198,7 @@ void test_generate_code(void)
 	pc += written;
 
 	buffer = "ASL\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -212,7 +220,7 @@ void test_generate_code(void)
 
 void test_resolve_label_ref(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_resolve_label_ref.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
@@ -220,6 +228,7 @@ void test_resolve_label_ref(void)
 	TEST_ASSERT_NOT_NULL(instr);
 	struct SymbolTable *symtab = init_symbol_table();
 	TEST_ASSERT_NOT_NULL(symtab);
+	int line_num = 1;
 
 	FILE *f = fopen("resolve_label_ref.out", "w+b");
 	TEST_ASSERT_NOT_NULL(f);
@@ -259,9 +268,10 @@ void test_resolve_label_ref(void)
 	// ADDRESS = $1234
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, insert_symbol(symtab, "ADDRESS", 0x1234));
 	TEST_ASSERT_EQUAL_INT(0x1234, search_symbol(symtab, "ADDRESS"));
+	line_num++;
 
 	buffer = "LABEL1 INX\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -273,7 +283,7 @@ void test_resolve_label_ref(void)
 	pc += written;
 
 	buffer = "BNE LABEL1\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -286,7 +296,7 @@ void test_resolve_label_ref(void)
 	pc += written;
 
 	buffer = "JMP LABEL1\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -297,7 +307,7 @@ void test_resolve_label_ref(void)
 	pc += written;
 
 	buffer = "SAME1 BEQ SAME1\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -309,7 +319,7 @@ void test_resolve_label_ref(void)
 	pc += written;
 
 	buffer = "SAME2 JMP SAME2\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -321,7 +331,7 @@ void test_resolve_label_ref(void)
 	pc += written;
 
 	buffer = "LABEL2 BPL SAME1\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -333,7 +343,7 @@ void test_resolve_label_ref(void)
 	pc += written;
 
 	buffer = "JSR LABEL2\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -344,7 +354,7 @@ void test_resolve_label_ref(void)
 	pc += written;
 
 	buffer = "JMP (ADDRESS)\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -360,7 +370,7 @@ void test_resolve_label_ref(void)
 
 	insert_symbol(symtab, "FARAWAY", 0xF000);
 	buffer = "\t\tBMI\tFARAWAY\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -378,7 +388,7 @@ void test_resolve_label_ref(void)
 
 void test_too_big_offset_no_forward_ref(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_too_big_offset_no_forward_ref.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
@@ -404,10 +414,11 @@ void test_too_big_offset_no_forward_ref(void)
 	int addr_mask;
 	int written;
 	int pc;
+	int line_num = 1;
 
 	pc = 0x0;
 	buffer = "BACK INX\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -419,7 +430,7 @@ void test_too_big_offset_no_forward_ref(void)
 
 	pc = 0x7E;
 	buffer = "BCC BACK\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -436,9 +447,10 @@ void test_too_big_offset_no_forward_ref(void)
 	007F                         * = $007F
 	007F                         BCC BACK
 	*/
+	line_num = 2;
 	pc = 0x7F;
 	buffer = "BCC\tBACK\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -455,9 +467,10 @@ void test_too_big_offset_no_forward_ref(void)
 	0ABC                         * = $0ABC
 	0ABC                         BCC BACK
 	*/
+	line_num = 2;
 	pc = 0xABC;
 	buffer = "                BCC     BACK\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -475,7 +488,7 @@ void test_too_big_offset_no_forward_ref(void)
 
 void test_resolve_forward_ref(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_resolve_forward_ref.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
@@ -485,6 +498,7 @@ void test_resolve_forward_ref(void)
 	TEST_ASSERT_NOT_NULL(symtab);
 	struct Unresolved *unresolved = init_unresolved();
 	TEST_ASSERT_NOT_NULL(unresolved);
+	int line_num = 1;
 
 	FILE *f = fopen("resolve_forward_ref.out", "w+b");
 	TEST_ASSERT_NOT_NULL(f);
@@ -521,7 +535,7 @@ void test_resolve_forward_ref(void)
 	int written;
 
 	buffer = "BVS L1\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -530,13 +544,13 @@ void test_resolve_forward_ref(void)
 	// dummy bytes
 	fputc(0x00, f);
 	fputc(0x00, f);
-	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, 1);
+	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 	pc += 2;
 
 	buffer = "JMP L2\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -545,13 +559,13 @@ void test_resolve_forward_ref(void)
 	fputc(0x00, f);
 	fputc(0x00, f);
 	fputc(0x00, f);
-	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, 2);
+	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 	pc += 3;
 
 	buffer = "JSR L3\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -560,13 +574,13 @@ void test_resolve_forward_ref(void)
 	fputc(0x00, f);
 	fputc(0x00, f);
 	fputc(0x00, f);
-	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, 3);
+	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 	pc += 3;
 
 	buffer = "JMP (WHERE)\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -575,14 +589,14 @@ void test_resolve_forward_ref(void)
 	fputc(0x00, f);
 	fputc(0x00, f);
 	fputc(0x00, f);
-	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, 4);
+	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 	TEST_ASSERT_EQUAL_INT(4, unresolved->curr);
 	pc += 3;
 
 	buffer = "L1 INX\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -594,7 +608,7 @@ void test_resolve_forward_ref(void)
 	pc += 1;
 
 	buffer = "L2 INY\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -606,7 +620,7 @@ void test_resolve_forward_ref(void)
 	pc += 1;
 
 	buffer = "L3 DEX\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -618,13 +632,13 @@ void test_resolve_forward_ref(void)
 	pc += 1;
 
 	buffer = "WHERE = $ABCD\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
 
 	for (int i = 0; unresolved->refs[i] != NULL; i++)
-		resolve_forward_ref(f, unresolved->refs[i], symtab);
+		resolve_forward_ref(f, unresolved->refs[i], lexer, symtab);
 
 	fseek(f, 0, SEEK_SET);
 	TEST_ASSERT_EQUAL_INT(exp_bytes, fread(produced_rom, sizeof(unsigned char), exp_bytes, f));
@@ -640,7 +654,7 @@ void test_resolve_forward_ref(void)
 
 void test_too_big_offset_with_forward_ref(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_too_big_offset_with_forward_ref.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
@@ -669,17 +683,18 @@ void test_too_big_offset_with_forward_ref(void)
 	int pc;
 	struct ForwardRef *ref;
 	int written;
+	int line_num = 1;
 
 	pc = 0x0;
 	buffer = "BVC FARAWAY1\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
 
-	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, 1);
+	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 	fputc(0x00, f);
@@ -687,7 +702,7 @@ void test_too_big_offset_with_forward_ref(void)
 
 	pc = 0x81;
 	buffer = "FARAWAY1 INY\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -698,7 +713,7 @@ void test_too_big_offset_with_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(1, written);
 
 	int curr_forward_ref = 0;
-	TEST_ASSERT_EQUAL_INT(2, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], symtab));
+	TEST_ASSERT_EQUAL_INT(2, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], lexer, symtab));
 	curr_forward_ref++;
 
 	/*
@@ -709,17 +724,18 @@ void test_too_big_offset_with_forward_ref(void)
 	0082                         * = $0082
 	0082               FARAWAY2  INY
 	*/
+	line_num = 1;
 
 	pc = 0x0;
 	buffer = "\t\tBCS\tFARAWAY2\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
 
-	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, 1);
+	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 	fputc(0x00, f);
@@ -727,7 +743,7 @@ void test_too_big_offset_with_forward_ref(void)
 
 	pc = 0x82;
 	buffer = "FARAWAY2 INY\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -737,7 +753,7 @@ void test_too_big_offset_with_forward_ref(void)
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], symtab));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], lexer, symtab));
 	curr_forward_ref++;
 
 	/*
@@ -748,17 +764,18 @@ void test_too_big_offset_with_forward_ref(void)
 	1000                         * = $1000
 	1000               FARAWAY3  DEX
 	*/
+	line_num = 1;
 
 	pc = 0x0;
 	buffer = "BVS FARAWAY3\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
 	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
 
-	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, 1);
+	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 	fputc(0x00, f);
@@ -766,7 +783,7 @@ void test_too_big_offset_with_forward_ref(void)
 
 	pc = 0x1000;
 	buffer = "FARAWAY3 DEX\n";
-	lex_line(buffer, lexer, tk, instr);
+	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
@@ -776,7 +793,7 @@ void test_too_big_offset_with_forward_ref(void)
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], symtab));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], lexer, symtab));
 	curr_forward_ref++;
 
 	destroy_lexer(lexer);

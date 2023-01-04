@@ -22,7 +22,7 @@ void test_init_destroy_unresolved(void)
 
 void test_create_forward_ref(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_create_forward_ref.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
@@ -32,7 +32,7 @@ void test_create_forward_ref(void)
 	TEST_ASSERT_NOT_NULL(symtab);
 	const char *buffer;
 	int pc;
-	int line_num;
+	int line_num = 1;
 	int operand_status;
 	struct ForwardRef *ref;
 	struct Token *operand;
@@ -40,10 +40,9 @@ void test_create_forward_ref(void)
 	// JMP L21
 	//         0 1234 5678 90123
 	buffer = "\t\tJMP\tL21\t; comment\n";
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	pc = 0x0;
-	line_num = 1;
 
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -70,13 +69,13 @@ void test_create_forward_ref(void)
 
 	destroy_forward_ref(ref);
 
+	line_num++;
 	// BNE LABEL1
 	//        012345678901234567890123 4
 	buffer = "             BNE LABEL1 \t\t\n";
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	pc = 0x3;
-	line_num = 2;
 
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -110,7 +109,7 @@ void test_create_forward_ref(void)
 
 void test_add_forward_ref(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_add_forward_ref.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
@@ -122,7 +121,7 @@ void test_add_forward_ref(void)
 	TEST_ASSERT_NOT_NULL(unresolved);
 	struct ForwardRef *ref;
 	int pc;
-	int line_num;
+	int line_num = 1;
 	int operand_status;
 	const char *buffer;
 	struct Token *operand;
@@ -130,10 +129,9 @@ void test_add_forward_ref(void)
 	// JSR FORREF
 	//         0 1234 5678
 	buffer = "\t\tJSR\tFORREF\n";
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	pc = 0x0;
-	line_num = 1;
 
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -152,13 +150,13 @@ void test_add_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(JUMP_FORWARD_REFERENCE, ref->operand_status);
 	TEST_ASSERT_EQUAL_PTR(&(ref->source_line[6]), ref->operand_location);
 
+	line_num++;
 	// BMI FORREF2
 	//        0123456789012345678901234567890
 	buffer = "             BMI        FORREF2\n";
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	pc = 0x3;
-	line_num = 2;
 
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
@@ -189,7 +187,7 @@ void test_add_forward_ref(void)
 
 void test_resize_unresolved(void)
 {
-	struct Lexer *lexer = init_lexer();
+	struct Lexer *lexer = init_lexer("test_resize_unresolved.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
@@ -201,17 +199,16 @@ void test_resize_unresolved(void)
 	TEST_ASSERT_NOT_NULL(unresolved);
 	struct ForwardRef *ref;
 	int pc;
-	int line_num;
+	int line_num = 1;
 	int operand_status;
 	const char *buffer;
 	struct Token *operand;
 
 	// JMP (FORREF)
 	buffer = "\t\tJMP\t(FORREF)\t;hi\n";
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	pc = 0x0;
-	line_num = 1;
 
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);

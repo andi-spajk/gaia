@@ -105,7 +105,8 @@ int resolve_label_ref(FILE *f, struct Lexer *lexer, struct Instruction *instr,
 		offset = calc_branch_offset(pc, dest_pc);
 		if (offset == ERROR_TOO_BIG_OFFSET) {
 			print_error(lexer->line, ERROR_TOO_BIG_OFFSET,
-			            label->buffer_location);
+			            label->buffer_location, lexer->file_name,
+			            lexer->line_num);
 			return ERROR_TOO_BIG_OFFSET;
 		}
 		label->value = (unsigned int)offset;
@@ -132,7 +133,7 @@ int resolve_label_ref(FILE *f, struct Lexer *lexer, struct Instruction *instr,
 	responsibility to check if the label had been defined in the midst of
 	normal assembly.
 */
-int resolve_forward_ref(FILE *f, struct ForwardRef *ref,
+int resolve_forward_ref(FILE *f, struct ForwardRef *ref, struct Lexer *lexer,
                         struct SymbolTable *symtab)
 {
 	struct Instruction *instr = ref->instr;
@@ -143,7 +144,8 @@ int resolve_forward_ref(FILE *f, struct ForwardRef *ref,
 		offset = calc_branch_offset(ref->pc, dest_pc);
 		if (offset == ERROR_TOO_BIG_OFFSET) {
 			print_error(ref->source_line, ERROR_TOO_BIG_OFFSET,
-			            ref->operand_location);
+			            ref->operand_location, lexer->file_name,
+			            ref->line_num);
 			return ERROR_TOO_BIG_OFFSET;
 		}
 
