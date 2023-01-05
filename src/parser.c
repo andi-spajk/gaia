@@ -427,7 +427,7 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 		instr->addr_bitflag = addr_mode & ADDR_MODE_RELATIVE;
 		return FORWARD_REFERENCE;
 	}
-	// JMP has two modes, so we AND with the field. JSR has only one mode
+	// JMP has two modes, so we AND with the FIELD!!! JSR has only one mode
 	if (instr->mnemonic == JMP)
 		instr->addr_bitflag = addr_mode & ABSOLUTE_FIELD;
 	else if (instr->mnemonic == JSR)

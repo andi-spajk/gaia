@@ -48,8 +48,8 @@ struct Token *init_token(void)
 	@return         ptr to dynamically allocated array of ptrs to Token
 	                structs, or NULL if fail
 
-	Dynamically allocates an array of Token pointers and initializes
-	the Tokens in the array.
+	Dynamically allocates an array of Token pointers and the Tokens
+	themselves.
 */
 static struct Token **init_sequence(void)
 {
@@ -389,8 +389,10 @@ int lex_literal(struct Token *tk, const char *literal)
 	@return         number of chars read, or error code
 
 	Lexically analyze @tk's string member and check if it's an instruction
-	mnemonic. @instr and @tk are NOT modified by this function if a
-	mnemonic was not found.
+	mnemonic.
+
+	@instr and @tk are NOT modified by this function if a mnemonic was not
+	found.
 */
 int lex_instruction(struct Token *tk, struct Instruction *instr)
 {
@@ -415,7 +417,7 @@ int lex_instruction(struct Token *tk, struct Instruction *instr)
 static int is_valid_token_char(const char c)
 {
 	// isalnum() is case-insensitive, although lex_text()
-	// guarantees all-uppercase input
+	// guarantees everything is converted to uppercase
 	return isalnum(c) || c == '_';
 }
 
