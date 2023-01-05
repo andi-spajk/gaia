@@ -72,7 +72,6 @@ void test_generate_code(void)
 	int pc = 0;
 	int written = 0;
 	struct Token *operand;
-	int addr_mask;
 	int operand_status;
 	const char *buffer;
 
@@ -81,8 +80,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 	pc += written;
@@ -92,8 +90,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc+= written;
@@ -103,8 +100,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
@@ -114,8 +110,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
@@ -125,8 +120,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
@@ -136,8 +130,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
@@ -147,8 +140,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
@@ -158,8 +150,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
@@ -169,8 +160,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
@@ -180,8 +170,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
@@ -191,8 +180,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
@@ -202,8 +190,7 @@ void test_generate_code(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 	pc += written;
@@ -263,7 +250,6 @@ void test_resolve_label_ref(void)
 	const char *buffer;
 	struct Token *operand;
 	int operand_status;
-	int addr_mask;
 
 	// ADDRESS = $1234
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, insert_symbol(symtab, "ADDRESS", 0x1234));
@@ -276,8 +262,7 @@ void test_resolve_label_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 	pc += written;
@@ -287,8 +272,7 @@ void test_resolve_label_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	TEST_ASSERT_EQUAL_INT(0x1000, operand->value);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(0xFD, operand->value);
@@ -300,8 +284,7 @@ void test_resolve_label_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
@@ -312,8 +295,7 @@ void test_resolve_label_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
@@ -324,8 +306,7 @@ void test_resolve_label_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
@@ -336,8 +317,7 @@ void test_resolve_label_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
@@ -347,8 +327,7 @@ void test_resolve_label_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
@@ -358,8 +337,7 @@ void test_resolve_label_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
@@ -374,8 +352,7 @@ void test_resolve_label_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, written);
 
@@ -411,7 +388,6 @@ void test_too_big_offset_no_forward_ref(void)
 	const char *buffer;
 	struct Token *operand;
 	int operand_status;
-	int addr_mask;
 	int written;
 	int pc;
 	int line_num = 1;
@@ -423,8 +399,7 @@ void test_too_big_offset_no_forward_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 
@@ -434,8 +409,7 @@ void test_too_big_offset_no_forward_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(2, written);
 
@@ -454,8 +428,7 @@ void test_too_big_offset_no_forward_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, written);
 
@@ -474,8 +447,7 @@ void test_too_big_offset_no_forward_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = instr->addr_bitfield & addr_mask;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = resolve_label_ref(f, lexer, instr, operand, operand_status, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, written);
 
@@ -529,7 +501,6 @@ void test_resolve_forward_ref(void)
 	const char *buffer;
 	struct Token *operand;
 	int operand_status;
-	int addr_mask;
 	int pc = 0x0;
 	struct ForwardRef *ref;
 	int written;
@@ -539,8 +510,7 @@ void test_resolve_forward_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(lexer, instr, operand, operand_status));
 	// dummy bytes
 	fputc(0x00, f);
 	fputc(0x00, f);
@@ -554,8 +524,7 @@ void test_resolve_forward_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(lexer, instr, operand, operand_status));
 	fputc(0x00, f);
 	fputc(0x00, f);
 	fputc(0x00, f);
@@ -569,8 +538,7 @@ void test_resolve_forward_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(lexer, instr, operand, operand_status));
 	fputc(0x00, f);
 	fputc(0x00, f);
 	fputc(0x00, f);
@@ -584,8 +552,7 @@ void test_resolve_forward_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(lexer, instr, operand, operand_status));
 	fputc(0x00, f);
 	fputc(0x00, f);
 	fputc(0x00, f);
@@ -601,11 +568,10 @@ void test_resolve_forward_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
-	pc += 1;
+	pc += written;
 
 	buffer = "L2 INY\n";
 	lex_line(buffer, lexer, tk, instr, line_num++);
@@ -613,11 +579,10 @@ void test_resolve_forward_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
-	pc += 1;
+	pc += written;
 
 	buffer = "L3 DEX\n";
 	lex_line(buffer, lexer, tk, instr, line_num++);
@@ -625,11 +590,10 @@ void test_resolve_forward_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
-	pc += 1;
+	pc += written;
 
 	buffer = "WHERE = $ABCD\n";
 	lex_line(buffer, lexer, tk, instr, line_num++);
@@ -679,7 +643,6 @@ void test_too_big_offset_with_forward_ref(void)
 	const char *buffer;
 	struct Token *operand;
 	int operand_status;
-	int addr_mask;
 	int pc;
 	struct ForwardRef *ref;
 	int written;
@@ -691,8 +654,7 @@ void test_too_big_offset_with_forward_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(lexer, instr, operand, operand_status));
 
 	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
@@ -707,8 +669,7 @@ void test_too_big_offset_with_forward_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 
@@ -732,8 +693,7 @@ void test_too_big_offset_with_forward_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(lexer, instr, operand, operand_status));
 
 	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
@@ -748,8 +708,7 @@ void test_too_big_offset_with_forward_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 
@@ -772,8 +731,7 @@ void test_too_big_offset_with_forward_ref(void)
 	parse_line(lexer);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, addr_mask);
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_addr_mode(lexer, instr, operand, operand_status));
 
 	ref = create_forward_ref(buffer, instr, operand, operand_status, pc, line_num);
 	TEST_ASSERT_NOT_NULL(ref);
@@ -788,8 +746,7 @@ void test_too_big_offset_with_forward_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	operand = find_operand(lexer);
 	operand_status = parse_operand(lexer, instr, operand, symtab);
-	addr_mask = parse_addr_mode(lexer, instr, operand, operand_status);
-	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	parse_addr_mode(lexer, instr, operand, operand_status);
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 

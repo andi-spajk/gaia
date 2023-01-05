@@ -100,9 +100,9 @@ void print_error(const char *line, int error_code, const char *bad_char,
 	int num_spaces = 0;
 	int tab_align = 0;
 	for (const char *tmp = line; tmp != bad_char; tmp++) {
-		if (tab_align == 8) {
+		if (tab_align == 8)
 			tab_align = 0;
-		}
+
 		if (*tmp == '\t') {
 			for (int i = 0; i < (8 - tab_align); i++)
 				num_spaces++;

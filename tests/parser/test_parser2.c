@@ -391,10 +391,10 @@ void test_parse_addr_mode(void)
 	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	// bad immediates
-	buffer = "JMP\t#000\n";
+	buffer = "ROL\t#000\n";
 	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
-	buffer = "BMI #CONSTANT16\n";
+	buffer = "NOP #CONSTANT16\n";
 	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	// bad jumps
@@ -407,12 +407,13 @@ void test_parse_addr_mode(void)
 	buffer = "JSR (ADDRESS)\n";
 	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
-	// no operand
 	buffer = "\t\tSTA\t;lol\n";
-	// parse_addr_mode() assumes it's implied
-	PARSE_ADDR_MODE_TESTER(ADDR_MODE_IMPLIED, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
-	// and we will check that it's an error
-	TEST_ASSERT_EQUAL_INT(0, ADDR_MODE_IMPLIED & instr->addr_bitfield);
+	// no operand so parse_addr_mode() assumed it's implied
+	// so STA bitfield and implied bitflag will zero each other out
+	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+
+	buffer = "\tLDY\t($AB),Y\n";
+	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);

@@ -180,10 +180,12 @@ int parse_line(struct Lexer *lexer)
 {
 	int index = 0;
 	struct Token **seq = lexer->sequence;
+
 	if (seq[index]->type == TOKEN_INSTRUCTION)
 		return parse_instr_tree(lexer, index);
 	else if (seq[index]->type == TOKEN_LABEL)
 		return parse_label_tree(lexer, index);
+
 	lexer->error_tk = lexer->sequence[index];
 	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
 	            lexer->error_tk->buffer_location, lexer->file_name,
@@ -440,11 +442,13 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 	@operand_status         whether operand is branch/jump and/or forward
 	                        reference
 
-	@return                 bitmask containing expressed addressing mode
+	@return                 bitmask containing expressed addressing mode, or
+	                        the FORWARD_REFERENCE signal code
 
 	Apply bit masks to determine the addressing mode of a lexer sequence.
-	Any invalid sequences will have incompatible bit masks and an
-	instruction bitfield that zero each other out.
+	@instr will be updated with the new addressing bitflag. Any invalid
+	sequences will have an addressing bit mask and an instruction bitfield
+	that zero each other out, resulting in a zero bitflag.
 */
 int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
                     struct Token *operand, int operand_status)
@@ -459,9 +463,13 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 		case LSR:
 		case ROL:
 		case ROR:
-			return ADDR_MODE_ACCUMULATOR;
+			instr->addr_bitflag = instr->addr_bitfield &
+			                      ADDR_MODE_ACCUMULATOR;
+			return instr->addr_bitflag;
 		default:
-			return ADDR_MODE_IMPLIED;
+			instr->addr_bitflag = instr->addr_bitfield &
+			                      ADDR_MODE_IMPLIED;
+			return instr->addr_bitflag;
 		}
 	}
 
@@ -500,8 +508,10 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 		addr_mode &= ~ADDR_MODE_IMMEDIATE;
 
 	addr_mode = apply_masks(lexer, addr_mode);
-	if (!(addr_mode & instr->addr_bitfield))
+	instr->addr_bitflag = addr_mode & instr->addr_bitfield;
+	if (!instr->addr_bitflag) {
 		print_error(lexer->line, ERROR_ILLEGAL_ADDRESSING_MODE, NULL,
 		            lexer->file_name, lexer->line_num);
-	return addr_mode;
+	}
+	return instr->addr_bitflag;
 }

@@ -19,7 +19,7 @@ Error codes used by the assembler. Also a prototype to print error messages.
 // internal error; no error message
 #define ERROR_INSTRUCTION_NOT_FOUND     -5
 
-// internal error, should never happen
+// internal error, should never happen (to the user)
 #define ERROR_BITFIELD_NOT_FOUND        -6
 
 #define ERROR_TOO_LONG_LABEL            -7
@@ -30,7 +30,7 @@ Error codes used by the assembler. Also a prototype to print error messages.
 #define ERROR_ILLEGAL_FORWARD_REFERENCE -12
 #define ERROR_ILLEGAL_ADDRESSING_MODE   -13
 
-// internal error; should never happen
+// internal error; should never happen (to the user)
 #define ERROR_ILLEGAL_MNEMONIC          -14
 
 #define ERROR_TOO_BIG_OFFSET            -15
