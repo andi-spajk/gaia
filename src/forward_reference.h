@@ -21,7 +21,7 @@ struct ForwardRef {
 	                               // assembled binary file
 	int line_num;
 	int operand_status;            // whether instr is branch or jump
-	const char *operand_location;  // location of operand in source buffer
+	const char *operand_location;  // location of operand in source_line
 };
 
 struct Unresolved {
@@ -34,9 +34,9 @@ struct Unresolved *init_unresolved(void);
 void destroy_forward_ref(struct ForwardRef *forward_ref);
 void destroy_unresolved(struct Unresolved *unresolved);
 struct ForwardRef *create_forward_ref(const char *buffer,
-                                      struct Instruction *instr,
-                                      struct Token *operand, int operand_status,
-                                      int pc, int line_num);
+                                      const struct Instruction *instr,
+                                      const struct Token *operand,
+                                      int operand_status, int pc, int line_num);
 int add_forward_ref(struct Unresolved *unresolved, struct ForwardRef *ref);
 
 #endif

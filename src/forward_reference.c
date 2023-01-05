@@ -95,9 +95,9 @@ void destroy_unresolved(struct Unresolved *unresolved)
 	The saved source line will have NO trailing whitespace.
 */
 struct ForwardRef *create_forward_ref(const char *buffer,
-                                      struct Instruction *instr,
-                                      struct Token *operand, int operand_status,
-                                      int pc, int line_num)
+                                      const struct Instruction *instr,
+                                      const struct Token *operand,
+                                      int operand_status, int pc, int line_num)
 {
 	struct ForwardRef *ref = malloc(sizeof(struct ForwardRef));
 	if (!ref)

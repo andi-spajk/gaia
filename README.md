@@ -2,6 +2,10 @@
 
 Gaia is a single-pass assembler for 6502 assembly.
 
+# Requirements
+
+`gcc` and `make` are required to compile the assembler.
+
 # Current Limitations
 
 - Only supported on Linux or WSL.
@@ -15,9 +19,9 @@ You must do `ASL` alone.
 
 # Unit Tests
 
-Unit tests are done in /tests/. The Unity framework is used and included; no
-extra configuration or install is necessary. Source code at
-https://github.com/ThrowTheSwitch/Unity.
+Unit tests are done in /tests/. The Makefiles and the Unity framework are both
+used and included; no extra configuration or install is necessary. Source code
+at https://github.com/ThrowTheSwitch/Unity.
 
 # Other Credits
 

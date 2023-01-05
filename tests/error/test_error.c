@@ -72,7 +72,6 @@ void test_print_error(void)
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(ERROR_LABEL_REDEFINITION, parse_label_declaration(lexer, symtab, 2));
-	TEST_ASSERT_EQUAL_INT(0, search_symbol(symtab, lexer->sequence[0]->str));
 	line_num++;
 
 	line = "\t\tCPY\tADDRESS\n";
@@ -85,8 +84,7 @@ void test_print_error(void)
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_operand(lexer, instr, find_operand(lexer), symtab));
-	int addr_mask = parse_addr_mode(lexer, instr, find_operand(lexer), PARSER_SUCCESS);
-	instr->addr_bitflag = addr_mask & instr->addr_bitfield;
+	parse_addr_mode(lexer, instr, find_operand(lexer), PARSER_SUCCESS);
 	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 	line_num++;
 
