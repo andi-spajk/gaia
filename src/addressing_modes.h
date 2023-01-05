@@ -4,32 +4,37 @@ Bitflags and bitfields for each 6502 addressing mode. Flags denote a single
 addressing mode, and fields contain numerous modes grouped together under
 certain properties.
 
-*/
 
-/*
-Each bit represents a particular addressing mode
-If we figure out whether the operand is absolute or zero page,
-we can just mask out the modes with registers and/or indirect parentheses.
-For example, an operand with an x register will have a specific bitfield.
-However, if the instr is a jump instr, that bitfield will be incompatible
-with the previous bitfield, ie they will share no bits.
+Each bit represents a particular addressing mode.
+If we figure out whether the operand is absolute or zero page, which registers
+it uses, etc., then we can just mask out the other modes until we arrive at one
+single bit.
 
-We start our addressing mode as a field, denoting all possible absolute
-modes or zero page modes
+For example, an operand with an x register will have a specific bitmask.
+However, if the instr is a jump instr, its bitfield will be incompatible with
+the bitmask, ie they will share no bits. A logical AND will result in a zero,
+indicating an error.
+
+We start our addressing mode as a field, denoting all possible addressing modes.
+If there is no operand, we mask off the RELATIVE and ACCUMULATOR modes, which
+take no explicit operands.
+Then we check the size of the operand to mask off either the ABSOLUTE modes or
+the ZERO PAGE modes.
+Then we check for branch instructions and the JSR instruction since these are
+easy to eliminate/confirm.
+Then we check for immediate operands.
 Then we mask the x register and y register modes depending on which register
-is in the source code
-If there is none, we mask the inverse of the registers' modes
-Then we mask the indirect modes
-If there is none, we mask the inverse of the indirect modes
+is in the source line of code. If there is none, we mask the inverse of the
+registers' modes.
+Then we mask the indirect modes. If there is none, we mask the inverse of the
+indirect modes.
 
 ********* BITFIELDS FORMATTED AND ORGANIZED FOR CLARITY *********
 no fields necessary, easy to check
         0b1 0000 0000 0000      ADDR_MODE_ACCUMULATOR
         0b0 1000 0000 0000      ADDR_MODE_IMPLIED
 
-these addressing modes have a zero page byte
-it is part of ZERO_PAGE_FIELD because it makes the
-semantic checking of the byte size into a simple logical AND
+these modes have a zero page byte so they are still part of ZERO_PAGE_FIELD
         0b0 0100 0000 0000      ADDR_MODE_IMMEDIATE
         0b0 0010 0000 0000      ADDR_MODE_RELATIVE
 
@@ -43,7 +48,7 @@ this addressing mode belongs to two fields <3
 
 there are 3 modes with indirect operands
         0b0 0000 0011 1000      INDIRECT_FIELD
-these are all zero page
+these are all zero page (recall the two modes from earlier which are included)
         0b0 0110 0001 1111      ZERO_PAGE_FIELD
         0b0 0000 0001 0000      ADDR_MODE_X_INDEXED_INDIRECT
         0b0 0000 0000 1000      ADDR_MODE_INDIRECT_Y_INDEXED

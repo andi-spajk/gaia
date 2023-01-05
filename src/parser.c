@@ -449,6 +449,8 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 	@instr will be updated with the new addressing bitflag. Any invalid
 	sequences will have an addressing bit mask and an instruction bitfield
 	that zero each other out, resulting in a zero bitflag.
+
+	FOR FULL DETAILED EXPLANATION, SEE /src/addressing_modes.h
 */
 int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
                     struct Token *operand, int operand_status)
@@ -475,7 +477,7 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 
 	int addr_mode = 0x1FFF;
 	if (operand->value > 0xFF) {
-		// see comment in parse_label_operand()
+		// see comment above in parse_label_operand()
 		// operand value might be an absolute address, but a branch
 		// instruction always has an operand that fits in 1 byte
 		if (!is_branch(instr->mnemonic))
