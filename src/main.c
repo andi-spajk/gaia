@@ -1,6 +1,6 @@
 /** main.c
 
-6502 assembler.
+The Gaia assembler for 6502 Assembly.
 
 */
 
@@ -15,15 +15,12 @@
 #include "parser.h"
 #include "symbol_table.h"
 
-// end assembling then return from main()
-#define ABORT_ASSEMBLY() { \
-	end_assembly(inf, outf, lexer, tk, instr, symtab, unresolved); \
-	return EXIT_FAILURE; \
-}
+// don't put semi-colon otherwise we can't write `ABORT_ASSEMBLY();`
+#define ABORT_ASSEMBLY() return free_gaia(inf, outf, lexer, tk, instr, symtab, unresolved)
 
 #define MAX_BUFFER_SIZE 128
 
-/* end_assembly()
+/* free_gaia()
 	@inf            source file
 	@outf           assembled binary file
 	@lexer          ptr to Lexer
@@ -32,9 +29,12 @@
 	@symtab         symbol table
 	@unresolved     ptr to Unresolved struct
 
-	Close all files and destroy all allocated data structures.
+	@return         EXIT_FAILURE code
+
+	Close all files and destroy all allocated data structures being used
+	by the Gaia assembler.
 */
-void end_assembly(FILE *inf, FILE *outf, struct Lexer *lexer, struct Token *tk,
+int free_gaia(FILE *inf, FILE *outf, struct Lexer *lexer, struct Token *tk,
                   struct Instruction *instr, struct SymbolTable *symtab,
                   struct Unresolved *unresolved)
 {
@@ -52,19 +52,20 @@ void end_assembly(FILE *inf, FILE *outf, struct Lexer *lexer, struct Token *tk,
 		destroy_symbol_table(symtab);
 	if (unresolved)
 		destroy_unresolved(unresolved);
+	return EXIT_FAILURE;
 }
 
 int main(int argc, char *argv[])
 {
 	// no argument parsing yet
 	if (argc != 2) {
-		printf("ERROR: invalid command-line arguments\n");
+		printf("ERROR: invalid command-line arguments\n\n");
 		return EXIT_FAILURE;
 	}
 
 	char *src_file = argv[1];
 	if (!src_file) {
-		printf("ERROR: no source file\n");
+		printf("ERROR: no source file\n\n");
 		return EXIT_FAILURE;
 	}
 
@@ -132,6 +133,8 @@ int main(int argc, char *argv[])
 		line_num++;
 	}
 	printf("\n\n");
+	if (written_bytes == -99999)
+		printf("shut up compiler");
 
 	struct Symbol *sym;
 	for (int i = 0; i < symtab->size; i++) {
@@ -140,6 +143,12 @@ int main(int argc, char *argv[])
 			printf("%02i: %s -- %i\n", i, sym->label, sym->value);
 	}
 
-	end_assembly(inf, outf, lexer, tk, instr, symtab, unresolved);
+	fclose(inf);
+	fclose(outf);
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+	destroy_symbol_table(symtab);
+	destroy_unresolved(unresolved);
 	return 0;
 }
