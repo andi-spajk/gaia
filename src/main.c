@@ -16,7 +16,10 @@ The Gaia assembler for 6502 Assembly.
 #include "symbol_table.h"
 
 // don't put semi-colon otherwise we can't write `ABORT_ASSEMBLY();`
+// only call this macro in main() after the FILEs and data structures have been
+// initialized
 #define ABORT_ASSEMBLY() return free_gaia(inf, outf, lexer, tk, instr, symtab, unresolved)
+// macro must be one-line to be compatible with linux kernel style
 
 #define MAX_BUFFER_SIZE 128
 
@@ -102,6 +105,7 @@ int main(int argc, char *argv[])
 	struct Token *operand = NULL;
 	int operand_status;
 	int written_bytes = 0;
+	struct ForwardRef *ref;
 	while (fgets(buffer, MAX_BUFFER_SIZE, inf)) {
 		error_code = lex_line(buffer, lexer, tk, instr, line_num);
 		if (error_code < 0)
@@ -127,6 +131,20 @@ int main(int argc, char *argv[])
 				written_bytes = 2;
 			else if (operand_status == JUMP_FORWARD_REFERENCE)
 				written_bytes = 3;
+
+			error_code = parse_addr_mode(lexer, instr, operand,
+			                             operand_status);
+			if (error_code == FORWARD_REFERENCE) {
+				ref = create_forward_ref(buffer, instr, operand,
+				                         operand_status, pc,
+				                         line_num);
+				if (!ref)
+					ABORT_ASSEMBLY();
+				if (add_forward_ref(unresolved, ref) < 0)
+					ABORT_ASSEMBLY();
+			} else if (error_code < 0) {
+				ABORT_ASSEMBLY();
+			}
 		}
 
 		printf("%03i\t%s", line_num, buffer);
@@ -136,11 +154,9 @@ int main(int argc, char *argv[])
 	if (written_bytes == -99999)
 		printf("shut up compiler");
 
-	struct Symbol *sym;
-	for (int i = 0; i < symtab->size; i++) {
-		sym = symtab->symbols[i];
-		if (sym)
-			printf("%02i: %s -- %i\n", i, sym->label, sym->value);
+	for (int i = 0; i < unresolved->curr; i++) {
+		ref = unresolved->refs[i];
+		printf("%03i\t%s\n", ref->line_num, ref->source_line);
 	}
 
 	fclose(inf);
