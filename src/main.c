@@ -15,6 +15,7 @@
 #include "parser.h"
 #include "symbol_table.h"
 
+// end assembling then return from main()
 #define ABORT_ASSEMBLY() { \
 	end_assembly(inf, outf, lexer, tk, instr, symtab, unresolved); \
 	return EXIT_FAILURE; \
@@ -95,24 +96,33 @@ int main(int argc, char *argv[])
 
 	char buffer[MAX_BUFFER_SIZE];
 	int line_num = 1;
-	// int pc = 0x0;
+	int pc = 0x0;
 	int error_code;
 	while (fgets(buffer, MAX_BUFFER_SIZE, inf)) {
 		error_code = lex_line(buffer, lexer, tk, instr, line_num);
 		if (error_code < 0)
 			ABORT_ASSEMBLY();
+
 		error_code = parse_line(lexer);
 		if (error_code < 0)
 			ABORT_ASSEMBLY();
 
+		if (lexer->sequence[0]->type == TOKEN_LABEL) {
+			error_code = parse_label_declaration(lexer, symtab, pc);
+			if (error_code < 0)
+				ABORT_ASSEMBLY();
+		}
+
 		printf("%03i\t%s", line_num, buffer);
 		line_num++;
 	}
-	putchar('\n');
+	printf("\n\n");
 
-	for (int i = 0; i < unresolved->size; i++) {
-		if (unresolved->refs[i])
-			printf("%s\n", unresolved->refs[i]->label);
+	struct Symbol *sym;
+	for (int i = 0; i < symtab->size; i++) {
+		sym = symtab->symbols[i];
+		if (sym)
+			printf("%02i: %s -- %i\n", i, sym->label, sym->value);
 	}
 
 	end_assembly(inf, outf, lexer, tk, instr, symtab, unresolved);
