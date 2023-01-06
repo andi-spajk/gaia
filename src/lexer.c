@@ -90,6 +90,16 @@ struct Lexer *init_lexer(const char *file_name)
 	return lexer;
 }
 
+void reset_token(struct Token *tk)
+{
+	tk->type = TOKEN_NULL;
+	tk->value = 0;
+	tk->error_char = NULL;
+	tk->buffer_location = NULL;
+	for (int i = 0; i < MAX_TOKEN_STR_LEN; i++)
+		tk->str[i] = '\0';
+}
+
 /* reset_lexer()
 	@lexer          ptr to Lexer struct
 
@@ -99,12 +109,7 @@ struct Lexer *init_lexer(const char *file_name)
 void reset_lexer(struct Lexer *lexer)
 {
 	for (int i = 0; i < MAX_TOKENS; i++) {
-		lexer->sequence[i]->type = TOKEN_NULL;
-		lexer->sequence[i]->value = 0;
-		lexer->sequence[i]->error_char = NULL;
-		lexer->sequence[i]->buffer_location = NULL;
-		// no need to wipe the string's contents
-		// lexing functions will do that automatically without trouble
+		reset_token(lexer->sequence[i]);
 	}
 	lexer->curr = 0;
 	lexer->error_tk = NULL;
@@ -562,6 +567,7 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 {
 	reset_lexer(lexer);
 	reset_instruction(instr);
+	reset_token(tk);
 
 	lexer->line = buffer;
 	lexer->line_num = line_num;

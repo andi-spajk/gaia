@@ -953,6 +953,17 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->buffer_location);
 
+	// just a comment
+	const char *just_comment = ";THIS SUBROUTINE ARRANGES THE 8-BIT ELEMENTS OF A LIST IN ASCENDING\n";
+	buffer = just_comment;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	TEST_ASSERT_EQUAL_PTR(buffer, lexer->line);
+	TEST_ASSERT_EQUAL_PTR(NULL, tk->error_char);
+	TEST_ASSERT_EQUAL_PTR(NULL, tk->buffer_location);
+	// everything is null token
+	for (int i = 0; i < MAX_TOKENS; i++)
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[i]->type);
+
 	destroy_lexer(lexer);
 	destroy_token(tk);
 	destroy_instruction(instr);
