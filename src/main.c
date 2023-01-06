@@ -96,8 +96,11 @@ int main(int argc, char *argv[])
 
 	char buffer[MAX_BUFFER_SIZE];
 	int line_num = 1;
-	int pc = 0x0;
 	int error_code;
+	int pc = 0x0;
+	struct Token *operand = NULL;
+	int operand_status;
+	int written_bytes = 0;
 	while (fgets(buffer, MAX_BUFFER_SIZE, inf)) {
 		error_code = lex_line(buffer, lexer, tk, instr, line_num);
 		if (error_code < 0)
@@ -111,6 +114,18 @@ int main(int argc, char *argv[])
 			error_code = parse_label_declaration(lexer, symtab, pc);
 			if (error_code < 0)
 				ABORT_ASSEMBLY();
+		}
+
+		if (instr->mnemonic != NULL_MNEMONIC) {
+			operand = find_operand(lexer);
+			operand_status = parse_operand(lexer, instr, operand,
+			                               symtab);
+			if (operand_status < 0)
+				ABORT_ASSEMBLY();
+			else if (operand_status == BRANCH_FORWARD_REFERENCE)
+				written_bytes = 2;
+			else if (operand_status == JUMP_FORWARD_REFERENCE)
+				written_bytes = 3;
 		}
 
 		printf("%03i\t%s", line_num, buffer);

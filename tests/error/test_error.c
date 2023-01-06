@@ -46,7 +46,7 @@ void test_print_error(void)
 	line_num++;
 
 	// pretend
-	print_error(line, ERROR_UNKNOWN, NULL, lexer->file_name, -1);
+	print_error(line, ERROR_UNKNOWN, NULL, lexer->file_name, line_num);
 	line_num++;
 
 	line = "INC     (LOL,),\n";

@@ -116,6 +116,8 @@ int resolve_label_ref(FILE *f, struct Lexer *lexer, struct Instruction *instr,
 		label->value = dest_pc;
 		return generate_code(f, instr, label, curr_pc);
 	}
+	print_error(lexer->line, ERROR_UNKNOWN, NULL, lexer->file_name,
+	            lexer->line_num);
 	return ERROR_UNKNOWN;
 }
 
@@ -168,5 +170,7 @@ int resolve_forward_ref(FILE *f, struct ForwardRef *ref, struct Lexer *lexer,
 		}
 		return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
+	print_error(lexer->line, ERROR_UNKNOWN, NULL, lexer->file_name,
+	            lexer->line_num);
 	return ERROR_UNKNOWN;
 }

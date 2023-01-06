@@ -241,6 +241,8 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 			return insert_symbol(symtab, label->str, label->value);
 		}
 	}
+	print_error(lexer->line, ERROR_UNKNOWN, NULL, lexer->file_name,
+	            lexer->line_num);
 	return ERROR_UNKNOWN;
 }
 
@@ -293,6 +295,8 @@ int parse_label_operand(struct Lexer *lexer, struct Instruction *instr,
 			return ERROR_ILLEGAL_FORWARD_REFERENCE;
 		}
 	}
+	print_error(lexer->line, ERROR_UNKNOWN, NULL, lexer->file_name,
+	            lexer->line_num);
 	return ERROR_UNKNOWN;
 }
 
@@ -329,6 +333,8 @@ int parse_operand(struct Lexer *lexer, struct Instruction *instr,
 		// the lexer did everything necessary
 		return PARSER_SUCCESS;
 	}
+	print_error(lexer->line, ERROR_UNKNOWN, NULL, lexer->file_name,
+	            lexer->line_num);
 	return ERROR_UNKNOWN;
 }
 

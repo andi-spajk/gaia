@@ -17,13 +17,18 @@ printed, which is aligned to the error in the source line.
 	@file_name      name of assembly source file
 	@line_num       line number of @line
 
-	Prints a formatted error message.
+	Prints a formatted error message and an arrow pointing to the error
+	character.
 
 	The following do not print source lines or the error arrow:
 		ERROR_MEMORY_ALLOCATION_FAIL
 		ERROR_FILE_OPEN_FAIL
 		ERROR_BINARY_FILE_CREATION_FAIL
 	These cases should pass in NULL for @line and @bad_char.
+	The following do not print the error arrow:
+		ERROR_UNKNOWN
+		ERROR_ILLEGAL_ADDRESSING_MODE
+		ERROR_TOO_BIG_OFFSET
 */
 void print_error(const char *line, int error_code, const char *bad_char,
                  const char *file_name, int line_num)
@@ -52,7 +57,7 @@ void print_error(const char *line, int error_code, const char *bad_char,
 		printf("ERROR: illegal sequence\n");
 		break;
 	case ERROR_UNKNOWN:
-		printf("ERROR: unknown\n");
+		printf("ERROR: unknown error while assembling\n");
 		break;
 	case ERROR_ILLEGAL_SEQUENCE:
 		printf("ERROR: illegal syntax\n");
@@ -92,7 +97,6 @@ void print_error(const char *line, int error_code, const char *bad_char,
 		putchar(*start);
 	putchar('\n');
 
-	// unknown errors and addr mode errors do not print error arrow
 	if (!bad_char) {
 		putchar('\n');
 		return;

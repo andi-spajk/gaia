@@ -234,6 +234,9 @@ int add_token(struct Lexer *lexer, const struct Token *tk)
 		lexer->curr++;
 		return TOKEN_INSERTION_SUCCESS;
 	}
+
+	print_error(lexer->line, ERROR_UNKNOWN, NULL, lexer->file_name,
+	            lexer->line_num);
 	return ERROR_UNKNOWN;
 }
 
