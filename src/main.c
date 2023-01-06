@@ -67,6 +67,8 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	FILE *inf = NULL;
+	FILE *outf = NULL;
 	struct Lexer *lexer = init_lexer(src_file);
 	struct Token *tk = init_token();
 	struct Instruction *instr = init_instruction();
@@ -75,23 +77,20 @@ int main(int argc, char *argv[])
 	if (!lexer || !tk || !instr || !symtab || !unresolved) {
 		print_error(NULL, ERROR_MEMORY_ALLOCATION_FAIL, NULL, src_file,
 		            -1);
-		return EXIT_FAILURE;
+		ABORT_ASSEMBLY();
 	}
 	char *bin_file = "a.out";
-	FILE *inf, *outf;
 
 	inf = fopen(src_file, "r");
 	if (!inf) {
 		print_error(NULL, ERROR_FILE_OPEN_FAIL, NULL, src_file, -1);
-		end_assembly(inf, NULL, lexer, tk, instr, symtab, unresolved);
-		return EXIT_FAILURE;
+		ABORT_ASSEMBLY();
 	}
 	outf = fopen(bin_file, "wb");
 	if (!outf) {
 		print_error(NULL, ERROR_BINARY_FILE_CREATION_FAIL, NULL,
 		            src_file, -1);
-		end_assembly(inf, outf, lexer, tk, instr, symtab, unresolved);
-		return EXIT_FAILURE;
+		ABORT_ASSEMBLY();
 	}
 
 	char buffer[MAX_BUFFER_SIZE];
