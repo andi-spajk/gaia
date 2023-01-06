@@ -52,6 +52,8 @@ void test_generate_code(void)
 	D1 FF           CMP     ($FF),Y
 	0A              ASL
 	*/
+	// no illegal instructions because the lexer/parser and caller would
+	// snuff them out before generating code
 	unsigned char expected_rom[] = {
 		0xE8,
 		0x05, 0xAA,
@@ -232,6 +234,8 @@ void test_resolve_label_ref(void)
 	100D    20 0B 10                JSR     LABEL2          ; subroutine jump
 	1010    6C 34 12                JMP     (ADDRESS)       ; indirect jump
 	*/
+	// no illegal instructions because the lexer/parser and caller would
+	// snuff them out before generating code
 	unsigned char expected_rom[] = {
 		0xE8,
 		0xD0, 0xFD,
@@ -486,6 +490,8 @@ void test_resolve_forward_ref(void)
 	000D  CA           L3        DEX
 	                             WHERE = $ABCD
 	*/
+	// no illegal instructions because the lexer/parser and caller would
+	// snuff them out before resolving forward refs
 	unsigned char expected_rom[] = {
 		0x70, 0x09,
 		0x4C, 0x0C, 0x00,

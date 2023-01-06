@@ -158,6 +158,10 @@ int resolve_forward_ref(FILE *f, struct ForwardRef *ref, struct Lexer *lexer,
 			fputc(offset & 0xFF, f);
 			return TWO_BYTES;
 		}
+
+		// this should never happen
+		print_error(lexer->line, ERROR_ILLEGAL_ADDRESSING_MODE, NULL,
+		            lexer->file_name, lexer->line_num);
 		return ERROR_ILLEGAL_ADDRESSING_MODE;
 	} else if (ref->operand_status == JUMP_FORWARD_REFERENCE) {
 		if (instr->addr_bitflag) {
@@ -168,6 +172,10 @@ int resolve_forward_ref(FILE *f, struct ForwardRef *ref, struct Lexer *lexer,
 			fputc(dest_pc >> 8, f);
 			return THREE_BYTES;
 		}
+
+		// this should never happen
+		print_error(lexer->line, ERROR_ILLEGAL_ADDRESSING_MODE, NULL,
+		            lexer->file_name, lexer->line_num);
 		return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 	print_error(lexer->line, ERROR_UNKNOWN, NULL, lexer->file_name,

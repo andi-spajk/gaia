@@ -414,32 +414,38 @@ int apply_masks(struct Lexer *lexer, int curr_field)
 	return curr_field;
 }
 
-/* parse_forward_reference_addr_mode()
+/* parse_forward_ref_addr_mode()
 	@lexer          ptr to Lexer struct
 	@instr          ptr to Instruction struct
 
-	@return         FORWARD_REFERENCE signal code, used by assembler to
-	                delay writing bytes until label is resolved
+	@return         FORWARD_REFERENCE success code, used by assembler to
+	                delay writing bytes until label is resolved, or error
+	                code
 
 	Apply bit masks and specialized checks to parse the addressing mode of a
 	forward reference. Saves this information in the instruction struct so
 	we can resolve the label later.
 */
-int parse_forward_reference_addr_mode(struct Lexer *lexer,
-                                      struct Instruction *instr)
+int parse_forward_ref_addr_mode(struct Lexer *lexer, struct Instruction *instr)
 {
 	int addr_mode = 0x1FFF;
 	addr_mode = apply_masks(lexer, addr_mode);
 
 	if (is_branch(instr->mnemonic)) {
 		instr->addr_bitflag = addr_mode & ADDR_MODE_RELATIVE;
-		return FORWARD_REFERENCE;
-	}
-	// JMP has two modes, so we AND with the FIELD!!! JSR has only one mode
-	if (instr->mnemonic == JMP)
+	} else if (instr->mnemonic == JMP) {
+		// JMP has two modes, so we AND with the FIELD!!!
 		instr->addr_bitflag = addr_mode & ABSOLUTE_FIELD;
-	else if (instr->mnemonic == JSR)
+	} else if (instr->mnemonic == JSR) {
+		// JSR has only one mode
 		instr->addr_bitflag = addr_mode & ADDR_MODE_ABSOLUTE;
+	}
+
+	if (!instr->addr_bitflag) {
+		print_error(lexer->line, ERROR_ILLEGAL_ADDRESSING_MODE, NULL,
+		            lexer->file_name, lexer->line_num);
+		return ERROR_ILLEGAL_ADDRESSING_MODE;
+	}
 	return FORWARD_REFERENCE;
 }
 
@@ -450,8 +456,9 @@ int parse_forward_reference_addr_mode(struct Lexer *lexer,
 	@operand_status         whether operand is branch/jump and/or forward
 	                        reference
 
-	@return                 bitmask containing expressed addressing mode, or
-	                        the FORWARD_REFERENCE signal code
+	@return                 bitflag containing the expressed addressing
+	                        mode, or the FORWARD_REFERENCE success code, or
+	                        error code
 
 	Apply bit masks to determine the addressing mode of a lexer sequence.
 	@instr will be updated with the new addressing bitflag. Any invalid
@@ -465,7 +472,7 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 {
 	if (operand_status == BRANCH_FORWARD_REFERENCE ||
 	    operand_status == JUMP_FORWARD_REFERENCE)
-		return parse_forward_reference_addr_mode(lexer, instr);
+		return parse_forward_ref_addr_mode(lexer, instr);
 
 	if (!operand) {
 		switch (instr->mnemonic) {
@@ -475,12 +482,18 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 		case ROR:
 			instr->addr_bitflag = instr->addr_bitfield &
 			                      ADDR_MODE_ACCUMULATOR;
-			return instr->addr_bitflag;
+			break;
 		default:
 			instr->addr_bitflag = instr->addr_bitfield &
 			                      ADDR_MODE_IMPLIED;
-			return instr->addr_bitflag;
+			break;
 		}
+		if (!instr->addr_bitflag) {
+			print_error(lexer->line, ERROR_ILLEGAL_ADDRESSING_MODE,
+			            NULL, lexer->file_name, lexer->line_num);
+			return ERROR_ILLEGAL_ADDRESSING_MODE;
+		}
+		return instr->addr_bitflag;
 	}
 
 	int addr_mode = 0x1FFF;
@@ -522,6 +535,7 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 	if (!instr->addr_bitflag) {
 		print_error(lexer->line, ERROR_ILLEGAL_ADDRESSING_MODE, NULL,
 		            lexer->file_name, lexer->line_num);
+		return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 	return instr->addr_bitflag;
 }

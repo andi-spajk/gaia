@@ -68,8 +68,7 @@ int parse_operand(struct Lexer *lexer, struct Instruction *instr,
 struct Token *find_operand(struct Lexer *lexer);
 
 int apply_masks(struct Lexer *lexer, int curr_field);
-int parse_forward_reference_addr_mode(struct Lexer *lexer,
-                                      struct Instruction *instr);
+int parse_forward_ref_addr_mode(struct Lexer *lexer, struct Instruction *instr);
 int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
                     struct Token *operand, int operand_status);
 

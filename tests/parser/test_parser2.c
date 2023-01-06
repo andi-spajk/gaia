@@ -203,14 +203,21 @@ void test_apply_masks(void)
 
 #define FOR_REF_ADDR_TESTER(expected, buffer, lexer, tk, instr, line_num) {\
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line((buffer), (lexer), (tk), (instr), (line_num))); \
-	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_reference_addr_mode((lexer), (instr))); \
+	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE, parse_forward_ref_addr_mode((lexer), (instr))); \
 	TEST_ASSERT_EQUAL_INT((expected), instr->addr_bitflag); \
 	(line_num)++; \
 }
 
-void test_parse_forward_reference_addr_mode(void)
+#define INVALID_FOR_REF_ADDR_TESTER(expected, buffer, lexer, tk, instr, line_num) {\
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line((buffer), (lexer), (tk), (instr), (line_num))); \
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_ADDRESSING_MODE, parse_forward_ref_addr_mode((lexer), (instr))); \
+	TEST_ASSERT_EQUAL_INT((expected), instr->addr_bitflag); \
+	(line_num)++; \
+}
+
+void test_parse_forward_ref_addr_mode(void)
 {
-	struct Lexer *lexer = init_lexer("test_parse_forward_reference_addr_mode.asm");
+	struct Lexer *lexer = init_lexer("test_parse_forward_ref_addr_mode.asm");
 	TEST_ASSERT_NOT_NULL(lexer);
 	struct Token *tk = init_token();
 	TEST_ASSERT_NOT_NULL(tk);
@@ -241,13 +248,13 @@ void test_parse_forward_reference_addr_mode(void)
 	// bad forward refs
 	buffer = "BCC (LABEL)\n";
 	expected = 0;
-	FOR_REF_ADDR_TESTER(expected, buffer, lexer, tk, instr, line_num);
+	INVALID_FOR_REF_ADDR_TESTER(expected, buffer, lexer, tk, instr, line_num);
 	buffer = "BVS (LABEL),Y\n";
-	FOR_REF_ADDR_TESTER(expected, buffer, lexer, tk, instr, line_num);
+	INVALID_FOR_REF_ADDR_TESTER(expected, buffer, lexer, tk, instr, line_num);
 	buffer = "JMP #LABEL\n";
-	FOR_REF_ADDR_TESTER(expected, buffer, lexer, tk, instr, line_num);
+	INVALID_FOR_REF_ADDR_TESTER(expected, buffer, lexer, tk, instr, line_num);
 	buffer = "JSR (LABEL)\n";
-	FOR_REF_ADDR_TESTER(expected, buffer, lexer, tk, instr, line_num);
+	INVALID_FOR_REF_ADDR_TESTER(expected, buffer, lexer, tk, instr, line_num);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -332,7 +339,7 @@ void test_parse_addr_mode(void)
 	PARSE_ADDR_MODE_TESTER(ADDR_MODE_INDIRECT_Y_INDEXED, operand, operand_status, indy_label, lexer, tk, instr, symtab, line_num);
 	PARSE_ADDR_MODE_TESTER(ADDR_MODE_RELATIVE, operand, operand_status, branch, lexer, tk, instr, symtab, line_num);
 	PARSE_ADDR_MODE_TESTER(FORWARD_REFERENCE, operand, operand_status, branch_forref, lexer, tk, instr, symtab, line_num);
-	// no need to check results of parse_forward_reference_addr_mode()
+	// no need to check results of parse_forward_ref_addr_mode()
 	// we already tested that exhaustively
 	PARSE_ADDR_MODE_TESTER(ADDR_MODE_ABSOLUTE, operand, operand_status, jump, lexer, tk, instr, symtab, line_num);
 	PARSE_ADDR_MODE_TESTER(FORWARD_REFERENCE, operand, operand_status, jump_forref, lexer, tk, instr, symtab, line_num);
@@ -382,38 +389,38 @@ void test_parse_addr_mode(void)
 
 	// bad branches
 	buffer = "BCC (ADDRESS)\n";
-	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	buffer = "BCS (CONSTANT8,X)\n";
-	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	buffer = "BVS (CONSTANT16),Y\n";
-	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	// bad immediates
 	buffer = "ROL\t#000\n";
-	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	buffer = "NOP #CONSTANT16\n";
-	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	// bad jumps
 	buffer = "\tJMP    (LABEL1),Y\n";
-	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	buffer = "\t\tJSR\t(ADDRESS,X)\n";
-	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	buffer = "JSR (ADDRESS)\n";
-	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	buffer = "\t\tSTA\t;lol\n";
 	// no operand so parse_addr_mode() assumed it's implied
 	// so STA bitfield and implied bitflag will zero each other out
-	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	buffer = "\tLDY\t($AB),Y\n";
-	PARSE_ADDR_MODE_TESTER(0, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -427,7 +434,7 @@ int main(void)
 
 	RUN_TEST(test_parse_operand);
 	RUN_TEST(test_apply_masks);
-	RUN_TEST(test_parse_forward_reference_addr_mode);
+	RUN_TEST(test_parse_forward_ref_addr_mode);
 	RUN_TEST(test_parse_addr_mode);
 
 	return UNITY_END();
