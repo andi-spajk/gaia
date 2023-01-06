@@ -1,4 +1,7 @@
 gaia
+a.out
+*.asm
+
 obj/
 opcodes/opcodes.txt
 opcodes/65C02ops.csv

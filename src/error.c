@@ -33,7 +33,8 @@ void print_error(const char *line, int error_code, const char *bad_char,
 
 	switch (error_code) {
 	case ERROR_MEMORY_ALLOCATION_FAIL:
-		printf("ERROR: could not allocate enough memory during assembly\n");
+		printf("ERROR: could not allocate enough memory during ");
+		printf("assembly\n");
 		break;
 	case ERROR_ILLEGAL_CHAR:
 		printf("ERROR: illegal character\n");
@@ -69,7 +70,7 @@ void print_error(const char *line, int error_code, const char *bad_char,
 		printf("ERROR: branch offset too far away\n");
 		break;
 	case ERROR_FILE_OPEN_FAIL:
-		printf("ERROR: program file could not be opened\n");
+		printf("ERROR: %s could not be opened\n", file_name);
 		break;
 	case ERROR_BINARY_FILE_CREATION_FAIL:
 		printf("ERROR: assembled binary file could not be created\n");
