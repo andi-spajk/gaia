@@ -102,6 +102,9 @@ int main(int argc, char *argv[])
 		error_code = lex_line(buffer, lexer, tk, instr, line_num);
 		if (error_code < 0)
 			ABORT_ASSEMBLY();
+		error_code = parse_line(lexer);
+		if (error_code < 0)
+			ABORT_ASSEMBLY();
 
 		printf("%03i\t%s", line_num, buffer);
 		line_num++;

@@ -212,6 +212,19 @@ void test_parse_line(void)
 	SETUP_TESTER(ERROR_ILLEGAL_SEQUENCE, bad_label, lexer, tk, instr, line_num);
 	TEST_ASSERT_EQUAL_PTR(lexer->sequence[1], lexer->error_tk);
 
+	const char *blank1 = "\n";
+	SETUP_TESTER(PARSER_SUCCESS, blank1, lexer, tk, instr, line_num);
+	TEST_ASSERT_EQUAL_PTR(NULL, lexer->error_tk);
+	const char *blank2 = "\r\n";
+	SETUP_TESTER(PARSER_SUCCESS, blank2, lexer, tk, instr, line_num);
+	TEST_ASSERT_EQUAL_PTR(NULL, lexer->error_tk);
+	const char *blank3 = "   \t\t  \t  \n";
+	SETUP_TESTER(PARSER_SUCCESS, blank3, lexer, tk, instr, line_num);
+	TEST_ASSERT_EQUAL_PTR(NULL, lexer->error_tk);
+	const char *comment = ";lolololol\r\n";
+	SETUP_TESTER(PARSER_SUCCESS, comment, lexer, tk, instr, line_num);
+	TEST_ASSERT_EQUAL_PTR(NULL, lexer->error_tk);
+
 	destroy_lexer(lexer);
 	destroy_token(tk);
 	destroy_instruction(instr);
