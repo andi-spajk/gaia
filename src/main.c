@@ -15,6 +15,11 @@
 #include "parser.h"
 #include "symbol_table.h"
 
+#define ABORT_ASSEMBLY() { \
+	end_assembly(inf, outf, lexer, tk, instr, symtab, unresolved); \
+	return EXIT_FAILURE; \
+}
+
 #define MAX_BUFFER_SIZE 128
 
 /* end_assembly()
@@ -53,7 +58,7 @@ int main(int argc, char *argv[])
 	// no argument parsing yet
 	if (argc != 2) {
 		printf("ERROR: invalid command-line arguments\n");
-		abort();
+		return EXIT_FAILURE;
 	}
 
 	char *src_file = argv[1];
@@ -67,6 +72,11 @@ int main(int argc, char *argv[])
 	struct Instruction *instr = init_instruction();
 	struct SymbolTable *symtab = init_symbol_table();
 	struct Unresolved *unresolved = init_unresolved();
+	if (!lexer || !tk || !instr || !symtab || !unresolved) {
+		print_error(NULL, ERROR_MEMORY_ALLOCATION_FAIL, NULL, src_file,
+		            -1);
+		return EXIT_FAILURE;
+	}
 	char *bin_file = "a.out";
 	FILE *inf, *outf;
 
@@ -87,7 +97,12 @@ int main(int argc, char *argv[])
 	char buffer[MAX_BUFFER_SIZE];
 	int line_num = 1;
 	// int pc = 0x0;
+	int error_code;
 	while (fgets(buffer, MAX_BUFFER_SIZE, inf)) {
+		error_code = lex_line(buffer, lexer, tk, instr, line_num);
+		if (error_code < 0)
+			ABORT_ASSEMBLY();
+
 		printf("%03i\t%s", line_num, buffer);
 		line_num++;
 	}

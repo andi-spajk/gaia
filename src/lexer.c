@@ -297,6 +297,7 @@ static int is_end_of_token(const char c)
 	switch (c) {
 	case ' ':
 	case '\t':
+	case '\r':
 	case '\n':
 	case '\0':
 	case ',':
@@ -537,6 +538,7 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 static int end_line_lexing(char c)
 {
 	switch (c) {
+	case '\r':
 	case '\n':
 	case ';':
 	case '\0':

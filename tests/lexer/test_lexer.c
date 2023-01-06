@@ -963,6 +963,43 @@ void test_lex_line(void)
 	// everything is null token
 	for (int i = 0; i < MAX_TOKENS; i++)
 		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[i]->type);
+	line_num++;
+
+	// blank lines
+	const char *blank1 = "     \n";
+	buffer = blank1;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	for (int i = 0; i < MAX_TOKENS; i++)
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[i]->type);
+	line_num++;
+
+	const char *blank2 = "\t\t\n";
+	buffer = blank2;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	for (int i = 0; i < MAX_TOKENS; i++)
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[i]->type);
+	line_num++;
+
+	const char *blank3 = "\n";
+	buffer = blank3;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	for (int i = 0; i < MAX_TOKENS; i++)
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[i]->type);
+	line_num++;
+
+	const char *blank4 = "\r\n";
+	buffer = blank4;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	for (int i = 0; i < MAX_TOKENS; i++)
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[i]->type);
+	line_num++;
+
+	const char *nothing = "";
+	buffer = nothing;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	for (int i = 0; i < MAX_TOKENS; i++)
+		TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[i]->type);
+	line_num++;
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
