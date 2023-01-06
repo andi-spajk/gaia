@@ -24,7 +24,8 @@ at https://github.com/ThrowTheSwitch/Unity.
 
 # Other Credits
 
-https://www.masswerk.at/6502/6502_instruction_set.html
+- https://www.masswerk.at/6502/6502_instruction_set.html
+- https://www.acrc.bris.ac.uk/acrc/RedHat/rhel-cpp-en-4/macro-pitfalls.html
 
 The opcode csv file was taken from:
 https://github.com/kpmiller/emulator101/tree/master/6502Disassembler

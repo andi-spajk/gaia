@@ -15,15 +15,27 @@ The Gaia assembler for 6502 Assembly.
 #include "parser.h"
 #include "symbol_table.h"
 
-// don't put semi-colon otherwise we can't write `ABORT_ASSEMBLY();`
 // only call this macro in main() after the FILEs and data structures have been
 // initialized
-#define ABORT_ASSEMBLY() return free_gaia(inf, outf, lexer, tk, instr, symtab, unresolved)
-// macro must be one-line to be compatible with linux kernel style
+#define ABORT_ASSEMBLY()                                                     \
+	do {                                                                 \
+		abort_gaia(inf, outf, lexer, tk, instr, symtab, unresolved); \
+		return EXIT_FAILURE;                                         \
+	} while (0)
+
+// `do {} while(0)` syntax lets us write a semicolon, as in `ABORT_ASSEMBLY();`
+// otherwise, a multiline macro in an if-block like this would break:
+// if (condition)
+//        ABORT_ASSEMBLY();
+// else
+//        something();
+
+// solution taken from section 3.10.3 of:
+// https://www.acrc.bris.ac.uk/acrc/RedHat/rhel-cpp-en-4/macro-pitfalls.html
 
 #define MAX_BUFFER_SIZE 128
 
-/* free_gaia()
+/* abort_gaia()
 	@inf            source file
 	@outf           assembled binary file
 	@lexer          ptr to Lexer
@@ -37,7 +49,7 @@ The Gaia assembler for 6502 Assembly.
 	Close all files and destroy all allocated data structures being used
 	by the Gaia assembler.
 */
-int free_gaia(FILE *inf, FILE *outf, struct Lexer *lexer, struct Token *tk,
+int abort_gaia(FILE *inf, FILE *outf, struct Lexer *lexer, struct Token *tk,
                   struct Instruction *instr, struct SymbolTable *symtab,
                   struct Unresolved *unresolved)
 {
