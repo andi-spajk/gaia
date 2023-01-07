@@ -74,7 +74,7 @@ int abort_gaia(FILE *inf, FILE *outf, struct Lexer *lexer, struct Token *tk,
 
 int main(int argc, char *argv[])
 {
-	// no argument parsing yet
+	// no robust argument parsing yet
 	if (argc != 2) {
 		printf("ERROR: invalid command-line arguments\n\n");
 		return EXIT_FAILURE;
@@ -188,6 +188,9 @@ int main(int argc, char *argv[])
 
 	for (int i = 0; i < unresolved->curr; i++) {
 		ref = unresolved->refs[i];
+		if (IS_ERROR(search_symbol(symtab, ref->label)))
+			ABORT_ASSEMBLY();
+		resolve_forward_ref(outf, ref, lexer, symtab);
 		printf("%03i\t%s\n", ref->line_num, ref->source_line);
 	}
 
