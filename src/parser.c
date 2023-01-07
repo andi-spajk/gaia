@@ -517,18 +517,11 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 	// branching is always relative
 	if (is_branch(instr->mnemonic))
 		addr_mode &= ADDR_MODE_RELATIVE;
-	// JSR is always absolute
-	else if (instr->mnemonic == JSR)
-		addr_mode &= ADDR_MODE_ABSOLUTE;
 	else
 		addr_mode &= ~ADDR_MODE_RELATIVE;
-
-	// immediate token is either at index 1 or 2
-	if (lexer->sequence[1]->type == TOKEN_IMMEDIATE ||
-	    lexer->sequence[2]->type == TOKEN_IMMEDIATE)
-		addr_mode &= ADDR_MODE_IMMEDIATE;
-	else
-		addr_mode &= ~ADDR_MODE_IMMEDIATE;
+	// JSR is always absolute
+	if (instr->mnemonic == JSR)
+		addr_mode &= ADDR_MODE_ABSOLUTE;
 
 	addr_mode = apply_masks(lexer, addr_mode);
 	instr->addr_bitflag = addr_mode & instr->addr_bitfield;
