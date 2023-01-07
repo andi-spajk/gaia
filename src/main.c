@@ -15,24 +15,38 @@ The Gaia assembler for 6502 Assembly.
 #include "parser.h"
 #include "symbol_table.h"
 
-// only call this macro in main() after the FILEs and data structures have been
-// initialized
+/** ABORT_ASSEMBLY()
+	Free all data structures that were initialized, and close any FILEs that
+	were opened. Then return the EXIT_FAILURE code.
+
+	Call this macro in main() to end the assembling process and terminate
+	the program. ONLY call this macro AFTER the FILEs and data structures
+	have all been initialized, either successfully or unsuccessfully.
+
+	The `do {} while(0)` syntax lets us write a semicolon, as in:
+	`if (condition)`
+		`ABORT_ASSEMBLY();`
+	Otherwise, a multiline macro in a brace-less if-block would break the
+	Linux kernel style:
+	`if (condition)`
+		`ABORT_ASSEMBLY();`
+	`else`
+		`something();`
+	This solution was taken from section 3.10.3 of:
+	https://www.acrc.bris.ac.uk/acrc/RedHat/rhel-cpp-en-4/macro-pitfalls.html
+*/
 #define ABORT_ASSEMBLY()                                                     \
 	do {                                                                 \
 		abort_gaia(inf, outf, lexer, tk, instr, symtab, unresolved); \
 		return EXIT_FAILURE;                                         \
 	} while (0)
 
-// `do {} while(0)` syntax lets us write a semicolon, as in `ABORT_ASSEMBLY();`
-// otherwise, a multiline macro in an if-block like this would break:
-// if (condition)
-//        ABORT_ASSEMBLY();
-// else
-//        something();
-// solution taken from section 3.10.3 of:
-// https://www.acrc.bris.ac.uk/acrc/RedHat/rhel-cpp-en-4/macro-pitfalls.html
+/** IS_ERROR()
+	@code           the return value of a function
 
-// all error codes are negative
+	Check if a return code indicates an error occurred. All errors generate
+	negative return codes.
+*/
 #define IS_ERROR(code) ((code) < 0)
 
 #define MAX_BUFFER_SIZE 128
@@ -180,20 +194,23 @@ int main(int argc, char *argv[])
 			written_bytes = generate_code(outf, instr, operand, pc);
 		}
 
-		printf("%03i\t%s", line_num, buffer);
 		line_num++;
 		pc += written_bytes;
 	}
-	printf("\n\n");
 
 	for (int i = 0; i < unresolved->curr; i++) {
 		ref = unresolved->refs[i];
-		if (IS_ERROR(search_symbol(symtab, ref->label)))
+		if (IS_ERROR(search_symbol(symtab, ref->label))) {
+			print_error(ref->source_line,
+			            ERROR_MISSING_LABEL_DEFINITION,
+			            ref->operand_location, src_file,
+			            ref->line_num);
 			ABORT_ASSEMBLY();
+		}
 		resolve_forward_ref(outf, ref, lexer, symtab);
-		printf("%03i\t%s\n", ref->line_num, ref->source_line);
 	}
 
+	printf("Assembly successful.\n");
 	fclose(inf);
 	fclose(outf);
 	destroy_lexer(lexer);

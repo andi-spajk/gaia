@@ -8,6 +8,7 @@ them to the array. Automatically resizes array when full.
 
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -103,9 +104,13 @@ struct ForwardRef *create_forward_ref(const char *buffer,
 	if (!ref)
 		return NULL;
 
-	// save source line without trailing whitespace
-	// -1 to skip null terminator, -1 again to skip newline
-	const char *end = buffer + strlen(buffer) - 2;
+	// -1 to skip null terminator
+	const char *end = buffer + strlen(buffer) - 1;
+	// -1 again to skip newline EXCEPT when there is no newline at the last
+	// line of the source file
+	if (*end == '\n')
+		end--;
+	// skip whitespace
 	while (*end == ' ' || *end == '\t')
 		end--;
 	const char *begin = buffer;

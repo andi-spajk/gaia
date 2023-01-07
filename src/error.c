@@ -80,6 +80,9 @@ void print_error(const char *line, int error_code, const char *bad_char,
 	case ERROR_BINARY_FILE_CREATION_FAIL:
 		printf("ERROR: assembled binary file could not be created\n");
 		break;
+	case ERROR_MISSING_LABEL_DEFINITION:
+		printf("ERROR: label definition was not found\n");
+		break;
 	default:
 		return;
 	}
