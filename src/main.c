@@ -211,6 +211,9 @@ int main(int argc, char *argv[])
 	}
 
 	printf("Assembly successful.\n");
+	printf("%i (0x%04x) bytes assembled.\n", pc+1, pc+1);
+	printf("%i symbols.\n", symtab->count);
+
 	fclose(inf);
 	fclose(outf);
 	destroy_lexer(lexer);
