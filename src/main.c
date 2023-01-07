@@ -29,9 +29,11 @@ The Gaia assembler for 6502 Assembly.
 //        ABORT_ASSEMBLY();
 // else
 //        something();
-
 // solution taken from section 3.10.3 of:
 // https://www.acrc.bris.ac.uk/acrc/RedHat/rhel-cpp-en-4/macro-pitfalls.html
+
+// all error codes are negative
+#define IS_ERROR(code) ((code) < 0)
 
 #define MAX_BUFFER_SIZE 128
 
@@ -112,59 +114,77 @@ int main(int argc, char *argv[])
 
 	char buffer[MAX_BUFFER_SIZE];
 	int line_num = 1;
-	int error_code;
+	int return_code;
 	int pc = 0x0;
 	struct Token *operand = NULL;
 	int operand_status;
 	int written_bytes = 0;
 	struct ForwardRef *ref;
 	while (fgets(buffer, MAX_BUFFER_SIZE, inf)) {
-		error_code = lex_line(buffer, lexer, tk, instr, line_num);
-		if (error_code < 0)
+		return_code = lex_line(buffer, lexer, tk, instr, line_num);
+		if (IS_ERROR(return_code))
 			ABORT_ASSEMBLY();
 
-		error_code = parse_line(lexer);
-		if (error_code < 0)
+		return_code = parse_line(lexer);
+		if (IS_ERROR(return_code))
 			ABORT_ASSEMBLY();
 
 		if (lexer->sequence[0]->type == TOKEN_LABEL) {
-			error_code = parse_label_declaration(lexer, symtab, pc);
-			if (error_code < 0)
+			return_code = parse_label_declaration(lexer, symtab, pc);
+			if (IS_ERROR(return_code))
 				ABORT_ASSEMBLY();
 		}
 
-		if (instr->mnemonic != NULL_MNEMONIC) {
-			operand = find_operand(lexer);
-			operand_status = parse_operand(lexer, instr, operand,
-			                               symtab);
-			if (operand_status < 0)
-				ABORT_ASSEMBLY();
-			else if (operand_status == BRANCH_FORWARD_REFERENCE)
-				written_bytes = 2;
-			else if (operand_status == JUMP_FORWARD_REFERENCE)
-				written_bytes = 3;
+		if (instr->mnemonic == NULL_MNEMONIC) {
+			line_num++;
+			continue;
+		}
 
-			error_code = parse_addr_mode(lexer, instr, operand,
-			                             operand_status);
-			if (error_code == FORWARD_REFERENCE) {
-				ref = create_forward_ref(buffer, instr, operand,
-				                         operand_status, pc,
-				                         line_num);
-				if (!ref)
-					ABORT_ASSEMBLY();
-				if (add_forward_ref(unresolved, ref) < 0)
-					ABORT_ASSEMBLY();
-			} else if (error_code < 0) {
+		operand = find_operand(lexer);
+		operand_status = parse_operand(lexer, instr, operand,
+		                               symtab);
+		if (IS_ERROR(operand_status))
+			ABORT_ASSEMBLY();
+		else if (operand_status == BRANCH_FORWARD_REFERENCE)
+			written_bytes = 2;
+		else if (operand_status == JUMP_FORWARD_REFERENCE)
+			written_bytes = 3;
+
+		return_code = parse_addr_mode(lexer, instr, operand,
+		                             operand_status);
+		if (return_code == FORWARD_REFERENCE) {
+			ref = create_forward_ref(buffer, instr, operand,
+			                         operand_status, pc,
+			                         line_num);
+			if (!ref)
 				ABORT_ASSEMBLY();
-			}
+			if (IS_ERROR(add_forward_ref(unresolved, ref)))
+				ABORT_ASSEMBLY();
+
+			// write dummy bytes
+			fputc(0x00, outf);
+			fputc(0x00, outf);
+			if (written_bytes == 3)
+				fputc(0x00, outf);
+		} else if (IS_ERROR(return_code)) {
+			ABORT_ASSEMBLY();
+		}
+
+		if (operand_status == BRANCH_OPERAND ||
+		    operand_status == JUMP_OPERAND) {
+			written_bytes = resolve_label_ref(outf, lexer, instr,
+			                                  operand,
+			                                  operand_status,
+			                                  symtab, pc);
+		} else {
+			written_bytes = generate_code(outf, instr, operand, pc);
 		}
 
 		printf("%03i\t%s", line_num, buffer);
 		line_num++;
+		pc += written_bytes;
 	}
 	printf("\n\n");
-	if (written_bytes == -99999)
-		printf("shut up compiler");
 
 	for (int i = 0; i < unresolved->curr; i++) {
 		ref = unresolved->refs[i];

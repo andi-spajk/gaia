@@ -48,6 +48,7 @@ LabelTree
 #include "opcode.h"
 #include "symbol_table.h"
 
+// return codes
 #define PARSER_SUCCESS           1
 #define BRANCH_OPERAND           2
 #define JUMP_OPERAND             3

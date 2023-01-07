@@ -186,7 +186,7 @@ int parse_line(struct Lexer *lexer)
 	else if (seq[index]->type == TOKEN_LABEL)
 		return parse_label_tree(lexer, index);
 	else if (seq[index]->type == TOKEN_NULL)
-		return PARSER_SUCCESS;
+		return PARSER_SUCCESS;  // blank or comment line
 
 	lexer->error_tk = lexer->sequence[index];
 	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,

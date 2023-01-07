@@ -1,7 +1,11 @@
 ifeq ($(OS), Windows_NT)
 	GAIA = gaia.exe
+	RM = del
+	MV = move
 else
 	GAIA = gaia
+	RM = rm -f
+	MV = mv
 endif
 
 CC = gcc
@@ -39,51 +43,51 @@ $(GAIA): $(DEP)
 
 $(OBJ)/main.o: $(SRC)/main.c $(HEADERS)
 	$(CC) $(CFLAGS) $< -c
-	mv main.o $(OBJ)
+	$(MV) main.o $(OBJ)
 
 $(OBJ)/assemble.o: $(SRC)/assemble.c $(SRC)/addressing_modes.h $(SRC)/error.h
 	$(CC) $(CFLAGS) $< -c
-	mv assemble.o $(OBJ)
+	$(MV) assemble.o $(OBJ)
 
 $(OBJ)/error.o: $(SRC)/error.c $(SRC)/error.h
 	$(CC) $(CFLAGS) $< -c
-	mv error.o $(OBJ)
+	$(MV) error.o $(OBJ)
 
 $(OBJ)/forward_reference.o: $(SRC)/forward_reference.c $(SRC)/error.h \
                             $(SRC)/forward_reference.h $(SRC)/lexer.h \
                             $(SRC)/opcode.h
 	$(CC) $(CFLAGS) $< -c
-	mv forward_reference.o $(OBJ)
+	$(MV) forward_reference.o $(OBJ)
 
 $(OBJ)/generator.o: $(SRC)/generator.c $(SRC)/addressing_modes.h \
                     $(SRC)/error.h $(SRC)/forward_reference.h $(SRC)/lexer.h \
                     $(SRC)/opcode.h $(SRC)/parser.h $(SRC)/symbol_table.h
 	$(CC) $(CFLAGS) $< -c
-	mv generator.o $(OBJ)
+	$(MV) generator.o $(OBJ)
 
 $(OBJ)/lexer.o: $(SRC)/lexer.c $(SRC)/error.h $(SRC)/lexer.h $(SRC)/opcode.h
 	$(CC) $(CFLAGS) $< -c
-	mv lexer.o $(OBJ)
+	$(MV) lexer.o $(OBJ)
 
 $(OBJ)/opcode.o: $(SRC)/opcode.c $(SRC)/assemble.h $(SRC)/bitfields.h \
                  $(SRC)/error.h $(SRC)/opcode.h
 	$(CC) $(CFLAGS) $< -c
-	mv opcode.o $(OBJ)
+	$(MV) opcode.o $(OBJ)
 
 $(OBJ)/parser.o: $(SRC)/parser.c $(SRC)/addressing_modes.h $(SRC)/error.h \
                  $(SRC)/lexer.h $(SRC)/opcode.h $(SRC)/parser.h \
                  $(SRC)/symbol_table.h
 	$(CC) $(CFLAGS) $< -c
-	mv parser.o $(OBJ)
+	$(MV) parser.o $(OBJ)
 
 $(OBJ)/prime.o: $(SRC)/prime.c
 	$(CC) $(CFLAGS) $< -c
-	mv prime.o $(OBJ)
+	$(MV) prime.o $(OBJ)
 
 $(OBJ)/symbol_table.o: $(SRC)/symbol_table.c $(SRC)/error.h $(SRC)/prime.h \
                        $(SRC)/symbol_table.h
 	$(CC) $(CFLAGS) $< -c
-	mv symbol_table.o $(OBJ)
+	$(MV) symbol_table.o $(OBJ)
 
 clean:
-	rm -f $(GAIA) $(DEP)
+	$(RM) $(GAIA) $(DEP)
