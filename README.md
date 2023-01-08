@@ -5,7 +5,7 @@ Gaia is a single-pass assembler for 6502 assembly.
 # Building
 
 `gcc` and `make` are required to compile the assembler. Run `make` in the root
-folder. Usage is `./gaia source_file.asm` which will produce a binary file
+folder. Usage is `$ ./gaia source_file.asm` which will produce a binary file
 `a.out`.
 
 # Current Limitations

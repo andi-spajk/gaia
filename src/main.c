@@ -198,16 +198,18 @@ int main(int argc, char *argv[])
 		pc += written_bytes;
 	}
 
+	int dest_pc;
 	for (int i = 0; i < unresolved->curr; i++) {
 		ref = unresolved->refs[i];
-		if (IS_ERROR(search_symbol(symtab, ref->label))) {
+		dest_pc = search_symbol(symtab, ref->label);
+		if (IS_ERROR(dest_pc)) {
 			print_error(ref->source_line,
 			            ERROR_MISSING_LABEL_DEFINITION,
 			            ref->operand_location, src_file,
 			            ref->line_num);
 			ABORT_ASSEMBLY();
 		}
-		resolve_forward_ref(outf, ref, lexer, symtab);
+		resolve_forward_ref(outf, ref, lexer, dest_pc);
 	}
 
 	printf("Assembly successful.\n");

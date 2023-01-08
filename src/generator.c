@@ -136,11 +136,11 @@ int resolve_label_ref(FILE *f, struct Lexer *lexer, struct Instruction *instr,
 	normal assembly.
 */
 int resolve_forward_ref(FILE *f, struct ForwardRef *ref, struct Lexer *lexer,
-                        struct SymbolTable *symtab)
+                        int dest_pc)
 {
 	struct Instruction *instr = ref->instr;
-	int dest_pc, offset;
-	dest_pc = search_symbol(symtab, ref->label);
+	int offset;
+	// dest_pc = search_symbol(symtab, ref->label);
 
 	if (ref->operand_status == BRANCH_FORWARD_REFERENCE) {
 		offset = calc_branch_offset(ref->pc, dest_pc);

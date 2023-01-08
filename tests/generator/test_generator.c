@@ -607,8 +607,13 @@ void test_resolve_forward_ref(void)
 	parse_label_declaration(lexer, symtab, pc);
 	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
 
-	for (int i = 0; unresolved->refs[i] != NULL; i++)
-		resolve_forward_ref(f, unresolved->refs[i], lexer, symtab);
+	int dest_pc;
+	ref = unresolved->refs[0];
+	for (int i = 0; i < unresolved->curr; i++) {
+		ref = unresolved->refs[i];
+		dest_pc = search_symbol(symtab, ref->label);
+		resolve_forward_ref(f, ref, lexer, dest_pc);
+	}
 
 	fseek(f, 0, SEEK_SET);
 	TEST_ASSERT_EQUAL_INT(exp_bytes, fread(produced_rom, sizeof(unsigned char), exp_bytes, f));
@@ -680,7 +685,8 @@ void test_too_big_offset_with_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(1, written);
 
 	int curr_forward_ref = 0;
-	TEST_ASSERT_EQUAL_INT(2, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], lexer, symtab));
+	int dest_pc = search_symbol(symtab, unresolved->refs[curr_forward_ref]->label);
+	TEST_ASSERT_EQUAL_INT(2, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], lexer, dest_pc));
 	curr_forward_ref++;
 
 	/*
@@ -718,7 +724,8 @@ void test_too_big_offset_with_forward_ref(void)
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], lexer, symtab));
+	dest_pc = search_symbol(symtab, unresolved->refs[curr_forward_ref]->label);
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], lexer, dest_pc));
 	curr_forward_ref++;
 
 	/*
@@ -756,7 +763,8 @@ void test_too_big_offset_with_forward_ref(void)
 	written = generate_code(f, instr, operand, pc);
 	TEST_ASSERT_EQUAL_INT(1, written);
 
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], lexer, symtab));
+	dest_pc = search_symbol(symtab, unresolved->refs[curr_forward_ref]->label);
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_OFFSET, resolve_forward_ref(f, unresolved->refs[curr_forward_ref], lexer, dest_pc));
 	curr_forward_ref++;
 
 	destroy_lexer(lexer);

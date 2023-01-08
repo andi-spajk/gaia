@@ -514,7 +514,7 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 			addr_mode = ABSOLUTE_FIELD;
 	}
 
-	// branching is always relative
+	// branching is the only instruction with relative addressing mode
 	if (is_branch(instr->mnemonic))
 		addr_mode &= ADDR_MODE_RELATIVE;
 	else
