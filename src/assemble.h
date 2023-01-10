@@ -3,8 +3,6 @@
 Opcode assembly functions. Checks a mnemonic's valid addressing modes against
 its bitflag and assembles the corresponding opcode.
 
-Auto-generated with /tests/assemble/gen/gen_assemble.py
-
 */
 
 #ifndef ASSEMBLE_H

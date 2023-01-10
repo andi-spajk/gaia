@@ -104,11 +104,5 @@ def gen_functions():
         print("}")
         print()
 
-def gen_headers():
-    for instr,pairs in bitfields.items():
-        # print(f"int assemble_{instr:s}(int16_t bitflag);")
-        print(f"int assemble_{instr:s}(int bitflag);")
-
 if __name__ == "__main__":
-    # gen_functions()
-    gen_headers()
+    gen_functions()
