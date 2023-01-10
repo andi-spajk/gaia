@@ -37,6 +37,7 @@ Error codes used by the assembler. Also a prototype to print error messages.
 #define ERROR_FILE_OPEN_FAIL            -16
 #define ERROR_BINARY_FILE_CREATION_FAIL -17
 #define ERROR_MISSING_LABEL_DEFINITION  -18
+#define ERROR_ILLEGAL_DIRECTIVE         -19
 /*
 ;       ;       ;       ;       ;       ;
 */

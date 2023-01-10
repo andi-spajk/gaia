@@ -188,218 +188,218 @@ void test_lex_literal(void)
 	const char *illegal;
 
 	illegal = "abc";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "@!#$";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = ";";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "\t\n";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 
 	//
 	// HEXADECIMAL LEXING
 	//
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$1234"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("$1234", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x1234, tk->value);
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$FACE\n"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("$FACE\n", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFACE, tk->value);
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$DEAD\t"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("$DEAD\t", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xDEAD, tk->value);
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$A00B\t"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("$A00B\t", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xA00B, tk->value);
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$0BEE"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("$0BEE", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xBEE, tk->value);
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$005A"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("$005A", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x5A, tk->value);
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$0001"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("$0001", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x1, tk->value);
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$0A0 ; lol comment"));
+	TEST_ASSERT_EQUAL_INT(4, lex_literal("$0A0 ; lol comment", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0A0, tk->value);
 	// lowercase
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$face\n"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("$face\n", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFACE, tk->value);
-	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "$0000dead\t"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal("$0000dead\t", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xDEAD, tk->value);
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$bee"));
+	TEST_ASSERT_EQUAL_INT(4, lex_literal("$bee", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xBEE, tk->value);
-	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$5a"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal("$5a", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x5A, tk->value);
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "$ace\t\t\t"));
+	TEST_ASSERT_EQUAL_INT(4, lex_literal("$ace\t\t\t", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xACE, tk->value);
-	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$ff"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal("$ff", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFF, tk->value);
 	// more
-	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$ab\t;AAAAAAAAAA\n"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal("$ab\t;AAAAAAAAAA\n", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xab, tk->value);
-	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "$1"));
+	TEST_ASSERT_EQUAL_INT(2, lex_literal("$1", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x1, tk->value);
-	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "$0c"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal("$0c", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xC, tk->value);
-	TEST_ASSERT_EQUAL_INT(11, lex_literal(tk, "$000000000a"));
+	TEST_ASSERT_EQUAL_INT(11, lex_literal("$000000000a", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xA, tk->value);
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$0000"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("$0000", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
-	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "$00000000"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal("$00000000", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
-	TEST_ASSERT_EQUAL_INT(17, lex_literal(tk, "$0000000000000000"));
+	TEST_ASSERT_EQUAL_INT(17, lex_literal("$0000000000000000", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
 
 	// errors
 	illegal = "$FFFFFFF";
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk, "$FFFFFFF"));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal("$FFFFFFF", tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "$1234567890ABCDEF";
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk, "$1234567890ABCDEF"));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal("$1234567890ABCDEF", tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "$10000";
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk, "$10000"));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal("$10000", tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "$\n";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, "$\n"));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal("$\n", tk));
 	TEST_ASSERT_EQUAL_PTR(&(illegal[1]), tk->error_char);
 
 	//
 	// BINARY LEXING
 	//
-	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%11111111"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal("%11111111", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFF, tk->value);
-	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%01010001"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal("%01010001", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x51, tk->value);
-	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%00000000\n"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal("%00000000\n", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
-	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%10000001"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal("%10000001", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x81, tk->value);
-	TEST_ASSERT_EQUAL_INT(17, lex_literal(tk, "%1111111100001110"));
+	TEST_ASSERT_EQUAL_INT(17, lex_literal("%1111111100001110", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFF0E, tk->value);
-	TEST_ASSERT_EQUAL_INT(12, lex_literal(tk, "%10101010101\t\t"));
+	TEST_ASSERT_EQUAL_INT(12, lex_literal("%10101010101\t\t", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x555, tk->value);
-	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "%0"));
+	TEST_ASSERT_EQUAL_INT(2, lex_literal("%0", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
-	TEST_ASSERT_EQUAL_INT(6, lex_literal(tk, "%00000"));
+	TEST_ASSERT_EQUAL_INT(6, lex_literal("%00000", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x0, tk->value);
-	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%00001001\t\t"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal("%00001001\t\t", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x9, tk->value);
-	TEST_ASSERT_EQUAL_INT(21, lex_literal(tk, "%00001111111111111111"));
+	TEST_ASSERT_EQUAL_INT(21, lex_literal("%00001111111111111111", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xFFFF, tk->value);
 
 	illegal = "%10001111111111111111";
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "%111111111111111111111111111111";
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "%1010101010101010101010101010101010101010101010101010110101010101";
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "%\n";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(&(illegal[1]), tk->error_char);
 	illegal = "%101002\n";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(&(illegal[6]), tk->error_char);
 
 	//
 	// DECIMAL LEXING
 	//
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "1234"));
+	TEST_ASSERT_EQUAL_INT(4, lex_literal("1234", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(1234, tk->value);
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "65535"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("65535", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(65535, tk->value);
-	TEST_ASSERT_EQUAL_INT(1, lex_literal(tk, "0"));
+	TEST_ASSERT_EQUAL_INT(1, lex_literal("0", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0, tk->value);
-	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "25"));
+	TEST_ASSERT_EQUAL_INT(2, lex_literal("25", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(25, tk->value);
-	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "800"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal("800", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(800, tk->value);
-	TEST_ASSERT_EQUAL_INT(12, lex_literal(tk, "000000000100"));
+	TEST_ASSERT_EQUAL_INT(12, lex_literal("000000000100", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(100, tk->value);
 
 	illegal = "123456789";
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "65536";
-	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "A";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 	illegal = "ffff";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(illegal, tk->error_char);
 
 	//
 	// detect VALID end of token
 	//
-	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "25             "));
+	TEST_ASSERT_EQUAL_INT(2, lex_literal("25             ", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(25, tk->value);
 
-	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "128\t;hi\n"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal("128\t;hi\n", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(128, tk->value);
 
-	TEST_ASSERT_EQUAL_INT(3, lex_literal(tk, "800\n"));
+	TEST_ASSERT_EQUAL_INT(3, lex_literal("800\n", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(800, tk->value);
 
-	TEST_ASSERT_EQUAL_INT(5, lex_literal(tk, "$ffff,X\n"));
+	TEST_ASSERT_EQUAL_INT(5, lex_literal("$ffff,X\n", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0xffff, tk->value);
 
-	TEST_ASSERT_EQUAL_INT(9, lex_literal(tk, "%10101111),Y\t;comment\n"));
+	TEST_ASSERT_EQUAL_INT(9, lex_literal("%10101111),Y\t;comment\n", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0b10101111, tk->value);
 
-	TEST_ASSERT_EQUAL_INT(2, lex_literal(tk, "64;comment\n"));
+	TEST_ASSERT_EQUAL_INT(2, lex_literal("64;comment\n", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(64, tk->value);
 
 	// syntactically invalid, but lexically valid
-	TEST_ASSERT_EQUAL_INT(4, lex_literal(tk, "5555(wtf),Y\n"));
+	TEST_ASSERT_EQUAL_INT(4, lex_literal("5555(wtf),Y\n", tk));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(5555, tk->value);
 
@@ -407,16 +407,16 @@ void test_lex_literal(void)
 	// INVALID token chars
 	//
 	illegal = "800!!!!!!SDJGHJSDHFSDKVNSFULM";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(&(illegal[3]), tk->error_char);
 	illegal = "$facq";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(&(illegal[4]), tk->error_char);
 	illegal = "%10102";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(&(illegal[5]), tk->error_char);
 	illegal = "%ABCD";
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(tk, illegal));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_literal(illegal, tk));
 	TEST_ASSERT_EQUAL_PTR(&(illegal[1]), tk->error_char);
 
 	destroy_token(tk);
@@ -464,6 +464,62 @@ void test_lex_instruction(void)
 
 	destroy_token(tk);
 	destroy_instruction(instr);
+}
+
+void test_lex_directive(void)
+{
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	const char *buffer;
+
+	buffer = ".EQU";
+	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_STRING(".EQU", tk->str);
+	buffer = ".equ";
+	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_STRING(".EQU", tk->str);
+
+	buffer = ".ORG";
+	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_STRING(".ORG", tk->str);
+	buffer = ".org";
+	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_STRING(".ORG", tk->str);
+
+	buffer = ".DEFINE";
+	TEST_ASSERT_EQUAL_INT(7, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_STRING(".DEFINE", tk->str);
+	buffer = ".define";
+	TEST_ASSERT_EQUAL_INT(7, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_STRING(".DEFINE", tk->str);
+
+	buffer = ".END";
+	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_STRING(".END", tk->str);
+	buffer = ".end";
+	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_STRING(".END", tk->str);
+
+	buffer = ".BADDIRECTIVE";
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_DIRECTIVE, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_PTR(buffer, tk->error_char);
+	//        01234
+	buffer = ".WTF_CHAR";
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_PTR(&buffer[4], tk->error_char);
+	buffer = ".TOOLONGWTFTOOLONGWTFTOOLONGWTFTOOLONGWTFTOOLONGWTFTOOLONGWTFABCD";
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_DIRECTIVE, lex_directive(buffer, tk));
+	TEST_ASSERT_EQUAL_PTR(buffer, tk->error_char);
+
+	destroy_token(tk);
 }
 
 void test_lex_text(void)
@@ -710,6 +766,46 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, tk->type);
 	TEST_ASSERT_EQUAL_STRING("X", tk->str);
 
+//                           0 123456
+	const char *base = "\t\t*=$1000\n";
+	buffer = base + 2;
+	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_BASE, tk->type);
+	TEST_ASSERT_EQUAL_STRING("*", tk->str);
+	buffer++;
+
+	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_EQUAL_SIGN, tk->type);
+	TEST_ASSERT_EQUAL_STRING("=", tk->str);
+	buffer++;
+
+	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
+	TEST_ASSERT_EQUAL_INT(0x1000, tk->value);
+
+//                               012345
+	const char *directive = ".org $800\n";
+	buffer = directive;
+	TEST_ASSERT_EQUAL_INT(4, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_STRING(".ORG", tk->str);
+	buffer += 5;
+
+	TEST_ASSERT_EQUAL_INT(4, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
+	TEST_ASSERT_EQUAL_INT(0x800, tk->value);
+
+//                                01234567890123 4
+	const char *directive2 = "ARRAY .EQU $10\n";
+	buffer = directive2;
+	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+	buffer += 6;
+
+	TEST_ASSERT_EQUAL_INT(4, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_STRING(".EQU", tk->str);
+
 	destroy_token(tk);
 	destroy_instruction(instr);
 }
@@ -907,6 +1003,55 @@ void test_lex_line(void)
 		free(eof_test);
 	}
 
+//                               0123456 78901 23456 7
+	const char *directive = "PATTERN\t.EQU\t$2000\n";
+	buffer = directive;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
+	TEST_ASSERT_EQUAL_INT(3, lexer->curr);
+	TEST_ASSERT_EQUAL_PTR(directive, lexer->line);
+
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
+
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[0]), lexer->sequence[0]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[8]), lexer->sequence[1]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, lexer->sequence[2]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[13]), lexer->sequence[2]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[3]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[4]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
+
+	TEST_ASSERT_EQUAL_STRING("PATTERN", lexer->sequence[0]->str);
+	TEST_ASSERT_EQUAL_INT(0x2000, lexer->sequence[2]->value);
+
+//                           0 12345
+	const char *base = "\t\t*=$1000\t; comment\n";
+	buffer = base;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
+	TEST_ASSERT_EQUAL_INT(3, lexer->curr);
+	TEST_ASSERT_EQUAL_PTR(base, lexer->line);
+
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
+
+	TEST_ASSERT_EQUAL_INT(TOKEN_BASE, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[2]), lexer->sequence[0]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_EQUAL_SIGN, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[3]), lexer->sequence[1]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, lexer->sequence[2]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[4]), lexer->sequence[2]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[3]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[4]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
+
+	TEST_ASSERT_EQUAL_INT(0x1000, lexer->sequence[2]->value);
+
 	// printing errors
 	//                            012345
 	const char *lexical_errors = "INX $#100\n";
@@ -952,6 +1097,24 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_PTR(buffer, lexer->line);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->buffer_location);
+
+//                                    0 1234567890 12345
+	const char *bad_directive = "\t\tSOMETHING\t.WTF\t$1234\n";
+	buffer = bad_directive;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_DIRECTIVE, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
+	TEST_ASSERT_EQUAL_PTR(bad_directive, lexer->line);
+	TEST_ASSERT_EQUAL_PTR(&bad_directive[12], tk->error_char);
+	TEST_ASSERT_EQUAL_PTR(&bad_directive[12], tk->buffer_location);
+
+//                                    012345678901234567890
+	const char *bad_directive2 = "VALUE .EQUBADCHAR%%% $800\n";
+	buffer = bad_directive2;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
+	TEST_ASSERT_EQUAL_PTR(bad_directive2, lexer->line);
+	TEST_ASSERT_EQUAL_PTR(&bad_directive2[17], tk->error_char);
+	TEST_ASSERT_EQUAL_PTR(&bad_directive2[6], tk->buffer_location);
 
 	// just a comment
 	const char *just_comment = ";THIS SUBROUTINE ARRANGES THE 8-BIT ELEMENTS OF A LIST IN ASCENDING\n";
@@ -1016,6 +1179,7 @@ int main(void)
 	RUN_TEST(test_add_token);
 	RUN_TEST(test_lex_literal);
 	RUN_TEST(test_lex_instruction);
+	RUN_TEST(test_lex_directive);
 	RUN_TEST(test_lex_text);
 	RUN_TEST(test_lex);
 	RUN_TEST(test_lex_line);

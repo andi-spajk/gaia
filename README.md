@@ -1,6 +1,7 @@
 # Gaia Assembler
 
-Gaia is a single-pass assembler for 6502 assembly.
+Gaia is a single-pass assembler for 6502 assembly. Labels and instructions are
+case-insensitive.
 
 # Building
 

@@ -83,6 +83,9 @@ void print_error(const char *line, int error_code, const char *bad_char,
 	case ERROR_MISSING_LABEL_DEFINITION:
 		printf("ERROR: label definition was not found\n");
 		break;
+	case ERROR_ILLEGAL_DIRECTIVE:
+		printf("ERROR: illegal assembler directive\n");
+		break;
 	default:
 		return;
 	}

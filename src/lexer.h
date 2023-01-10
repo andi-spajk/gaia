@@ -27,6 +27,8 @@ enum TokenType {
 	TOKEN_EQUAL_SIGN,
 	TOKEN_X_REGISTER,
 	TOKEN_Y_REGISTER,
+	TOKEN_BASE,
+	TOKEN_DIRECTIVE,
 	TOKEN_NULL
 };
 
@@ -59,8 +61,9 @@ void destroy_lexer(struct Lexer *lexer);
 
 int add_token(struct Lexer *lexer, const struct Token *tk);
 
-int lex_literal(struct Token *tk, const char *literal);
+int lex_literal(const char *literal, struct Token *tk);
 int lex_instruction(struct Token *tk, struct Instruction *instr);
+int lex_directive(const char *buffer, struct Token *tk);
 int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr);
 int lex(const char *buffer, struct Token *tk, struct Instruction *instr);
 int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,

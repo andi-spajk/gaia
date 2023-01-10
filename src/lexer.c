@@ -314,15 +314,15 @@ static int is_end_of_token(const char c)
 }
 
 /* lex_literal()
-	@tk             ptr to Token in the lexer sequence
 	@literal        ptr to first char of the literal token
+	@tk             ptr to Token in the lexer sequence
 
 	@return         number of chars read, or error code
 
 	Lexically analyze a literal token and update @tk to hold the literal's
 	information.
 */
-int lex_literal(struct Token *tk, const char *literal)
+int lex_literal(const char *literal, struct Token *tk)
 {
 	// array of ptrs to converter function
 	int (*converters[])(char) = {hex_digit_to_int, bin_digit_to_int,
@@ -413,6 +413,50 @@ int lex_instruction(struct Token *tk, struct Instruction *instr)
 		return strlen(tk->str);
 	}
 	return ERROR_INSTRUCTION_NOT_FOUND;
+}
+
+/* lex_directive()
+	@buffer         ptr aligned to a direcitve in a line of source code
+	@tk             running token
+
+	@return         number of characters read
+*/
+int lex_directive(const char *buffer, struct Token *tk)
+{
+	// skip period
+	char c;
+	int num_chars;
+	for (num_chars = 1; num_chars < MAX_TOKEN_STR_LEN; num_chars++) {
+		c = buffer[num_chars];
+		if (is_end_of_token(c)) {
+			break;
+		} else if (!isalpha(c)) {
+			tk->error_char = &buffer[num_chars];
+			return ERROR_ILLEGAL_CHAR;
+		}
+	}
+
+	if (num_chars == MAX_TOKEN_STR_LEN) {
+		tk->error_char = buffer;
+		return ERROR_ILLEGAL_DIRECTIVE;
+	}
+
+	// include period
+	token_strncpy(tk, buffer, num_chars);
+
+	if (!strcmp(tk->str, ".DEFINE")) {
+		tk->type = TOKEN_DIRECTIVE;
+	} else if (!strcmp(tk->str, ".EQU")) {
+		tk->type = TOKEN_DIRECTIVE;
+	} else if (!strcmp(tk->str, ".ORG")) {
+		tk->type = TOKEN_DIRECTIVE;
+	} else if (!strcmp(tk->str, ".END")) {
+		tk->type = TOKEN_DIRECTIVE;
+	} else {
+		tk->error_char = buffer;
+		return ERROR_ILLEGAL_DIRECTIVE;
+	}
+	return num_chars;
 }
 
 /* is_valid_token_char()
@@ -521,12 +565,18 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 		tk->type = TOKEN_EQUAL_SIGN;
 		token_strncpy(tk, "=", 1);
 		return 1;
+	case '*':
+		tk->type = TOKEN_BASE;
+		token_strncpy(tk, "*", 1);
+		return 1;
 	}
 
 	if (isalpha(c))
 		return lex_text(buffer, tk, instr);
 	else if (c == '$' || c == '%' || (c >= '0' && c <= '9'))
-		return lex_literal(tk, buffer);
+		return lex_literal(buffer, tk);
+	else if (c == '.')
+		return lex_directive(buffer, tk);
 	tk->error_char = buffer;
 	return ERROR_ILLEGAL_CHAR;
 }
