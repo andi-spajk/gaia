@@ -4,6 +4,7 @@ The Gaia assembler for 6502 Assembly.
 
 */
 
+#include <argp.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,6 +15,59 @@ The Gaia assembler for 6502 Assembly.
 #include "opcode.h"
 #include "parser.h"
 #include "symbol_table.h"
+
+const char *argp_program_version = "gaia assembler 1.0";
+
+static char *args_doc = "SOURCE.asm";
+static char *doc = "Gaia assembles a 6502 source code file into a binary file.";
+
+// array of cmdline options
+static struct argp_option options[] = {
+	{"output", 'o', "FILE", 0, "Place assembled binary into <FILE>", 0},
+	// {"cmos",   'c', NULL,   0, "Use 65C02 opcodes",                  0}
+};
+
+// struct used as storage for arg_parse()
+struct Arguments {
+	char *src_file;
+	char *out_file;
+	// int cmos;
+};
+
+/* parse_opt()
+	Parse an option or argument from the command line.
+*/
+error_t parse_opt(int key, char *arg, struct argp_state *state)
+{
+	struct Arguments *args = state->input;
+
+	switch (key) {
+	// case 'c':
+	// 	args->cmos = 1;
+	// 	break;
+	case 'o':
+		args->out_file = arg;
+		break;
+	case ARGP_KEY_ARG:
+		// arg_num starts at 0
+		if (state->arg_num >= 1) {
+			// too many arguments
+			argp_usage(state);
+		}
+		args->src_file = arg;
+		break;
+	case ARGP_KEY_END:
+		// arg_num is incremented after returning from ARGP_KEY_ARG
+		// if arg_num is still its initial value of zero then we never
+		// saw ARGP_KEY_ARG
+		if (state->arg_num == 0)
+			argp_usage(state);
+		break;
+	default:
+		return ARGP_ERR_UNKNOWN;
+	}
+	return 0;
+}
 
 /** ABORT_ASSEMBLY()
 	Free all data structures that were initialized, and close any FILEs that
@@ -88,41 +142,36 @@ int abort_gaia(FILE *inf, FILE *outf, struct Lexer *lexer, struct Token *tk,
 
 int main(int argc, char *argv[])
 {
-	// no robust argument parsing yet
-	if (argc != 2) {
-		printf("ERROR: invalid command-line arguments\n\n");
-		return EXIT_FAILURE;
-	}
-
-	char *src_file = argv[1];
-	if (!src_file) {
-		printf("ERROR: no source file\n\n");
-		return EXIT_FAILURE;
-	}
+	struct Arguments args = {.src_file = NULL, .out_file = "a.out"};//,
+	                         // .cmos = 0};
+	struct argp argp = {.options = options, .parser = parse_opt,
+	                    .args_doc = args_doc, .doc = doc, .children = NULL,
+	                    .help_filter = NULL, .argp_domain = NULL};
+	argp_parse(&argp, argc, argv, 0, NULL, &args);
 
 	FILE *inf = NULL;
 	FILE *outf = NULL;
-	struct Lexer *lexer = init_lexer(src_file);
+	struct Lexer *lexer = init_lexer(args.src_file);
 	struct Token *tk = init_token();
 	struct Instruction *instr = init_instruction();
 	struct SymbolTable *symtab = init_symbol_table();
 	struct Unresolved *unresolved = init_unresolved();
 	if (!lexer || !tk || !instr || !symtab || !unresolved) {
-		print_error(NULL, ERROR_MEMORY_ALLOCATION_FAIL, NULL, src_file,
+		print_error(NULL, ERROR_MEMORY_ALLOCATION_FAIL, NULL,
+		            args.src_file, -1);
+		ABORT_ASSEMBLY();
+	}
+
+	inf = fopen(args.src_file, "r");
+	if (!inf) {
+		print_error(NULL, ERROR_FILE_OPEN_FAIL, NULL, args.src_file,
 		            -1);
 		ABORT_ASSEMBLY();
 	}
-	char *bin_file = "a.out";
-
-	inf = fopen(src_file, "r");
-	if (!inf) {
-		print_error(NULL, ERROR_FILE_OPEN_FAIL, NULL, src_file, -1);
-		ABORT_ASSEMBLY();
-	}
-	outf = fopen(bin_file, "wb");
+	outf = fopen(args.out_file, "wb");
 	if (!outf) {
 		print_error(NULL, ERROR_BINARY_FILE_CREATION_FAIL, NULL,
-		            src_file, -1);
+		            args.src_file, -1);
 		ABORT_ASSEMBLY();
 	}
 
@@ -205,7 +254,7 @@ int main(int argc, char *argv[])
 		if (IS_ERROR(dest_pc)) {
 			print_error(ref->source_line,
 			            ERROR_MISSING_LABEL_DEFINITION,
-			            ref->operand_location, src_file,
+			            ref->operand_location, args.src_file,
 			            ref->line_num);
 			ABORT_ASSEMBLY();
 		}

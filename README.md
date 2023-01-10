@@ -6,12 +6,12 @@ Gaia is a single-pass assembler for 6502 assembly.
 
 `gcc` and `make` are required to compile the assembler. Run `make` in the root
 folder. Usage is `$ ./gaia source_file.asm` which will produce a binary file
-`a.out`.
+`a.out`. Specify an output file name with the option `-o output_file`. Run
+`$ ./gaia --help` for more info.
 
 # Current Limitations
 
-- Can't specify a name for the output file, e.g. `./gaia source.asm -o source`
-is not possible.
+- Only supported on Linux/WSL.
 - No colons in labels.
 - Forward references are only allowed in branch and jump instructions.
 - Maximum label length is 63 characters.
@@ -20,7 +20,6 @@ is not possible.
 You must do `ASL` alone.
 - Operands can only be basic literals and labels, e.g. `#"?"` is illegal.
 - No arithmetic on operands, e.g. `CPX NUM-1` is illegal.
-- Unit tests only work on Linux/WSL.
 
 # Unit Tests
 
