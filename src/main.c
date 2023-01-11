@@ -182,6 +182,7 @@ int main(int argc, char *argv[])
 	struct Token *operand, *first;
 	int operand_status;
 	int written_bytes = 0;
+	int total_bytes = 0;
 	struct ForwardRef *ref;
 	while (fgets(buffer, MAX_BUFFER_SIZE, inf)) {
 		return_code = lex_line(buffer, lexer, tk, instr, line_num);
@@ -201,6 +202,8 @@ int main(int argc, char *argv[])
 		} else if (first->type == TOKEN_BASE ||
 		           first->type == TOKEN_ORG_DIRECTIVE) {
 			pc = first->value;
+		} else if (first->type == TOKEN_END_DIRECTIVE) {
+			break;
 		}
 
 		if (instr->mnemonic == NULL_MNEMONIC) {
@@ -250,6 +253,7 @@ int main(int argc, char *argv[])
 
 		line_num++;
 		pc += written_bytes;
+		total_bytes += written_bytes;
 	}
 
 	int dest_pc;
@@ -267,7 +271,7 @@ int main(int argc, char *argv[])
 	}
 
 	printf("Assembly successful.\n");
-	printf("%i (0x%04x) bytes assembled.\n", pc+1, pc+1);
+	printf("%i (0x%04x) bytes assembled.\n", total_bytes, total_bytes);
 	printf("%i symbols.\n", symtab->count);
 
 	fclose(inf);
