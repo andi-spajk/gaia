@@ -208,8 +208,11 @@ int parse_directive_tree(struct Lexer *lexer, int index)
 		index++;
 		if (seq[index]->type == TOKEN_LITERAL) {
 			index++;
-			if (seq[index]->type == TOKEN_NULL)
+			if (seq[index]->type == TOKEN_NULL) {
+				// org token will store the new location
+				seq[index-2]->value = seq[index-1]->value;
 				return PARSER_SUCCESS;
+			}
 		}
 	} else if (seq[index]->type == TOKEN_END_DIRECTIVE) {
 		index++;
@@ -242,6 +245,7 @@ int parse_base_tree(struct Lexer *lexer, int index)
 		if (seq[index]->type == TOKEN_LITERAL) {
 			index++;
 			if (seq[index]->type == TOKEN_NULL) {
+				// base token will store the new location
 				seq[index-3]->value = seq[index-1]->value;
 				return PARSER_SUCCESS;
 			}

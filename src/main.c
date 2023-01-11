@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
 	int line_num = 1;
 	int return_code;
 	int pc = 0x0;
-	struct Token *operand = NULL;
+	struct Token *operand, *first;
 	int operand_status;
 	int written_bytes = 0;
 	struct ForwardRef *ref;
@@ -192,10 +192,15 @@ int main(int argc, char *argv[])
 		if (IS_ERROR(return_code))
 			ABORT_ASSEMBLY();
 
-		if (lexer->sequence[0]->type == TOKEN_LABEL) {
+		first = lexer->sequence[0];
+		if (first->type == TOKEN_LABEL ||
+		    first->type == TOKEN_DEFINE_DIRECTIVE) {
 			return_code = parse_label_declaration(lexer, symtab, pc);
 			if (IS_ERROR(return_code))
 				ABORT_ASSEMBLY();
+		} else if (first->type == TOKEN_BASE ||
+		           first->type == TOKEN_ORG_DIRECTIVE) {
+			pc = first->value;
 		}
 
 		if (instr->mnemonic == NULL_MNEMONIC) {

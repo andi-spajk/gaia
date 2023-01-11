@@ -143,6 +143,7 @@ void test_parse_directive_tree(void)
 
 	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, define_directive, lexer, tk, instr, line_num, 0);
 	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, org_directive, lexer, tk, instr, line_num, 0);
+	TEST_ASSERT_EQUAL_INT(0x1000, lexer->sequence[0]->value);
 	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, end_directive, lexer, tk, instr, line_num, 0);
 
 	const char *buffer = ".DEFINE NUMBER CONSTANT8\n";
@@ -203,6 +204,7 @@ void test_parse_line(void)
 	SETUP_TESTER(PARSER_SUCCESS, equ_directive, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, define_directive, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, org_directive, lexer, tk, instr, line_num);
+	TEST_ASSERT_EQUAL_INT(0x1000, lexer->sequence[0]->value);
 	SETUP_TESTER(PARSER_SUCCESS, base, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, lone_label, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, imp, lexer, tk, instr, line_num);
