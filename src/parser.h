@@ -37,7 +37,21 @@ LabelTree
 		equal_sign
 			literal
 				null
+		equ_directive
+			literal
+				null
 		InstructionTree
+		null
+
+DirectiveTree
+	define_directive
+		label
+			literal
+				null
+	org_directive
+		literal
+			null
+	end_directive
 		null
 */
 
@@ -58,6 +72,7 @@ LabelTree
 
 int parse_instr_tree(struct Lexer *lexer, int index);
 int parse_label_tree(struct Lexer *lexer, int index);
+int parse_directive_tree(struct Lexer *lexer, int index);
 int parse_line(struct Lexer *lexer);
 
 int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,

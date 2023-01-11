@@ -22,6 +22,10 @@ See parser.h for full diagram of valid token sequences.
 #include "parser.h"
 #include "symbol_table.h"
 
+#define IS_DIRECTIVE(type) ((type) == TOKEN_DEFINE_DIRECTIVE || \
+                            (type) == TOKEN_ORG_DIRECTIVE ||    \
+                            (type) == TOKEN_END_DIRECTIVE)
+
 /* parse_indirect_operand_tree()
 	@lexer          ptr to Lexer struct
 	@index          index of operand token
@@ -162,6 +166,49 @@ int parse_label_tree(struct Lexer *lexer, int index)
 	else if (seq[index]->type == TOKEN_NULL) {
 		return PARSER_SUCCESS;
 	}
+	// .EQU directive
+	else if (seq[index]->type == TOKEN_EQU_DIRECTIVE) {
+		index++;
+		if (seq[index]->type == TOKEN_LITERAL) {
+			index++;
+			if (seq[index]->type == TOKEN_NULL)
+				return PARSER_SUCCESS;
+		}
+	}
+	lexer->error_tk = lexer->sequence[index];
+	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
+	            lexer->error_tk->buffer_location, lexer->file_name,
+	            lexer->line_num);
+	return ERROR_ILLEGAL_SEQUENCE;
+}
+
+int parse_directive_tree(struct Lexer *lexer, int index)
+{
+	struct Token **seq = lexer->sequence;
+
+	if (seq[index]->type == TOKEN_DEFINE_DIRECTIVE) {
+		index++;
+		if (seq[index]->type == TOKEN_LABEL) {
+			index++;
+			if (seq[index]->type == TOKEN_LITERAL) {
+				index++;
+				if (seq[index]->type == TOKEN_NULL)
+					return PARSER_SUCCESS;
+			}
+		}
+	} else if (seq[index]->type == TOKEN_ORG_DIRECTIVE) {
+		index++;
+		if (seq[index]->type == TOKEN_LITERAL) {
+			index++;
+			if (seq[index]->type == TOKEN_NULL)
+				return PARSER_SUCCESS;
+		}
+	} else if (seq[index]->type == TOKEN_END_DIRECTIVE) {
+		index++;
+		if (seq[index]->type == TOKEN_NULL)
+			return PARSER_SUCCESS;
+	}
+
 	lexer->error_tk = lexer->sequence[index];
 	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
 	            lexer->error_tk->buffer_location, lexer->file_name,
@@ -185,6 +232,8 @@ int parse_line(struct Lexer *lexer)
 		return parse_instr_tree(lexer, index);
 	else if (seq[index]->type == TOKEN_LABEL)
 		return parse_label_tree(lexer, index);
+	else if (IS_DIRECTIVE(seq[index]->type))
+		return parse_directive_tree(lexer, index);
 	else if (seq[index]->type == TOKEN_NULL)
 		return PARSER_SUCCESS;  // blank or comment line
 

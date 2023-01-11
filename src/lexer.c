@@ -445,13 +445,13 @@ int lex_directive(const char *buffer, struct Token *tk)
 	token_strncpy(tk, buffer, num_chars);
 
 	if (!strcmp(tk->str, ".DEFINE")) {
-		tk->type = TOKEN_DIRECTIVE;
+		tk->type = TOKEN_DEFINE_DIRECTIVE;
 	} else if (!strcmp(tk->str, ".EQU")) {
-		tk->type = TOKEN_DIRECTIVE;
+		tk->type = TOKEN_EQU_DIRECTIVE;
 	} else if (!strcmp(tk->str, ".ORG")) {
-		tk->type = TOKEN_DIRECTIVE;
+		tk->type = TOKEN_ORG_DIRECTIVE;
 	} else if (!strcmp(tk->str, ".END")) {
-		tk->type = TOKEN_DIRECTIVE;
+		tk->type = TOKEN_END_DIRECTIVE;
 	} else {
 		tk->error_char = buffer;
 		return ERROR_ILLEGAL_DIRECTIVE;

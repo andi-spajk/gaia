@@ -8,6 +8,10 @@ ADDRESS         =       $ABCD
 CONSTANT8       =       $7F
 CONSTANT16      =       $1111
 
+DIRECTIVE1      .EQU    $4000
+.DEFINE DIRECTIVE2      $8000
+
+                .ORG    $1000
 LABEL1
                 INX
                 ORA     $AA
@@ -64,6 +68,7 @@ L18             ADC     ($EE,X)
 L19             LDA     (CONSTANT8,X)
 L20             STA     ($FF),Y
 L21             SBC     (CONSTANT8),Y
+                .END
 */
 
 // no accumulator instructions because they are lexically identical to implied
@@ -73,6 +78,9 @@ L21             SBC     (CONSTANT8),Y
 const char *constant_addr =     "ADDRESS\t\t=\t$ABCD\n";
 const char *constant_8bit =     "CONSTANT8\t=\t$7F\n";
 const char *constant_16bit =    "CONSTANT16\t=\t$1111\n";
+const char *directive1 =        "DIRECTIVE1\t.EQU\t$4000\n";
+const char *directive2 =        ".DEFINE\tDIRECTIVE2\t$8000\n";
+const char *org =                      "\t\t.ORG\t$1000\n";
 const char *lone_label =        "LABEL1\n";
 const char *imp =                      "\t\tINX\n";
 const char *zp =                       "\t\tORA\t$AA\n";
@@ -126,5 +134,6 @@ const char *label_indx =            "L18\t\tADC\t($EE,X)\n";
 const char *label_indx_label =      "L19\t\tLDA\t(CONSTANT8,X)\n";
 const char *label_indy =            "L20\t\tSTA\t($FF),Y\n";
 const char *label_indy_label =      "L21\t\tSBC\t(CONSTANT8),Y\n";
+const char *end =                      "\t\t.END\n";
 
 #endif

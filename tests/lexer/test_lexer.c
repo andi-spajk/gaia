@@ -474,38 +474,38 @@ void test_lex_directive(void)
 
 	buffer = ".EQU";
 	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_EQU_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".EQU", tk->str);
 	buffer = ".equ";
 	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_EQU_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".EQU", tk->str);
 
 	buffer = ".ORG";
 	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_ORG_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".ORG", tk->str);
 	buffer = ".org";
 	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_ORG_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".ORG", tk->str);
 
 	buffer = ".DEFINE";
 	TEST_ASSERT_EQUAL_INT(7, lex_directive(buffer, tk));
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_DEFINE_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".DEFINE", tk->str);
 	buffer = ".define";
 	TEST_ASSERT_EQUAL_INT(7, lex_directive(buffer, tk));
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_DEFINE_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".DEFINE", tk->str);
 
 	buffer = ".END";
 	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_END_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".END", tk->str);
 	buffer = ".end";
 	TEST_ASSERT_EQUAL_INT(4, lex_directive(buffer, tk));
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_END_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".END", tk->str);
 
 	buffer = ".BADDIRECTIVE";
@@ -787,7 +787,7 @@ void test_lex(void)
 	const char *directive = ".org $800\n";
 	buffer = directive;
 	TEST_ASSERT_EQUAL_INT(4, lex(buffer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_ORG_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".ORG", tk->str);
 	buffer += 5;
 
@@ -803,7 +803,7 @@ void test_lex(void)
 	buffer += 6;
 
 	TEST_ASSERT_EQUAL_INT(4, lex(buffer, tk, instr));
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, tk->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_EQU_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".EQU", tk->str);
 
 	destroy_token(tk);
@@ -1015,7 +1015,7 @@ void test_lex_line(void)
 
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[0]->type);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[0]), lexer->sequence[0]->buffer_location);
-	TEST_ASSERT_EQUAL_INT(TOKEN_DIRECTIVE, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_EQU_DIRECTIVE, lexer->sequence[1]->type);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[8]), lexer->sequence[1]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, lexer->sequence[2]->type);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[13]), lexer->sequence[2]->buffer_location);
