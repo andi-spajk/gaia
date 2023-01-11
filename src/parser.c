@@ -251,20 +251,25 @@ int parse_line(struct Lexer *lexer)
 
 	@return         success or error code
 
-	Parse a source line that begins with a label and insert the label into
+	Parse a source line that defines a label and insert the label into
 	the symbol table. The label's value is either the current program
 	counter location, or a constant.
+
+	Label definitions are either lines that begin with a label, or have the
+	.DEFINE directive.
 */
 int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
                             int pc)
 {
 	struct Token **seq = lexer->sequence;
 	struct Token *label = seq[0];
+	struct Token *define_label = seq[1];
 	int found = search_symbol(symtab, label->str);
+	int found_define = search_symbol(symtab, define_label->str);
 
-	if (seq[1]->type != TOKEN_EQUAL_SIGN) {
+	if (seq[1]->type == TOKEN_NULL || seq[1]->type == TOKEN_INSTRUCTION) {
 		// address label
-		// might be lone label or a label and instr
+		// might be lone label or a label then instr
 		if (found != ERROR_SYMBOL_NOT_FOUND) {
 			lexer->error_tk = label;
 			print_error(lexer->line, ERROR_LABEL_REDEFINITION,
@@ -275,7 +280,8 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 			label->value = pc;
 			return insert_symbol(symtab, label->str, label->value);
 		}
-	} else if (seq[1]->type == TOKEN_EQUAL_SIGN) {
+	} else if (seq[1]->type == TOKEN_EQUAL_SIGN ||
+	           seq[1]->type == TOKEN_EQU_DIRECTIVE) {
 		// constant label
 		if (found != ERROR_SYMBOL_NOT_FOUND) {
 			lexer->error_tk = label;
@@ -290,6 +296,22 @@ int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,
 			return insert_symbol(symtab, label->str, label->value);
 		}
 	}
+
+	if (seq[0]->type == TOKEN_DEFINE_DIRECTIVE) {
+		// label defined by .DEFINE
+		if (found_define != ERROR_SYMBOL_NOT_FOUND) {
+			lexer->error_tk = define_label;
+			print_error(lexer->line, ERROR_LABEL_REDEFINITION,
+			            lexer->error_tk->buffer_location,
+			            lexer->file_name, lexer->line_num);
+			return ERROR_LABEL_REDEFINITION;
+		} else {
+			define_label->value = seq[2]->value;
+			return insert_symbol(symtab, define_label->str,
+			                     define_label->value);
+		}
+	}
+
 	print_error(lexer->line, ERROR_UNKNOWN, NULL, lexer->file_name,
 	            lexer->line_num);
 	return ERROR_UNKNOWN;

@@ -84,7 +84,7 @@ void test_parse_label_tree(void)
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, constant_addr, lexer, tk, instr, line_num, 0);
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, constant_8bit, lexer, tk, instr, line_num, 0);
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, constant_16bit, lexer, tk, instr, line_num, 0);
-	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, directive1, lexer, tk, instr, line_num, 0);
+	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, equ_directive, lexer, tk, instr, line_num, 0);
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, lone_label, lexer, tk, instr, line_num, 0);
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, label_branch, lexer, tk, instr, line_num, 0);
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, label_branch_forref, lexer, tk, instr, line_num, 0);
@@ -141,9 +141,9 @@ void test_parse_directive_tree(void)
 	TEST_ASSERT_NOT_NULL(instr);
 	int line_num = 1;
 
-	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, directive2, lexer, tk, instr, line_num, 0);
-	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, org, lexer, tk, instr, line_num, 0);
-	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, end, lexer, tk, instr, line_num, 0);
+	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, define_directive, lexer, tk, instr, line_num, 0);
+	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, org_directive, lexer, tk, instr, line_num, 0);
+	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, end_directive, lexer, tk, instr, line_num, 0);
 
 	destroy_lexer(lexer);
 	destroy_token(tk);
@@ -170,9 +170,9 @@ void test_parse_line(void)
 	SETUP_TESTER(PARSER_SUCCESS, constant_addr, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, constant_8bit, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, constant_16bit, lexer, tk, instr, line_num);
-	SETUP_TESTER(PARSER_SUCCESS, directive1, lexer, tk, instr, line_num);
-	SETUP_TESTER(PARSER_SUCCESS, directive2, lexer, tk, instr, line_num);
-	SETUP_TESTER(PARSER_SUCCESS, org, lexer, tk, instr, line_num);
+	SETUP_TESTER(PARSER_SUCCESS, equ_directive, lexer, tk, instr, line_num);
+	SETUP_TESTER(PARSER_SUCCESS, define_directive, lexer, tk, instr, line_num);
+	SETUP_TESTER(PARSER_SUCCESS, org_directive, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, lone_label, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, imp, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, zp, lexer, tk, instr, line_num);
@@ -224,7 +224,7 @@ void test_parse_line(void)
 	SETUP_TESTER(PARSER_SUCCESS, label_indx_label, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, label_indy, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, label_indy_label, lexer, tk, instr, line_num);
-	SETUP_TESTER(PARSER_SUCCESS, end, lexer, tk, instr, line_num);
+	SETUP_TESTER(PARSER_SUCCESS, end_directive, lexer, tk, instr, line_num);
 
 	const char *bad = "LDA LDX LDY LOLOL\n";
 	SETUP_TESTER(ERROR_ILLEGAL_SEQUENCE, bad, lexer, tk, instr, line_num);
@@ -244,8 +244,8 @@ void test_parse_line(void)
 	const char *bad_directive = "number .define $9999";
 	SETUP_TESTER(ERROR_ILLEGAL_SEQUENCE, bad_directive, lexer, tk, instr, line_num);
 	TEST_ASSERT_EQUAL_PTR(lexer->sequence[1], lexer->error_tk);
-	const char *bad_directive2 = ".equ wow $666";
-	SETUP_TESTER(ERROR_ILLEGAL_SEQUENCE, bad_directive2, lexer, tk, instr, line_num);
+	const char *bad_define_directive = ".equ wow $666";
+	SETUP_TESTER(ERROR_ILLEGAL_SEQUENCE, bad_define_directive, lexer, tk, instr, line_num);
 	TEST_ASSERT_EQUAL_PTR(lexer->sequence[0], lexer->error_tk);
 	const char *bad_directive3 = ".END ZP,X";
 	SETUP_TESTER(ERROR_ILLEGAL_SEQUENCE, bad_directive3, lexer, tk, instr, line_num);
@@ -306,6 +306,16 @@ void test_parse_label_declaration(void)
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x2));
 	TEST_ASSERT_EQUAL_INT(0x2, search_symbol(symtab, lexer->sequence[0]->str));
 	TEST_ASSERT_EQUAL_INT(0x2, lexer->sequence[0]->value);
+	buffer = equ_directive;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num++));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x2));
+	TEST_ASSERT_EQUAL_INT(0x4000, search_symbol(symtab, lexer->sequence[0]->str));
+	TEST_ASSERT_EQUAL_INT(0x4000, lexer->sequence[0]->value);
+	buffer = define_directive;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num++));
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x2));
+	TEST_ASSERT_EQUAL_INT(0x8000, search_symbol(symtab, lexer->sequence[1]->str));
+	TEST_ASSERT_EQUAL_INT(0x8000, lexer->sequence[1]->value);
 
 	const char *label_redefinition = "CONSTANT16\t\t=\t$1234\n";
 	buffer = label_redefinition;

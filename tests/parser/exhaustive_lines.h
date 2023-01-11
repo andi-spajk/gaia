@@ -78,9 +78,9 @@ L21             SBC     (CONSTANT8),Y
 const char *constant_addr =     "ADDRESS\t\t=\t$ABCD\n";
 const char *constant_8bit =     "CONSTANT8\t=\t$7F\n";
 const char *constant_16bit =    "CONSTANT16\t=\t$1111\n";
-const char *directive1 =        "DIRECTIVE1\t.EQU\t$4000\n";
-const char *directive2 =        ".DEFINE\tDIRECTIVE2\t$8000\n";
-const char *org =                      "\t\t.ORG\t$1000\n";
+const char *equ_directive =     "DIRECTIVE1\t.EQU\t$4000\n";
+const char *define_directive =  ".DEFINE\tDIRECTIVE2\t$8000\n";
+const char *org_directive =            "\t\t.ORG\t$1000\n";
 const char *lone_label =        "LABEL1\n";
 const char *imp =                      "\t\tINX\n";
 const char *zp =                       "\t\tORA\t$AA\n";
@@ -134,6 +134,6 @@ const char *label_indx =            "L18\t\tADC\t($EE,X)\n";
 const char *label_indx_label =      "L19\t\tLDA\t(CONSTANT8,X)\n";
 const char *label_indy =            "L20\t\tSTA\t($FF),Y\n";
 const char *label_indy_label =      "L21\t\tSBC\t(CONSTANT8),Y\n";
-const char *end =                      "\t\t.END\n";
+const char *end_directive =            "\t\t.END\n";
 
 #endif
