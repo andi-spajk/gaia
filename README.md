@@ -16,7 +16,6 @@ folder. Usage is `$ ./gaia source_file.asm` which will produce a binary file
 - No colons in labels.
 - Forward references are only allowed in branch and jump instructions.
 - Maximum label length is 63 characters.
-- No assembler directives.
 - You cannot specify the accumulator as an operand, e.g. `ASL A` is illegal.
 You must do `ASL` alone.
 - Operands can only be basic literals and labels, e.g. `#"?"` is illegal.
