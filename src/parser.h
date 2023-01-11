@@ -53,6 +53,11 @@ DirectiveTree
 			null
 	end_directive
 		null
+
+BaseTree
+	base
+		equal_sign
+			null
 */
 
 #ifndef PARSER_H
@@ -73,6 +78,7 @@ DirectiveTree
 int parse_instr_tree(struct Lexer *lexer, int index);
 int parse_label_tree(struct Lexer *lexer, int index);
 int parse_directive_tree(struct Lexer *lexer, int index);
+int parse_base_tree(struct Lexer *lexer, int index);
 int parse_line(struct Lexer *lexer);
 
 int parse_label_declaration(struct Lexer *lexer, struct SymbolTable *symtab,

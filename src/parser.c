@@ -182,6 +182,14 @@ int parse_label_tree(struct Lexer *lexer, int index)
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
+/* parse_directive_tree()
+	@lexer          ptr to Lexer struct
+	@index          index of directive token
+
+	@return         success or error code
+
+	Parse the directive and detect syntax errors.
+*/
 int parse_directive_tree(struct Lexer *lexer, int index)
 {
 	struct Token **seq = lexer->sequence;
@@ -216,6 +224,35 @@ int parse_directive_tree(struct Lexer *lexer, int index)
 	return ERROR_ILLEGAL_SEQUENCE;
 }
 
+/* parse_base_tree()
+	@lexer          ptr to Lexer struct
+	@index          index of base token
+
+	@return         success or error code
+
+	Parse the base directive and detect syntax errors.
+*/
+int parse_base_tree(struct Lexer *lexer, int index)
+{
+	struct Token **seq = lexer->sequence;
+	index++;
+
+	if (seq[index]->type == TOKEN_EQUAL_SIGN) {
+		index++;
+		if (seq[index]->type == TOKEN_LITERAL) {
+			index++;
+			if (seq[index]->type == TOKEN_NULL)
+				return PARSER_SUCCESS;
+		}
+	}
+
+	lexer->error_tk = lexer->sequence[index];
+	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
+	            lexer->error_tk->buffer_location, lexer->file_name,
+	            lexer->line_num);
+	return ERROR_ILLEGAL_SEQUENCE;
+}
+
 /* parse_line()
 	@lexer          ptr to Lexer struct
 
@@ -234,6 +271,8 @@ int parse_line(struct Lexer *lexer)
 		return parse_label_tree(lexer, index);
 	else if (IS_DIRECTIVE(seq[index]->type))
 		return parse_directive_tree(lexer, index);
+	else if (seq[index]->type == TOKEN_BASE)
+		return parse_base_tree(lexer, index);
 	else if (seq[index]->type == TOKEN_NULL)
 		return PARSER_SUCCESS;  // blank or comment line
 

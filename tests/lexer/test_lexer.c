@@ -1028,8 +1028,8 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_STRING("PATTERN", lexer->sequence[0]->str);
 	TEST_ASSERT_EQUAL_INT(0x2000, lexer->sequence[2]->value);
 
-//                           0 12345
-	const char *base = "\t\t*=$1000\t; comment\n";
+//                           0 123456
+	const char *base = "\t\t* = $1000\t; comment\n";
 	buffer = base;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
 	line_num++;
@@ -1041,9 +1041,9 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_BASE, lexer->sequence[0]->type);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[2]), lexer->sequence[0]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_EQUAL_SIGN, lexer->sequence[1]->type);
-	TEST_ASSERT_EQUAL_PTR(&(buffer[3]), lexer->sequence[1]->buffer_location);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[4]), lexer->sequence[1]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, lexer->sequence[2]->type);
-	TEST_ASSERT_EQUAL_PTR(&(buffer[4]), lexer->sequence[2]->buffer_location);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[6]), lexer->sequence[2]->buffer_location);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[3]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[4]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);

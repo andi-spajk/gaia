@@ -150,6 +150,30 @@ void test_parse_directive_tree(void)
 	destroy_instruction(instr);
 }
 
+void test_parse_base_tree(void)
+{
+	struct Lexer *lexer = init_lexer("test_parse_base_tree.asm");
+	TEST_ASSERT_NOT_NULL(lexer);
+	struct Token *tk = init_token();
+	TEST_ASSERT_NOT_NULL(tk);
+	struct Instruction *instr = init_instruction();
+	TEST_ASSERT_NOT_NULL(instr);
+	int line_num = 1;
+
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(base, lexer, tk, instr, line_num));
+	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_base_tree(lexer, 0));
+	line_num++;
+
+	const char *buffer = "\t\t*=bad";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_base_tree(lexer, 0));
+	line_num++;
+
+	destroy_lexer(lexer);
+	destroy_token(tk);
+	destroy_instruction(instr);
+}
+
 #define SETUP_TESTER(result_code, buffer, lexer, tk, instr, line_num) { \
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line((buffer), (lexer), (tk), (instr), (line_num))); \
 	TEST_ASSERT_EQUAL_INT((result_code), parse_line((lexer))); \
@@ -173,6 +197,7 @@ void test_parse_line(void)
 	SETUP_TESTER(PARSER_SUCCESS, equ_directive, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, define_directive, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, org_directive, lexer, tk, instr, line_num);
+	SETUP_TESTER(PARSER_SUCCESS, base, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, lone_label, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, imp, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, zp, lexer, tk, instr, line_num);
@@ -598,8 +623,8 @@ int main(void)
 
 	RUN_TEST(test_parse_instr_tree);
 	RUN_TEST(test_parse_label_tree);
-
 	RUN_TEST(test_parse_directive_tree);
+	RUN_TEST(test_parse_base_tree);
 	RUN_TEST(test_parse_line);
 	RUN_TEST(test_parse_label_declaration);
 	RUN_TEST(test_find_operand);

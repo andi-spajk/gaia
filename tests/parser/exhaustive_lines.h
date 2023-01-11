@@ -12,6 +12,7 @@ DIRECTIVE1      .EQU    $4000
 .DEFINE DIRECTIVE2      $8000
 
                 .ORG    $1000
+                *=$800
 LABEL1
                 INX
                 ORA     $AA
@@ -81,6 +82,7 @@ const char *constant_16bit =    "CONSTANT16\t=\t$1111\n";
 const char *equ_directive =     "DIRECTIVE1\t.EQU\t$4000\n";
 const char *define_directive =  ".DEFINE\tDIRECTIVE2\t$8000\n";
 const char *org_directive =            "\t\t.ORG\t$1000\n";
+const char *base =                     "\t\t*=$800\n";
 const char *lone_label =        "LABEL1\n";
 const char *imp =                      "\t\tINX\n";
 const char *zp =                       "\t\tORA\t$AA\n";
