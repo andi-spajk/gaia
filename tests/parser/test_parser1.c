@@ -145,6 +145,11 @@ void test_parse_directive_tree(void)
 	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, org_directive, lexer, tk, instr, line_num, 0);
 	PARSE_DIRECTIVE_TREE_TESTER(PARSER_SUCCESS, end_directive, lexer, tk, instr, line_num, 0);
 
+	const char *buffer = ".DEFINE NUMBER CONSTANT8\n";
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_directive_tree(lexer, 0));
+	line_num++;
+
 	destroy_lexer(lexer);
 	destroy_token(tk);
 	destroy_instruction(instr);
@@ -162,6 +167,7 @@ void test_parse_base_tree(void)
 
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(base, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_base_tree(lexer, 0));
+	TEST_ASSERT_EQUAL_INT(0x800, lexer->sequence[0]->value);
 	line_num++;
 
 	const char *buffer = "\t\t*=bad";

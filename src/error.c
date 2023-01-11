@@ -47,9 +47,6 @@ void print_error(const char *line, int error_code, const char *bad_char,
 	case ERROR_TOO_BIG_LITERAL:
 		printf("ERROR: value of literal exceeds 2 bytes\n");
 		break;
-	case ERROR_BITFIELD_NOT_FOUND:
-		printf("ERROR: bad mnemonic\n");
-		break;
 	case ERROR_TOO_LONG_LABEL:
 		printf("ERROR: label exceeds 63 characters\n");
 		break;
@@ -129,5 +126,9 @@ void print_error(const char *line, int error_code, const char *bad_char,
 
 	for (int i = 0; i < num_spaces; i++)
 		putchar(' ');
+	// putchar('^');
+	// for (const char *tmp = bad_char+1; !is_end_of_token(*tmp); tmp++) {
+	// 	putchar('~');
+	// }
 	printf("^~~~~~\n\n");
 }

@@ -3,7 +3,7 @@
 // In the actual assembler loop, you wouldn't increment until the very end.
 // I am too lazy to fix it here because adding the proper line number was
 // already tested in test_forward_reference.c. None of the tests here are broken
-// by having wrong line numbers.
+// by having wrong line numbers anyway.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -255,8 +255,11 @@ void test_resolve_label_ref(void)
 	struct Token *operand;
 	int operand_status;
 
-	// ADDRESS = $1234
-	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, insert_symbol(symtab, "ADDRESS", 0x1234));
+	// ADDRESS .EQU $1234
+	buffer = "ADDRESS .EQU $1234\n";lex_line(buffer, lexer, tk, instr, line_num++);
+	parse_line(lexer);
+	parse_label_declaration(lexer, symtab, pc);
+	TEST_ASSERT_EQUAL_INT(NULL_MNEMONIC, instr->mnemonic);
 	TEST_ASSERT_EQUAL_INT(0x1234, search_symbol(symtab, "ADDRESS"));
 	line_num++;
 
@@ -699,7 +702,14 @@ void test_too_big_offset_with_forward_ref(void)
 	*/
 	line_num = 1;
 
-	pc = 0x0;
+	buffer = "*=$0000";
+	lex_line(buffer, lexer, tk, instr, line_num++);
+	parse_line(lexer);
+	if (lexer->sequence[0]->type == TOKEN_BASE) {
+		pc = lexer->sequence[0]->value;
+	}
+	TEST_ASSERT_EQUAL_INT(0x0, pc);
+
 	buffer = "\t\tBCS\tFARAWAY2\n";
 	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
@@ -712,6 +722,14 @@ void test_too_big_offset_with_forward_ref(void)
 	TEST_ASSERT_EQUAL_INT(FORWARD_REFERENCE_INSERTION_SUCCESS, add_forward_ref(unresolved, ref));
 	fputc(0x00, f);
 	fputc(0x00, f);
+
+	buffer = "*=$0082";
+	lex_line(buffer, lexer, tk, instr, line_num++);
+	parse_line(lexer);
+	if (lexer->sequence[0]->type == TOKEN_BASE) {
+		pc = lexer->sequence[0]->value;
+	}
+	TEST_ASSERT_EQUAL_INT(0x82, pc);
 
 	pc = 0x82;
 	buffer = "FARAWAY2 INY\n";

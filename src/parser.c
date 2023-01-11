@@ -241,8 +241,10 @@ int parse_base_tree(struct Lexer *lexer, int index)
 		index++;
 		if (seq[index]->type == TOKEN_LITERAL) {
 			index++;
-			if (seq[index]->type == TOKEN_NULL)
+			if (seq[index]->type == TOKEN_NULL) {
+				seq[index-3]->value = seq[index-1]->value;
 				return PARSER_SUCCESS;
+			}
 		}
 	}
 
@@ -262,8 +264,8 @@ int parse_base_tree(struct Lexer *lexer, int index)
 */
 int parse_line(struct Lexer *lexer)
 {
-	int index = 0;
 	struct Token **seq = lexer->sequence;
+	int index = 0;
 
 	if (seq[index]->type == TOKEN_INSTRUCTION)
 		return parse_instr_tree(lexer, index);
