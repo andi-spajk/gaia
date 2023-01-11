@@ -166,7 +166,7 @@ void test_parse_base_tree(void)
 
 	const char *buffer = "\t\t*=bad";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
-	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_base_tree(lexer, 0));
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_BASE, parse_base_tree(lexer, 0));
 	line_num++;
 
 	destroy_lexer(lexer);

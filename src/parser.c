@@ -247,10 +247,10 @@ int parse_base_tree(struct Lexer *lexer, int index)
 	}
 
 	lexer->error_tk = lexer->sequence[index];
-	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
+	print_error(lexer->line, ERROR_ILLEGAL_BASE,
 	            lexer->error_tk->buffer_location, lexer->file_name,
 	            lexer->line_num);
-	return ERROR_ILLEGAL_SEQUENCE;
+	return ERROR_ILLEGAL_BASE;
 }
 
 /* parse_line()

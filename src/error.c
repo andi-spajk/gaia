@@ -86,6 +86,9 @@ void print_error(const char *line, int error_code, const char *bad_char,
 	case ERROR_ILLEGAL_DIRECTIVE:
 		printf("ERROR: illegal assembler directive\n");
 		break;
+	case ERROR_ILLEGAL_BASE:
+		printf("ERROR: illegal base\n");
+		break;
 	default:
 		return;
 	}
