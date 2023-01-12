@@ -15,6 +15,7 @@ DIRECTIVE1      .EQU    $4000
                 *=$800
 LABEL1
                 INX
+                ROL     A
                 ORA     $AA
                 ASL     CONSTANT8
                 LDA     $1234
@@ -49,26 +50,27 @@ FORREF2         JMP     L21             ; label jump forward ref
 FORREF3         JMP     (WHERE)         ; label indirect forward ref
 
 L1              DEY
-L2              STY     $AA
-L3              ROL     CONSTANT8
-L4              LSR     $1234
-L5              ROR     ADDRESS
-L6              LDY     $BB,X
-L7              DEC     CONSTANT8,X
-L8              INC     $1000,X
-L9              CMP     CONSTANT16,X
-L10             STX     $CC,Y
-L11             LDX     $CONSTANT8,Y
-L12             STA     $B00B,Y
-L13             AND     ADDRESS,Y
-L14             JMP     ($CAFE)
-L15             JMP     (CONSTANT16)
-L16             CPX     #$DD
-L17             LDY     #CONSTANT8
-L18             ADC     ($EE,X)
-L19             LDA     (CONSTANT8,X)
-L20             STA     ($FF),Y
-L21             SBC     (CONSTANT8),Y
+L2              ASL     A
+L3              STY     $AA
+L4              ROL     CONSTANT8
+L5              LSR     $1234
+L6              ROR     ADDRESS
+L7              LDY     $BB,X
+L8              DEC     CONSTANT8,X
+L9              INC     $1000,X
+L10              CMP     CONSTANT16,X
+L11             STX     $CC,Y
+L12             LDX     $CONSTANT8,Y
+L13             STA     $B00B,Y
+L14             AND     ADDRESS,Y
+L15             JMP     ($CAFE)
+L16             JMP     (CONSTANT16)
+L17             CPX     #$DD
+L18             LDY     #CONSTANT8
+L19             ADC     ($EE,X)
+L20             LDA     (CONSTANT8,X)
+L21             STA     ($FF),Y
+L22             SBC     (CONSTANT8),Y
                 .END
 */
 
@@ -85,6 +87,7 @@ const char *org_directive =            "\t\t.ORG\t$1000\n";
 const char *base =                     "\t\t*=$800\n";
 const char *lone_label =        "LABEL1\n";
 const char *imp =                      "\t\tINX\n";
+const char *acc =                      "\t\tROL\tA\n";
 const char *zp =                       "\t\tORA\t$AA\n";
 const char *zp_label =                 "\t\tASL\tCONSTANT8\n";
 const char *absolute =                 "\t\tLDA\t$1234\n";
@@ -116,6 +119,7 @@ const char *label_jump_forref = "FORREF2\t\tJMP\tL21\n";
 const char *ind_forref =               "\t\tJMP\t(WHERE)\n";
 const char *label_ind_forref =  "FORREF3\t\tJMP\t(THERE)\n";
 const char *label_imp =              "L1\t\tDEY\n";
+const char *label_acc =              "L2\t\tASL\tA\n";
 const char *label_zp =               "L2\t\tSTY\t$AA\n";
 const char *label_zp_label =         "L3\t\tROL\tCONSTANT8\n";
 const char *label_abs =              "L4\t\tLSR\t$1234\n";

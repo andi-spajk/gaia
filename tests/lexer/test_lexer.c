@@ -1069,7 +1069,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(0x1000, lexer->sequence[2]->value);
 
 //                          0 123456
-	const char *acc = "\t\tLSR A\t\t\t; this routine calculates it as:\n";
+	const char *acc = "\t\tlsr a\t\t\t; this routine calculates it as:\n";
 	buffer = acc;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
 	line_num++;

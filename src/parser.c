@@ -126,9 +126,16 @@ int parse_instr_tree(struct Lexer *lexer, int index)
 				return PARSER_SUCCESS;
 		}
 	}
+	// A
+	else if (seq[index]->type == TOKEN_ACCUMULATOR) {
+		index++;
+		if (seq[index]->type == TOKEN_NULL)
+			return PARSER_SUCCESS;
+	}
 	else if (seq[index]->type == TOKEN_NULL) {
 		return PARSER_SUCCESS;
 	}
+
 	lexer->error_tk = lexer->sequence[index];
 	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
 	            lexer->error_tk->buffer_location, lexer->file_name,

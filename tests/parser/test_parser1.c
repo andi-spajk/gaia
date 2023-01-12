@@ -27,6 +27,7 @@ void test_parse_instr_tree(void)
 	int line_num = 1;
 
 	PARSE_INSTR_TREE_TESTER(PARSER_SUCCESS, imp, lexer, tk, instr, line_num, 0);
+	PARSE_INSTR_TREE_TESTER(PARSER_SUCCESS, acc, lexer, tk, instr, line_num, 0);
 	PARSE_INSTR_TREE_TESTER(PARSER_SUCCESS, zp, lexer, tk, instr, line_num, 0);
 	PARSE_INSTR_TREE_TESTER(PARSER_SUCCESS, zp_label, lexer, tk, instr, line_num, 0);
 	PARSE_INSTR_TREE_TESTER(PARSER_SUCCESS, absolute, lexer, tk, instr, line_num, 0);
@@ -91,6 +92,7 @@ void test_parse_label_tree(void)
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, label_jump, lexer, tk, instr, line_num, 0);
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, label_jump_forref, lexer, tk, instr, line_num, 0);
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, label_imp, lexer, tk, instr, line_num, 0);
+	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, label_acc, lexer, tk, instr, line_num, 0);
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, label_zp, lexer, tk, instr, line_num, 0);
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, label_zp_label, lexer, tk, instr, line_num, 0);
 	PARSE_LABEL_TREE_TESTER(PARSER_SUCCESS, label_abs, lexer, tk, instr, line_num, 0);
@@ -208,6 +210,7 @@ void test_parse_line(void)
 	SETUP_TESTER(PARSER_SUCCESS, base, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, lone_label, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, imp, lexer, tk, instr, line_num);
+	SETUP_TESTER(PARSER_SUCCESS, acc, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, zp, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, zp_label, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, absolute, lexer, tk, instr, line_num);
@@ -237,6 +240,7 @@ void test_parse_line(void)
 	SETUP_TESTER(PARSER_SUCCESS, label_jump, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, label_jump_forref, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, label_imp, lexer, tk, instr, line_num);
+	SETUP_TESTER(PARSER_SUCCESS, label_acc, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, label_zp, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, label_zp_label, lexer, tk, instr, line_num);
 	SETUP_TESTER(PARSER_SUCCESS, label_abs, lexer, tk, instr, line_num);
