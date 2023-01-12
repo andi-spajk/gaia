@@ -31,8 +31,6 @@ The following are accepted directives of the Gaia assembler and their syntax.
 - No colons in labels.
 - Forward references are only allowed in branch and jump instructions.
 - Maximum label length is 63 characters.
-- You cannot specify the accumulator as an operand, e.g. `ASL A` is illegal.
-You must do `ASL` alone.
 - Operands can only be basic literals and labels, e.g. `#"?"` is illegal.
 - No arithmetic on operands, e.g. `CPX NUM-1` is illegal.
 
