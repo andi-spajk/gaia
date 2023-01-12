@@ -23,12 +23,13 @@ The following are accepted directives of the Gaia assembler and their syntax.
 - `.ORG $1000`
 - `.END`
 - `*=$1000`
-- Values and bases are hexadecimal in these examples but they can be any base.
+- Values and `*` are hexadecimal in these examples but they can be any numeral
+base.
 
 # Current Limitations
 
 - Only supported on Linux/WSL.
-- No colons in labels.
+- No colons at the end of labels.
 - Forward references are only allowed in branch and jump instructions.
 - Maximum label length is 63 characters.
 - Operands can only be basic literals and labels, e.g. `#"?"` is illegal.
