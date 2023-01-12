@@ -312,6 +312,14 @@ void test_parse_line(void)
 	destroy_instruction(instr);
 }
 
+#define PARSE_LABEL_DECL_TESTER(buffer, lexer, tk, instr, line_num, symtab, pc, expected, index) { \
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line((buffer), (lexer), (tk), (instr), (line_num))); \
+	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration((lexer), (symtab), (pc))); \
+	TEST_ASSERT_EQUAL_INT((expected), search_symbol((symtab), (lexer)->sequence[(index)]->str)); \
+	TEST_ASSERT_EQUAL_INT((expected), (lexer)->sequence[(index)]->value); \
+	(line_num)++; \
+}
+
 void test_parse_label_declaration(void)
 {
 	struct Lexer *lexer = init_lexer("test_parse_label_declaration.asm");
@@ -325,37 +333,37 @@ void test_parse_label_declaration(void)
 	const char *buffer;
 	int line_num = 1;
 
-	buffer = constant_addr;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num++));
-	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x0));
-	TEST_ASSERT_EQUAL_INT(0xABCD, search_symbol(symtab, lexer->sequence[0]->str));
-	TEST_ASSERT_EQUAL_INT(0xABCD, lexer->sequence[0]->value);
-	buffer = constant_8bit;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num++));
-	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x0));
-	TEST_ASSERT_EQUAL_INT(0x7F, search_symbol(symtab, lexer->sequence[0]->str));
-	TEST_ASSERT_EQUAL_INT(0x7F, lexer->sequence[0]->value);
-	buffer = constant_16bit;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num++));
-	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x0));
-	TEST_ASSERT_EQUAL_INT(0x1111, search_symbol(symtab, lexer->sequence[0]->str));
-	TEST_ASSERT_EQUAL_INT(0x1111, lexer->sequence[0]->value);
+	PARSE_LABEL_DECL_TESTER(constant_addr, lexer, tk, instr, line_num, symtab, 0x0, 0xABCD, 0);
+	PARSE_LABEL_DECL_TESTER(constant_8bit, lexer, tk, instr, line_num, symtab, 0x0, 0x7F, 0);
+	PARSE_LABEL_DECL_TESTER(constant_16bit, lexer, tk, instr, line_num, symtab, 0x0, 0x1111, 0);
 	// let's set pc = 2
-	buffer = lone_label;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num++));
-	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x2));
-	TEST_ASSERT_EQUAL_INT(0x2, search_symbol(symtab, lexer->sequence[0]->str));
-	TEST_ASSERT_EQUAL_INT(0x2, lexer->sequence[0]->value);
-	buffer = equ_directive;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num++));
-	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x2));
-	TEST_ASSERT_EQUAL_INT(0x4000, search_symbol(symtab, lexer->sequence[0]->str));
-	TEST_ASSERT_EQUAL_INT(0x4000, lexer->sequence[0]->value);
-	buffer = define_directive;
-	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num++));
-	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0x2));
-	TEST_ASSERT_EQUAL_INT(0x8000, search_symbol(symtab, lexer->sequence[1]->str));
-	TEST_ASSERT_EQUAL_INT(0x8000, lexer->sequence[1]->value);
+	PARSE_LABEL_DECL_TESTER(lone_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(equ_directive, lexer, tk, instr, line_num, symtab, 0x2, 0x4000, 0);
+	PARSE_LABEL_DECL_TESTER(define_directive, lexer, tk, instr, line_num, symtab, 0x2, 0x8000, 1);
+
+	// keep pc at 2
+	PARSE_LABEL_DECL_TESTER(label_imp, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_acc, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_zp, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_zp_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_abs, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_abs_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_zpx, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_zpx_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_absx, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_absx_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_zpy, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_zpy_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_absy, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_absy_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_ind, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_ind_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_imm, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_imm_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_indx, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_indx_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_indy, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
+	PARSE_LABEL_DECL_TESTER(label_indy_label, lexer, tk, instr, line_num, symtab, 0x2, 0x2, 0);
 
 	const char *label_redefinition = "CONSTANT16\t\t=\t$1234\n";
 	buffer = label_redefinition;
@@ -611,8 +619,11 @@ void test_parse_label_operand(void)
 	pc += 3;
 
 	// random instruction in order to test gauge symbol insertion
-	// L2 STY $AA
-	SETUP_TESTER(PARSER_SUCCESS, label_zp, lexer, tk, instr, line_num);
+	buffer = "L2 STY $AA\n";
+	// we had to shift the labels after adding a line with accumulator
+	// better to just hardcode this one line than redo all the other lines to make
+	// the forward references agree with each other
+	SETUP_TESTER(PARSER_SUCCESS, buffer, lexer, tk, instr, line_num);
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, pc));
 	TEST_ASSERT_EQUAL_INT(22, search_symbol(symtab, "L2"));
 	pc += 2;

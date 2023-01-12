@@ -58,9 +58,9 @@ L6              ROR     ADDRESS
 L7              LDY     $BB,X
 L8              DEC     CONSTANT8,X
 L9              INC     $1000,X
-L10              CMP     CONSTANT16,X
+L10             CMP     CONSTANT16,X
 L11             STX     $CC,Y
-L12             LDX     $CONSTANT8,Y
+L12             LDX     CONSTANT8,Y
 L13             STA     $B00B,Y
 L14             AND     ADDRESS,Y
 L15             JMP     ($CAFE)
@@ -120,26 +120,26 @@ const char *ind_forref =               "\t\tJMP\t(WHERE)\n";
 const char *label_ind_forref =  "FORREF3\t\tJMP\t(THERE)\n";
 const char *label_imp =              "L1\t\tDEY\n";
 const char *label_acc =              "L2\t\tASL\tA\n";
-const char *label_zp =               "L2\t\tSTY\t$AA\n";
-const char *label_zp_label =         "L3\t\tROL\tCONSTANT8\n";
-const char *label_abs =              "L4\t\tLSR\t$1234\n";
-const char *label_abs_label =        "L5\t\tROR\tADDRESS\n";
-const char *label_zpx =              "L6\t\tLDY\t$BB,X\n";
-const char *label_zpx_label =        "L7\t\tDEC\tCONSTANT8,X\n";
-const char *label_absx =             "L8\t\tINC\t$1000,X\n";
-const char *label_absx_label =       "L9\t\tCMP\tCONSTANT16,X\n";
-const char *label_zpy =             "L10\t\tSTX\t$CC,Y\n";
-const char *label_zpy_label =       "L11\t\tLDX\tCONSTANT8,Y\n";
-const char *label_absy =            "L12\t\tSTA\t$B00B,Y\n";
-const char *label_absy_label =      "L13\t\tAND\tADDRESS,Y\n";
-const char *label_ind =             "L14\t\tJMP\t($CAFE)\n";
-const char *label_ind_label =       "L15\t\tJMP\t(CONSTANT16)\n";
-const char *label_imm =             "L16\t\tCPX\t#$DD\n";
-const char *label_imm_label =       "L17\t\tLDY\t#CONSTANT8\n";
-const char *label_indx =            "L18\t\tADC\t($EE,X)\n";
-const char *label_indx_label =      "L19\t\tLDA\t(CONSTANT8,X)\n";
-const char *label_indy =            "L20\t\tSTA\t($FF),Y\n";
-const char *label_indy_label =      "L21\t\tSBC\t(CONSTANT8),Y\n";
+const char *label_zp =               "L3\t\tSTY\t$AA\n";
+const char *label_zp_label =         "L4\t\tROL\tCONSTANT8\n";
+const char *label_abs =              "L5\t\tLSR\t$1234\n";
+const char *label_abs_label =        "L6\t\tROR\tADDRESS\n";
+const char *label_zpx =              "L7\t\tLDY\t$BB,X\n";
+const char *label_zpx_label =        "L8\t\tDEC\tCONSTANT8,X\n";
+const char *label_absx =             "L9\t\tINC\t$1000,X\n";
+const char *label_absx_label =      "L10\t\tCMP\tCONSTANT16,X\n";
+const char *label_zpy =             "L11\t\tSTX\t$CC,Y\n";
+const char *label_zpy_label =       "L12\t\tLDX\tCONSTANT8,Y\n";
+const char *label_absy =            "L13\t\tSTA\t$B00B,Y\n";
+const char *label_absy_label =      "L14\t\tAND\tADDRESS,Y\n";
+const char *label_ind =             "L15\t\tJMP\t($CAFE)\n";
+const char *label_ind_label =       "L16\t\tJMP\t(CONSTANT16)\n";
+const char *label_imm =             "L17\t\tCPX\t#$DD\n";
+const char *label_imm_label =       "L18\t\tLDY\t#CONSTANT8\n";
+const char *label_indx =            "L19\t\tADC\t($EE,X)\n";
+const char *label_indx_label =      "L20\t\tLDA\t(CONSTANT8,X)\n";
+const char *label_indy =            "L21\t\tSTA\t($FF),Y\n";
+const char *label_indy_label =      "L22\t\tSBC\t(CONSTANT8),Y\n";
 const char *end_directive =            "\t\t.END\n";
 
 #endif
