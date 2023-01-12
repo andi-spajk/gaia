@@ -1,14 +1,29 @@
 # Gaia Assembler
 
-Gaia is a single-pass assembler for 6502 assembly. Labels and instructions are
+Gaia is a single-pass assembler for 6502 assembly. This assembler is
 case-insensitive.
 
 # Building
 
 `gcc` and `make` are required to compile the assembler. Run `make` in the root
-folder. Usage is `$ ./gaia source_file.asm` which will produce a binary file
-`a.out`. Specify an output file name with the option `-o output_file`. Run
-`$ ./gaia --help` for more info.
+folder.
+
+Usage is `$ ./gaia source_file.asm` which will produce a binary file `a.out`.
+
+Specify an output file name with the option `-o output_file`.
+
+Run `$ ./gaia --help` for more info.
+
+# Directives
+
+The following are accepted directives of the Gaia assembler and their syntax.
+
+- `.DEFINE LABEL $ABCD`
+- `LABEL .EQU $80`
+- `.ORG $1000`
+- `.END`
+- `*=$1000`
+- Values and bases are hexadecimal in these examples but they can be any base.
 
 # Current Limitations
 
