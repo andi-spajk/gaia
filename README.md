@@ -49,3 +49,9 @@ at https://github.com/ThrowTheSwitch/Unity.
 
 The opcode csv file was taken from:
 https://github.com/kpmiller/emulator101/tree/master/6502Disassembler
+
+Example programs in /example/ were taken from:
+http://www.6502.org/source/
+
+They can be assembled with Gaia and then compared with the assembly from:
+https://www.masswerk.at/6502/assembler.html

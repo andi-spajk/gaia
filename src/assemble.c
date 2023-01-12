@@ -411,8 +411,8 @@ int assemble_ROR(int bitflag)
 	case ADDR_MODE_ACCUMULATOR: return 0x6a;
 	case ADDR_MODE_ZERO_PAGE: return 0x66;
 	case ADDR_MODE_ZERO_PAGE_X: return 0x76;
-	case ADDR_MODE_ABSOLUTE: return 0x7e;
-	case ADDR_MODE_ABSOLUTE_X: return 0x6e;
+	case ADDR_MODE_ABSOLUTE: return 0x6e;
+	case ADDR_MODE_ABSOLUTE_X: return 0x7e;
 	default: return ERROR_ILLEGAL_ADDRESSING_MODE;
 	}
 }
