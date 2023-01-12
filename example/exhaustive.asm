@@ -2,6 +2,7 @@ ADDRESS		=	$ABCD
 CONST8		=	$7F	; masswerk assembler only looks at 8 chars in labels
 CONST16		=	$1111
 
+; in masswerk, REMOVE THE PERIODS! gaia allows them
 DIR1		.EQU	$4000
 DIR2		.EQU	$8000
 ;.DEFINE		DIR2	$8000	; masswerk does not accept this directive
