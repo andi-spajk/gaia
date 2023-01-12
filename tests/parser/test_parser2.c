@@ -47,6 +47,7 @@ void test_parse_operand(void)
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_declaration(lexer, symtab, 0x0));
 
 	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, imp, lexer, tk, instr, line_num, symtab);
+	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, acc, lexer, tk, instr, line_num, symtab);
 	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, zp, lexer, tk, instr, line_num, symtab);
 	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, zp_label, lexer, tk, instr, line_num, symtab);
 	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, absolute, lexer, tk, instr, line_num, symtab);
@@ -68,6 +69,7 @@ void test_parse_operand(void)
 	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, indy, lexer, tk, instr, line_num, symtab);
 	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, indy_label, lexer, tk, instr, line_num, symtab);
 	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, label_imp, lexer, tk, instr, line_num, symtab);
+	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, label_acc, lexer, tk, instr, line_num, symtab);
 	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, label_zp, lexer, tk, instr, line_num, symtab);
 	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, label_zp_label, lexer, tk, instr, line_num, symtab);
 	PARSE_OPERAND_TESTER(PARSER_SUCCESS, operand, label_abs, lexer, tk, instr, line_num, symtab);
@@ -156,43 +158,41 @@ void test_apply_masks(void)
 	int expected = 0;
 	int line_num = 1;
 
-	// don't pass the exhaustive_lines.h directly into APPLY_MASKS_TESTER()
-	// harder to keep track of when/why we update expected
-	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
+	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE & ~ADDR_MODE_ACCUMULATOR;
 	APPLY_MASKS_TESTER(expected, imp, lexer, tk, instr, line_num);
+	APPLY_MASKS_TESTER(ADDR_MODE_ACCUMULATOR, acc, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, zp, lexer, tk, instr, line_num);
 
 	// expected value is still the same for the following tests
-	// will only update when necessary
 	APPLY_MASKS_TESTER(expected, zp_label, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, absolute, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, abs_label, lexer, tk, instr, line_num);
 
-	expected = X_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
+	expected = X_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE & ~ADDR_MODE_ACCUMULATOR;
 	APPLY_MASKS_TESTER(expected, zpx, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, zpx_label, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, absx, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, absx_label, lexer, tk, instr, line_num);
 
-	expected = Y_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
+	expected = Y_REGISTER_FIELD & NOT_INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE & ~ADDR_MODE_ACCUMULATOR;
 	APPLY_MASKS_TESTER(expected, zpy, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, zpy_label, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, absy, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, absy_label, lexer, tk, instr, line_num);
 
-	expected = NOT_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
+	expected = NOT_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE & ~ADDR_MODE_ACCUMULATOR;
 	APPLY_MASKS_TESTER(expected, ind, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, ind_label, lexer, tk, instr, line_num);
 
-	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD & ADDR_MODE_IMMEDIATE;
+	expected = NOT_REGISTER_FIELD & NOT_INDIRECT_FIELD & ADDR_MODE_IMMEDIATE & ~ADDR_MODE_ACCUMULATOR;
 	APPLY_MASKS_TESTER(expected, imm, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, imm_label, lexer, tk, instr, line_num);
 
-	expected = X_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
+	expected = X_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE & ~ADDR_MODE_ACCUMULATOR;
 	APPLY_MASKS_TESTER(expected, indx, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, indx_label, lexer, tk, instr, line_num);
 
-	expected = Y_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE;
+	expected = Y_REGISTER_FIELD & INDIRECT_FIELD & ~ADDR_MODE_IMMEDIATE & ~ADDR_MODE_ACCUMULATOR;
 	APPLY_MASKS_TESTER(expected, indy, lexer, tk, instr, line_num);
 	APPLY_MASKS_TESTER(expected, indy_label, lexer, tk, instr, line_num);
 
@@ -302,9 +302,8 @@ void test_parse_addr_mode(void)
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_label_declaration(lexer, symtab, 0x0));
 
 	PARSE_ADDR_MODE_TESTER(ADDR_MODE_IMPLIED, operand, operand_status, imp, lexer, tk, instr, symtab, line_num);
+	PARSE_ADDR_MODE_TESTER(ADDR_MODE_ACCUMULATOR, operand, operand_status, acc, lexer, tk, instr, symtab, line_num);
 
-	// exhaustive_lines.h has exhaustive token sequences
-	// BUT NOT exhaustive addressing modes (missing accumulator)
 	buffer = "\t\tASL\n";
 	PARSE_ADDR_MODE_TESTER(ADDR_MODE_ACCUMULATOR, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
@@ -395,6 +394,9 @@ void test_parse_addr_mode(void)
 	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	buffer = "BVS (CONSTANT16),Y\n";
+	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
+
+	buffer = "BNE A\n";
 	PARSE_ADDR_MODE_TESTER(ERROR_ILLEGAL_ADDRESSING_MODE, operand, operand_status, buffer, lexer, tk, instr, symtab, line_num);
 
 	// bad immediates

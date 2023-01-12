@@ -451,7 +451,8 @@ int parse_operand(struct Lexer *lexer, struct Instruction *instr,
 
 	if (operand->type == TOKEN_LABEL) {
 		return parse_label_operand(lexer, instr, operand, symtab);
-	} else if (operand->type == TOKEN_LITERAL) {
+	} else if (operand->type == TOKEN_LITERAL ||
+	           operand->type == TOKEN_ACCUMULATOR) {
 		// no need to do anything special to parse literal
 		// the lexer did everything necessary
 		return PARSER_SUCCESS;
@@ -480,7 +481,8 @@ struct Token *find_operand(struct Lexer *lexer)
 	for (int i = 1; curr->type != TOKEN_NULL; i++) {
 		curr = lexer->sequence[i];
 		if (curr->type == TOKEN_LABEL ||
-		    curr->type == TOKEN_LITERAL)
+		    curr->type == TOKEN_LITERAL ||
+		    curr->type == TOKEN_ACCUMULATOR)
 			return curr;
 	}
 	return NULL;
@@ -504,6 +506,7 @@ int apply_masks(struct Lexer *lexer, int curr_field)
 	int has_y = 0;
 	int is_indirect = 0;
 	int is_immediate = 0;
+	int has_accumulator = 0;
 
 	struct Token *curr;
 	for (int i = 0; i < MAX_TOKENS; i++) {
@@ -516,6 +519,8 @@ int apply_masks(struct Lexer *lexer, int curr_field)
 			is_indirect = 1;
 		else if (curr->type == TOKEN_IMMEDIATE)
 			is_immediate = 1;
+		else if (curr->type == TOKEN_ACCUMULATOR)
+			has_accumulator = 1;
 	}
 
 	if (has_x)
@@ -534,6 +539,11 @@ int apply_masks(struct Lexer *lexer, int curr_field)
 		curr_field &= ADDR_MODE_IMMEDIATE;
 	else
 		curr_field &= ~ADDR_MODE_IMMEDIATE;
+
+	if (has_accumulator)
+		curr_field &= ADDR_MODE_ACCUMULATOR;
+	else
+		curr_field &= ~ADDR_MODE_ACCUMULATOR;
 	return curr_field;
 }
 
@@ -620,7 +630,9 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 	}
 
 	int addr_mode = 0x1FFF;
-	if (operand->value > 0xFF) {
+	if (operand->type == TOKEN_ACCUMULATOR) {
+		addr_mode &= ADDR_MODE_ACCUMULATOR;
+	} else if (operand->value > 0xFF) {
 		// see comment above in parse_label_operand()
 		// operand value might be an absolute address, but a branch
 		// instruction always has an operand that fits in 1 byte

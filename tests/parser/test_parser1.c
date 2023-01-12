@@ -290,6 +290,9 @@ void test_parse_line(void)
 	const char *bad_directive4 = ".ORG CONSTANT16";
 	SETUP_TESTER(ERROR_ILLEGAL_SEQUENCE, bad_directive4, lexer, tk, instr, line_num);
 	TEST_ASSERT_EQUAL_PTR(lexer->sequence[1], lexer->error_tk);
+	const char *bad_acc = "LSR A,X\n";
+	SETUP_TESTER(ERROR_ILLEGAL_SEQUENCE, bad_acc, lexer, tk, instr, line_num);
+	TEST_ASSERT_EQUAL_PTR(lexer->sequence[2], lexer->error_tk);
 
 	const char *blank1 = "\n";
 	SETUP_TESTER(PARSER_SUCCESS, blank1, lexer, tk, instr, line_num);
@@ -395,6 +398,7 @@ void test_find_operand(void)
 	TEST_ASSERT_EQUAL_PTR(NULL, find_operand(NULL));
 
 	FIND_OPERAND_TESTER(NULL, imp, lexer, tk, instr, line_num);
+	FIND_OPERAND_TESTER(lexer->sequence[1], acc, lexer, tk, instr, line_num);
 	FIND_OPERAND_TESTER(lexer->sequence[1], zp, lexer, tk, instr, line_num);
 	FIND_OPERAND_TESTER(lexer->sequence[1], zp_label, lexer, tk, instr, line_num);
 	FIND_OPERAND_TESTER(lexer->sequence[1], absolute, lexer, tk, instr, line_num);
@@ -416,6 +420,7 @@ void test_find_operand(void)
 	FIND_OPERAND_TESTER(lexer->sequence[2], indy, lexer, tk, instr, line_num);
 	FIND_OPERAND_TESTER(lexer->sequence[2], indy_label, lexer, tk, instr, line_num);
 	FIND_OPERAND_TESTER(NULL, label_imp, lexer, tk, instr, line_num);
+	FIND_OPERAND_TESTER(lexer->sequence[2], label_acc, lexer, tk, instr, line_num);
 	FIND_OPERAND_TESTER(lexer->sequence[2], label_zp, lexer, tk, instr, line_num);
 	FIND_OPERAND_TESTER(lexer->sequence[2], label_zp_label, lexer, tk, instr, line_num);
 	FIND_OPERAND_TESTER(lexer->sequence[2], label_abs, lexer, tk, instr, line_num);
