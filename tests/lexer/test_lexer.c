@@ -113,6 +113,10 @@ void test_token_strncpy(void)
 	token_strncpy(tk, buffer, 1);
 	TEST_ASSERT_EQUAL_STRING("Y", tk->str);
 
+	buffer = "A\n";
+	token_strncpy(tk, buffer, 1);
+	TEST_ASSERT_EQUAL_STRING("A", tk->str);
+
 	buffer = "XNOTREGISTER\t;comment\n";
 	token_strncpy(tk, buffer, 12);
 	TEST_ASSERT_EQUAL_STRING("XNOTREGISTER", tk->str);
@@ -592,6 +596,11 @@ void test_lex_text(void)
 	TEST_ASSERT_EQUAL_STRING("Y", tk->str);
 	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, tk->type);
 
+	buffer = "A\n";
+	TEST_ASSERT_EQUAL_INT(1, lex_text(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_STRING("A", tk->str);
+	TEST_ASSERT_EQUAL_INT(TOKEN_ACCUMULATOR, tk->type);
+
 	buffer = "XNOTREGISTER\t;comment\n";
 	TEST_ASSERT_EQUAL_INT(12, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
@@ -805,6 +814,13 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(4, lex(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_EQU_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".EQU", tk->str);
+
+//                          0 123456 7 8
+	const char *acc = "\t\tLSR A\t\t; comment\n";
+	buffer = acc + 6;
+	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_ACCUMULATOR, tk->type);
+	TEST_ASSERT_EQUAL_STRING("A", tk->str);
 
 	destroy_token(tk);
 	destroy_instruction(instr);
@@ -1051,6 +1067,27 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
 
 	TEST_ASSERT_EQUAL_INT(0x1000, lexer->sequence[2]->value);
+
+//                          0 123456
+	const char *acc = "\t\tLSR A\t\t\t; this routine calculates it as:\n";
+	buffer = acc;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
+	TEST_ASSERT_EQUAL_INT(2, lexer->curr);
+	TEST_ASSERT_EQUAL_PTR(acc, lexer->line);
+
+	TEST_ASSERT_EQUAL_INT(LSR, instr->mnemonic);
+
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[2]), lexer->sequence[0]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_ACCUMULATOR, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[6]), lexer->sequence[1]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[2]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[3]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[4]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[5]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
 
 	// printing errors
 	//                            012345

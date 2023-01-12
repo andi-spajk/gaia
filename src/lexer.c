@@ -519,6 +519,9 @@ int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 	} else if (!strcmp(tk->str, "Y")) {
 		tk->type = TOKEN_Y_REGISTER;
 		return num_chars;
+	} else if (!strcmp(tk->str, "A")) {
+		tk->type = TOKEN_ACCUMULATOR;
+		return num_chars;
 	}
 
 	int lex_instr = lex_instruction(tk, instr);
