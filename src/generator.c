@@ -41,10 +41,13 @@ int generate_code(FILE *f, struct Instruction *instr, struct Token *operand,
 
 	int operand_bytes;
 	// nonexistent operand indicates accumulator or implied addr mode
-	if (operand)
+	if (operand) {
+		if (operand->type == TOKEN_ACCUMULATOR)
+			return ONE_BYTE;
 		operand_bytes = operand->value;
-	else
+	} else {
 		return ONE_BYTE;
+	}
 
 	// little endian
 	fputc(operand_bytes & 0xFF, f);

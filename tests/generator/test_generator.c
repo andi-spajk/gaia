@@ -40,6 +40,7 @@ void test_generate_code(void)
 	/*
 	from /tests/parser/exhaustive_lines.h
 	E8              INX
+	2A              ROL     A
 	05 AA           ORA     $AA
 	AD 34 12        LDA     $1234
 	F5 BB           SBC     $BB,X
@@ -56,6 +57,7 @@ void test_generate_code(void)
 	// snuff them out before generating code
 	unsigned char expected_rom[] = {
 		0xE8,
+		0x2A,
 		0x05, 0xAA,
 		0xAD, 0x34, 0x12,
 		0xF5, 0xBB,
@@ -68,7 +70,7 @@ void test_generate_code(void)
 		0xD1, 0xFF,
 		0x0A
 	};
-	int exp_bytes = 23;
+	int exp_bytes = 24;
 	unsigned char produced_rom[exp_bytes];
 
 	int pc = 0;
@@ -78,6 +80,16 @@ void test_generate_code(void)
 	const char *buffer;
 
 	buffer = "INX\n";
+	lex_line(buffer, lexer, tk, instr, line_num++);
+	parse_line(lexer);
+	operand = find_operand(lexer);
+	operand_status = parse_operand(lexer, instr, operand, symtab);
+	parse_addr_mode(lexer, instr, operand, operand_status);
+	written = generate_code(f, instr, operand, pc);
+	TEST_ASSERT_EQUAL_INT(1, written);
+	pc += written;
+
+	buffer = "ROL A\n";
 	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	operand = find_operand(lexer);
