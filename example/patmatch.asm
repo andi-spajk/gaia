@@ -11,7 +11,7 @@ MATCHN		.EQU $2A	; Matches any string (including "")
 PATTERN		.EQU $2000	; Address of pattern
 STR		.EQU $6		; Pointer to string to match
 
-PATTERNMATCH
+PATTERNMATCH:
 		LDX #$00	; X is an index in the pattern
 		LDY #$FF	; Y is an index in the string
 NEXT		LDA PATTERN,X	; Look at next pattern character

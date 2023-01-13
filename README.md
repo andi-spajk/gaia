@@ -29,7 +29,6 @@ base.
 # Current Limitations
 
 - Only supported on Linux/WSL.
-- No colons at the end of labels.
 - Forward references are only allowed in branch and jump instructions.
 - Maximum label length is 63 characters.
 - Operands can only be basic literals and labels, e.g. `#"?"` is illegal.
