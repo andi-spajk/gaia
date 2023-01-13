@@ -495,7 +495,7 @@ int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 	int num_chars;
 	for (num_chars = 0; num_chars < MAX_TOKEN_STR_LEN; num_chars++) {
 		c = buffer[num_chars];
-		if (is_end_of_token(c)) {
+		if (is_end_of_token(c) || c == ':') {
 			break;
 		} else if (!is_valid_token_char(c)) {
 			tk->error_char = &buffer[num_chars];
@@ -639,19 +639,34 @@ int lex_line(const char *buffer, struct Lexer *lexer, struct Token *tk,
 	int num_chars;
 	while (!end_line_lexing(*curr)) {
 		num_chars = lex(curr, tk, instr);
+
 		// negative returns indicate an error code
 		if (num_chars < 0) {
 			print_error(buffer, num_chars, tk->error_char,
 			            lexer->file_name, lexer->line_num);
 			return num_chars;
 		}
-		if (add_token(lexer, tk)  == ERROR_TOO_MANY_TOKENS) {
+
+		if (add_token(lexer, tk) == ERROR_TOO_MANY_TOKENS) {
 			// don't set lexer->error_tk or call print_error()
 			// the parser will pinpoint the first bad token
 			return ERROR_TOO_MANY_TOKENS;
 		}
 
 		curr += num_chars;
+
+		// validate colon
+		if (*curr == ':') {
+			if (tk->type == TOKEN_LABEL && lexer->curr == 1) {
+				curr++;
+			} else {
+				tk->error_char = curr;
+				print_error(buffer, ERROR_ILLEGAL_CHAR,
+				            tk->error_char, lexer->file_name,
+				            lexer->line_num);
+				return ERROR_ILLEGAL_CHAR;
+			}
+		}
 		// skip whitespace AFTER A TOKEN
 		while (*curr == ' ' || *curr == '\t')
 			curr++;

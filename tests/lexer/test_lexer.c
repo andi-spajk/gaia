@@ -539,6 +539,11 @@ void test_lex_text(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	TEST_ASSERT_EQUAL_STRING("LABEL1", tk->str);
 
+	buffer = "LABEL1: TXA\n";
+	TEST_ASSERT_EQUAL_INT(6, lex_text(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+	TEST_ASSERT_EQUAL_STRING("LABEL1", tk->str);
+
 	buffer = "Loop\tCMP\t$01\n";
 	TEST_ASSERT_EQUAL_INT(4, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
@@ -546,6 +551,11 @@ void test_lex_text(void)
 	TEST_ASSERT_EQUAL_STRING("LOOP", tk->str);
 
 	buffer = "LoNeLaBeL\n";
+	TEST_ASSERT_EQUAL_INT(9, lex_text(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+	TEST_ASSERT_EQUAL_STRING("LONELABEL", tk->str);
+
+	buffer = "LoNeLaBeL:\n";
 	TEST_ASSERT_EQUAL_INT(9, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	TEST_ASSERT_EQUAL_STRING("LONELABEL", tk->str);
@@ -676,8 +686,14 @@ void test_lex_text(void)
 	TEST_ASSERT_EQUAL_STRING("LDA", tk->str);
 	TEST_ASSERT_EQUAL_PTR(too_long_label, tk->error_char);
 
-	const char *just_enough =    "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefg BEQ wtf";
+	const char *just_enough = "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefg BEQ wtf";
 	buffer = just_enough;
+	TEST_ASSERT_EQUAL_INT(63, lex_text(buffer, tk, instr));
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
+	TEST_ASSERT_EQUAL_STRING("ABCDEFGH2BCDEFGH3BCDEFGH4BCDEFGH5BCDEFGH6BCDEFGH7BCDEFGH8BCDEFG", tk->str);
+
+	const char *just_enough_colon = "abcdefgh2bcdefgh3bcdefgh4bcdefgh5bcdefgh6bcdefgh7bcdefgh8bcdefg: BEQ wtf";
+	buffer = just_enough_colon;
 	TEST_ASSERT_EQUAL_INT(63, lex_text(buffer, tk, instr));
 	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, tk->type);
 	TEST_ASSERT_EQUAL_STRING("ABCDEFGH2BCDEFGH3BCDEFGH4BCDEFGH5BCDEFGH6BCDEFGH7BCDEFGH8BCDEFG", tk->str);
@@ -1089,6 +1105,32 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
 
+//                           012345678 901234567890
+	const char *colon = "STREQULP:\tLDA ($FC),Y\n";
+	buffer = colon;
+	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
+	TEST_ASSERT_EQUAL_INT(7, lexer->curr);
+	TEST_ASSERT_EQUAL_PTR(colon, lexer->line);
+
+	TEST_ASSERT_EQUAL_INT(LDA, instr->mnemonic);
+
+	TEST_ASSERT_EQUAL_INT(TOKEN_LABEL, lexer->sequence[0]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[0]), lexer->sequence[0]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_INSTRUCTION, lexer->sequence[1]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[10]), lexer->sequence[1]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_OPEN_PARENTHESIS, lexer->sequence[2]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[14]), lexer->sequence[2]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, lexer->sequence[3]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[15]), lexer->sequence[3]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_CLOSE_PARENTHESIS, lexer->sequence[4]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[18]), lexer->sequence[4]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_COMMA, lexer->sequence[5]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[19]), lexer->sequence[5]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, lexer->sequence[6]->type);
+	TEST_ASSERT_EQUAL_PTR(&(buffer[20]), lexer->sequence[6]->buffer_location);
+	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
+
 	// printing errors
 	//                            012345
 	const char *lexical_errors = "INX $#100\n";
@@ -1152,6 +1194,24 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_PTR(bad_directive2, lexer->line);
 	TEST_ASSERT_EQUAL_PTR(&bad_directive2[17], tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&bad_directive2[6], tk->buffer_location);
+
+//                                0 1234 567890123
+	const char *bad_colon = "\t\tLDA\tSETW:,X\n";
+	buffer = bad_colon;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
+	TEST_ASSERT_EQUAL_PTR(bad_colon, lexer->line);
+	TEST_ASSERT_EQUAL_PTR(&bad_colon[10], tk->error_char);
+	TEST_ASSERT_EQUAL_PTR(&bad_colon[6], tk->buffer_location);
+
+//                          0123 4567890123
+	const char *wtf = "\t   \t **=:=LDA\n";
+	buffer = wtf;
+	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));
+	line_num++;
+	TEST_ASSERT_EQUAL_PTR(wtf, lexer->line);
+	TEST_ASSERT_EQUAL_PTR(&wtf[9], tk->error_char);
+	TEST_ASSERT_EQUAL_PTR(&wtf[8], tk->buffer_location);
 
 	// just a comment
 	const char *just_comment = ";THIS SUBROUTINE ARRANGES THE 8-BIT ELEMENTS OF A LIST IN ASCENDING\n";
