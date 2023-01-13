@@ -349,7 +349,7 @@ void test_get_opcode(void)
 	instr->mnemonic = ROR;
 	instr->addr_bitfield = ROR_BITFIELD;
 	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;
-	TEST_ASSERT_EQUAL_INT(0x7E, get_opcode(instr));
+	TEST_ASSERT_EQUAL_INT(0x6E, get_opcode(instr));
 	instr->mnemonic = RTI;
 	instr->addr_bitfield = RTI_BITFIELD;
 	instr->addr_bitflag = ADDR_MODE_ABSOLUTE;

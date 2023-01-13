@@ -40,7 +40,7 @@ void test_print_error(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_LONG_LABEL, lex_line(line, lexer, tk, instr, line_num));
 	line_num++;
 
-	line = "LABEL\t\tADC\t((PLACE,X),Y)\t;lolwtf\n";
+	line = "LABEL:\t\tADC\t((PLACE,X),Y)\t;lolwtf\n";
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_MANY_TOKENS, lex_line(line, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_SEQUENCE, parse_line(lexer));
 	line_num++;
@@ -64,11 +64,11 @@ void test_print_error(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_LABEL_REDEFINITION, parse_label_declaration(lexer, symtab, 0));
 	line_num++;
 
-	line = "\t\tLOOP\tADC\t$01\n";
+	line = "\t\tLOOP:\tADC\t$01\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(SYMBOL_INSERTION_SUCCESS, parse_label_declaration(lexer, symtab, 0));
-	line = "\t\tLOOP\tJMP\tBYE\n";
+	line = "\t\tLOOP:\tJMP\tBYE\n";
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(line, lexer, tk, instr, line_num));
 	TEST_ASSERT_EQUAL_INT(PARSER_SUCCESS, parse_line(lexer));
 	TEST_ASSERT_EQUAL_INT(ERROR_LABEL_REDEFINITION, parse_label_declaration(lexer, symtab, 2));

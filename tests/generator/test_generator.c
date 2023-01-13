@@ -237,12 +237,12 @@ void test_resolve_label_ref(void)
 	/*
 	LOC     CODE
 	                        ADDRESS =       $1234
-	1000    E8              LABEL1  INX
+	1000    E8              LABEL1: INX
 	1001    D0 FD                   BNE     LABEL1          ; branch
 	1003    4C 00 10                JMP     LABEL1          ; jump
-	1006    F0 FE           SAME1   BEQ     SAME1           ; branch to same instr
-	1008    4C 08 10        SAME2   JMP     SAME2           ; jump to same instr
-	100B    10 F9           LABEL2  BPL     SAME1           ; label branch
+	1006    F0 FE           SAME1:  BEQ     SAME1           ; branch to same instr
+	1008    4C 08 10        SAME2:  JMP     SAME2           ; jump to same instr
+	100B    10 F9           LABEL2: BPL     SAME1           ; label branch
 	100D    20 0B 10                JSR     LABEL2          ; subroutine jump
 	1010    6C 34 12                JMP     (ADDRESS)       ; indirect jump
 	*/
@@ -275,7 +275,7 @@ void test_resolve_label_ref(void)
 	TEST_ASSERT_EQUAL_INT(0x1234, search_symbol(symtab, "ADDRESS"));
 	line_num++;
 
-	buffer = "LABEL1 INX\n";
+	buffer = "LABEL1: INX\n";
 	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
@@ -308,7 +308,7 @@ void test_resolve_label_ref(void)
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
 
-	buffer = "SAME1 BEQ SAME1\n";
+	buffer = "SAME1: BEQ SAME1\n";
 	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
@@ -319,7 +319,7 @@ void test_resolve_label_ref(void)
 	TEST_ASSERT_EQUAL_INT(2, written);
 	pc += written;
 
-	buffer = "SAME2 JMP SAME2\n";
+	buffer = "SAME2: JMP SAME2\n";
 	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
@@ -330,7 +330,7 @@ void test_resolve_label_ref(void)
 	TEST_ASSERT_EQUAL_INT(3, written);
 	pc += written;
 
-	buffer = "LABEL2 BPL SAME1\n";
+	buffer = "LABEL2: BPL SAME1\n";
 	lex_line(buffer, lexer, tk, instr, line_num++);
 	parse_line(lexer);
 	parse_label_declaration(lexer, symtab, pc);
