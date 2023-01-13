@@ -495,6 +495,9 @@ int lex_text(const char *buffer, struct Token *tk, struct Instruction *instr)
 	int num_chars;
 	for (num_chars = 0; num_chars < MAX_TOKEN_STR_LEN; num_chars++) {
 		c = buffer[num_chars];
+		// checking colon is not done in is_end_of_token() because other
+		// functions use is_end_of_token() and they don't expect a colon
+		// at any time
 		if (is_end_of_token(c) || c == ':') {
 			break;
 		} else if (!is_valid_token_char(c)) {
