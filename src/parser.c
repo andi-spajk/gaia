@@ -631,6 +631,12 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 
 	int addr_mode = 0x1FFF;
 	if (operand->type == TOKEN_ACCUMULATOR) {
+		// seems redundant since we mask off accumulator later in
+		// apply_masks()
+		// however, the accumulator token value will be the initialized
+		// value of 0
+		// so operand->value will lead us to the else block, which we
+		// don't want
 		addr_mode &= ADDR_MODE_ACCUMULATOR;
 	} else if (operand->value > 0xFF) {
 		// see comment above in parse_label_operand()
