@@ -179,11 +179,12 @@ int main(int argc, char *argv[])
 	int line_num = 1;
 	int return_code;
 	int pc = 0x0;
-	struct Token *operand, *first;
+	struct Token *operand;
+	struct Token *first;
 	int operand_status;
 	int written_bytes = 0;
-	int total_bytes = 0;
 	struct ForwardRef *ref;
+	int total_bytes = 0;
 	while (fgets(buffer, MAX_BUFFER_SIZE, inf)) {
 		return_code = lex_line(buffer, lexer, tk, instr, line_num);
 		if (IS_ERROR(return_code))

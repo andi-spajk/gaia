@@ -156,7 +156,9 @@ int parse_label_tree(struct Lexer *lexer, int index)
 	struct Token **seq = lexer->sequence;
 	index++;
 	// =
-	if (seq[index]->type == TOKEN_EQUAL_SIGN) {
+	// .EQU
+	if (seq[index]->type == TOKEN_EQUAL_SIGN ||
+	    seq[index]->type == TOKEN_EQU_DIRECTIVE) {
 		index++;
 		// = $A0
 		if (seq[index]->type == TOKEN_LITERAL) {
@@ -172,15 +174,6 @@ int parse_label_tree(struct Lexer *lexer, int index)
 	// just a declaration of label
 	else if (seq[index]->type == TOKEN_NULL) {
 		return PARSER_SUCCESS;
-	}
-	// .EQU directive
-	else if (seq[index]->type == TOKEN_EQU_DIRECTIVE) {
-		index++;
-		if (seq[index]->type == TOKEN_LITERAL) {
-			index++;
-			if (seq[index]->type == TOKEN_NULL)
-				return PARSER_SUCCESS;
-		}
 	}
 	lexer->error_tk = lexer->sequence[index];
 	print_error(lexer->line, ERROR_ILLEGAL_SEQUENCE,
