@@ -11,7 +11,7 @@ TOKEN SEQUENCES:
 InstructionTree
 	instruction
 		open parenthesis
-			operand
+			label | literal
 				comma
 					x_register
 						close parenthesis
@@ -21,23 +21,20 @@ InstructionTree
 						y_register
 							null
 					null
-		operand
+		label | literal
 			comma
 				x_register
 				y_register
 					null
 			null
 		immediate
-			operand
+			label | literal
 				null
 		null
 
 LabelTree
 	label
-		equal_sign
-			literal
-				null
-		equ_directive
+		equal_sign | equ_directive
 			literal
 				null
 		InstructionTree
@@ -57,7 +54,8 @@ DirectiveTree
 BaseTree
 	base
 		equal_sign
-			null
+			literal
+				null
 */
 
 #ifndef PARSER_H

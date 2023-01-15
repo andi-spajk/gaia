@@ -39,6 +39,8 @@ base.
 # Current Limitations
 
 - Only supported on Linux/WSL.
+- Labels cannot be defined by other labels, e.g. `.DEFINE LABEL1 LABEL2` is
+illegal.
 - Forward references are only allowed in branch and jump instructions.
 - Maximum label length is 63 characters.
 - Operands can only be basic literals and labels, e.g. `#"?"` is illegal.
@@ -56,6 +58,12 @@ at https://github.com/ThrowTheSwitch/Unity.
 - https://www.acrc.bris.ac.uk/acrc/RedHat/rhel-cpp-en-4/macro-pitfalls.html
 
 The opcode csv file was taken from:
+
 https://github.com/kpmiller/emulator101/tree/master/6502Disassembler
+
 - NOTE: the original csv source has an error. Opcode for ROR absolute address
 and opcode for ROR absolute,X address are swapped.
+
+The symbol table implementation was adapted from this tutorial:
+
+https://github.com/jamesroutley/write-a-hash-table
