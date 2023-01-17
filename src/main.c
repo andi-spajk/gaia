@@ -251,6 +251,8 @@ int main(int argc, char *argv[])
 		} else {
 			written_bytes = generate_code(outf, instr, operand, pc);
 		}
+		if (IS_ERROR(written_bytes))
+			ABORT_ASSEMBLY();
 
 		line_num++;
 		pc += written_bytes;
@@ -268,7 +270,10 @@ int main(int argc, char *argv[])
 			            ref->line_num);
 			ABORT_ASSEMBLY();
 		}
-		resolve_forward_ref(outf, ref, lexer, dest_pc);
+
+		written_bytes = resolve_forward_ref(outf, ref, lexer, dest_pc);
+		if (IS_ERROR(written_bytes))
+			ABORT_ASSEMBLY();
 	}
 
 	printf("Assembly successful.\n");
