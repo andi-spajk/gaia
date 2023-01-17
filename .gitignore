@@ -2,7 +2,6 @@ gaia
 a.out
 
 programs/
-obj/
 opcodes/opcodes.txt
 opcodes/65C02ops.csv
 pseudocode/
