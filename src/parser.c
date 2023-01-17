@@ -26,6 +26,9 @@ See parser.h for full diagram of valid token sequences.
                             (type) == TOKEN_ORG_DIRECTIVE ||    \
                             (type) == TOKEN_END_DIRECTIVE)
 
+#define IS_OPERAND(type) ((type) == TOKEN_LABEL || \
+                          (type) == TOKEN_LITERAL)
+
 /* parse_indirect_operand_tree()
 	@lexer          ptr to Lexer struct
 	@index          index of operand token
@@ -93,13 +96,11 @@ int parse_instr_tree(struct Lexer *lexer, int index)
 	if (seq[index]->type == TOKEN_OPEN_PARENTHESIS) {
 		index++;
 		// (OPERAND
-		if (seq[index]->type == TOKEN_LABEL ||
-		    seq[index]->type == TOKEN_LITERAL)
+		if (IS_OPERAND(seq[index]->type))
 			return parse_indirect_operand_tree(lexer, index);
 	}
 	// OPERAND
-	else if (seq[index]->type == TOKEN_LABEL ||
-	         seq[index]->type == TOKEN_LITERAL) {
+	else if (IS_OPERAND(seq[index]->type)) {
 		index++;
 		if (seq[index]->type == TOKEN_NULL) {
 			return PARSER_SUCCESS;
@@ -119,8 +120,7 @@ int parse_instr_tree(struct Lexer *lexer, int index)
 		index++;
 		// #OPERAND
 		// immediate labels are also legal
-		if (seq[index]->type == TOKEN_LITERAL ||
-		    seq[index]->type == TOKEN_LABEL) {
+		if (IS_OPERAND(seq[index]->type)) {
 			index++;
 			if (seq[index]->type == TOKEN_NULL)
 				return PARSER_SUCCESS;
@@ -653,9 +653,6 @@ int parse_addr_mode(struct Lexer *lexer, struct Instruction *instr,
 		addr_mode &= ADDR_MODE_RELATIVE;
 	else
 		addr_mode &= ~ADDR_MODE_RELATIVE;
-	// JSR is always absolute
-	if (instr->mnemonic == JSR)
-		addr_mode &= ADDR_MODE_ABSOLUTE;
 
 	addr_mode = apply_masks(lexer, addr_mode);
 	instr->addr_bitflag = addr_mode & instr->addr_bitfield;
