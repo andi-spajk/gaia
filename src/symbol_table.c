@@ -146,7 +146,7 @@ static struct Symbol *init_symbol(const char *label, const int value)
 	if (!sym->label)
 		return NULL;
 
-	strncpy(sym->label, label, strlen(label));
+	memcpy(sym->label, label, strlen(label));
 	sym->value = value;
 	return sym;
 }

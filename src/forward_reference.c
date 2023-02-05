@@ -121,14 +121,14 @@ struct ForwardRef *create_forward_ref(const char *buffer,
 	if (!ref->source_line)
 		return NULL;
 	// keep the comments in, no one cares
-	strncpy(ref->source_line, begin, num_chars);
+	memcpy(ref->source_line, begin, num_chars);
 
 	// copy label string into forward ref's label
-	size_t label_length = strlen(operand->str) + 1;
-	ref->label = calloc(label_length, sizeof(char));
+	size_t label_length = strlen(operand->str);
+	ref->label = calloc(label_length + 1, sizeof(char));
 	if (!ref->label)
 		return NULL;
-	strncpy(ref->label, operand->str, label_length);
+	memcpy(ref->label, operand->str, label_length);
 
 	// copy instr into forward ref's instr
 	struct Instruction *new_instr = init_instruction();

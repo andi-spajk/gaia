@@ -175,7 +175,7 @@ int token_strcpy(struct Token *tk, const char *str)
 	// include null terminator to cut off the chars that may be left over
 	// from the prior string
 	size_t length = strlen(str) + 1;
-	strncpy(tk->str, str, length);
+	memcpy(tk->str, str, length);
 	return length - 1;
 }
 
@@ -420,12 +420,15 @@ int lex_instruction(struct Token *tk, struct Instruction *instr)
 	@tk             running token
 
 	@return         number of characters read
+
+	Lexically analyze a directive at location @buffer and store the token
+	into @tk.
 */
 int lex_directive(const char *buffer, struct Token *tk)
 {
-	// skip period
 	char c;
 	int num_chars;
+	// skip period
 	for (num_chars = 1; num_chars < MAX_TOKEN_STR_LEN; num_chars++) {
 		c = buffer[num_chars];
 		if (is_end_of_token(c)) {
@@ -482,7 +485,7 @@ static int is_valid_token_char(const char c)
 	@return         number of chars read, or error code
 
 	Lexically analyze a TEXT TOKEN at @buffer, which is a label, register,
-	or an instruction mnemonic. Ipdate @tk to represent that token.
+	or an instruction mnemonic. Update @tk to represent that token.
 	@instr may also be updated if the token was an instruction mnemonic.
 
 	If no valid text is found, @tk is unchanged. If no valid instruction

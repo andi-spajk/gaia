@@ -9,7 +9,7 @@ else
 endif
 
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -g -std=c11
+CFLAGS = -Wall -Werror -Wextra -O3 -g -std=c11
 
 OBJ = obj
 SRC = src

@@ -84,7 +84,7 @@ int calc_branch_offset(int curr_pc, int dest_pc)
 
 /* resolve_label_ref()
 	@f                      ptr to binary FILE
-	@lexer          ptr to Lexer struct
+	@lexer                  ptr to Lexer struct
 	@instr                  ptr to Instruction struct
 	@label                  ptr to token containing the label reference
 	@operand_status         whether @label is part of branch/jump
@@ -102,8 +102,13 @@ int resolve_label_ref(FILE *f, struct Lexer *lexer, struct Instruction *instr,
                       struct SymbolTable *symtab, int curr_pc)
 {
 	int dest_pc, offset;
-	if (label)
+	if (label) {
 		dest_pc = search_symbol(symtab, label->str);
+	} else {
+		print_error(lexer->line, ERROR_UNKNOWN, NULL, lexer->file_name,
+		            lexer->line_num);
+		return ERROR_UNKNOWN;
+	}
 
 	if (operand_status == BRANCH_OPERAND) {
 		offset = calc_branch_offset(curr_pc, dest_pc);
