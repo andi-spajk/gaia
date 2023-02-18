@@ -70,6 +70,8 @@ int calc_branch_offset(int curr_pc, int dest_pc)
 {
 	// offset must be within [-128, 127] or [0x80, 0x7F]
 	int offset = dest_pc - curr_pc - 2;
+
+	// we must subtract 2 for some reason
 	if (dest_pc <= curr_pc) {
 		// branch backward or to same instr
 		if (offset < -128)

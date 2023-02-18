@@ -10,13 +10,13 @@ Error codes used by the assembler. Also a prototype to print error messages.
 // all codes are negative
 #define ERROR_MEMORY_ALLOCATION_FAIL    -1
 
-// internal error; no error message
+// internal signal; no error message
 #define ERROR_SYMBOL_NOT_FOUND          -2
 
 #define ERROR_ILLEGAL_CHAR              -3
 #define ERROR_TOO_BIG_LITERAL           -4
 
-// internal error; no error message
+// internal signal; no error message
 #define ERROR_INSTRUCTION_NOT_FOUND     -5
 
 // internal error, should never happen (to the user)

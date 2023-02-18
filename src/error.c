@@ -126,9 +126,5 @@ void print_error(const char *line, int error_code, const char *bad_char,
 
 	for (int i = 0; i < num_spaces; i++)
 		putchar(' ');
-	// putchar('^');
-	// for (const char *tmp = bad_char+1; !is_end_of_token(*tmp); tmp++) {
-	// 	putchar('~');
-	// }
 	printf("^~~~~~\n\n");
 }

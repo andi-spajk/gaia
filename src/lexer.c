@@ -428,7 +428,7 @@ int lex_directive(const char *buffer, struct Token *tk)
 {
 	char c;
 	int num_chars;
-	// skip period
+	// skip the period at index 0
 	for (num_chars = 1; num_chars < MAX_TOKEN_STR_LEN; num_chars++) {
 		c = buffer[num_chars];
 		if (is_end_of_token(c)) {
@@ -591,11 +591,12 @@ int lex(const char *buffer, struct Token *tk, struct Instruction *instr)
 }
 
 /* end_line_lexing()
-	@c      current char to check
+	@c              current char to check
+
+	@return         1 if end of 6502 source line, 0 if not
 
 	Check if the current character in a line of source code is a signal to
-	end the lexical analysis. Newlines, comments, null terminators, and EOF
-	are all signals that the source code has ended.
+	end the lexical analysis.
 */
 static int end_line_lexing(char c)
 {
