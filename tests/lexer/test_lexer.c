@@ -639,7 +639,7 @@ void test_lex_text(void)
 
 	reset_instruction(instr);
 
-//                                 01234 567890123456789 0
+	//                         01234 567890123456789 0
 	const char *source_line = "LABEL\tJSR MORE_LabeL\n";
 	buffer = source_line;
 	TEST_ASSERT_EQUAL_INT(5, lex_text(buffer, tk, instr));
@@ -668,7 +668,7 @@ void test_lex_text(void)
 
 	reset_instruction(instr);
 
-//                                     012345678901234567890123
+	//                             012345678901234567890123
 	const char *bad_source_line = "bad&&#label      LDA #$01";
 	buffer = bad_source_line;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_text(buffer, tk, instr));
@@ -710,7 +710,7 @@ void test_lex(void)
 	TEST_ASSERT_NOT_NULL(instr);
 	const char *buffer;
 
-//                               0123456789
+	//                       0123456789
 	const char *immediate = "#%10011001\n";
 	buffer = immediate;
 	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
@@ -722,7 +722,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0b10011001, tk->value);
 
-//                              01234 5 67 8901 2
+	//                      01234 5 67 8901 2
 	const char *constant = "array\t\t=\t$30\n";
 	buffer = constant;
 	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
@@ -740,7 +740,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x30, tk->value);
 
-//                          01234 5 678901234567 8
+	//                  01234 5 678901234567 8
 	const char *indy = "SORT8\t\tlda (array),Y\t\t; FETCH ELEMENT COUNT\n";
 	buffer = indy;
 	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
@@ -783,7 +783,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_Y_REGISTER, tk->type);
 	TEST_ASSERT_EQUAL_STRING("Y", tk->str);
 
-//                                    0123456789
+	//                            0123456789
 	const char *another_source = "LDA 256,X\n";
 	buffer = another_source + 8;
 
@@ -791,7 +791,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, tk->type);
 	TEST_ASSERT_EQUAL_STRING("X", tk->str);
 
-//                           0 123456
+	//                   0 123456
 	const char *base = "\t\t*=$1000\n";
 	buffer = base + 2;
 	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
@@ -808,7 +808,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x1000, tk->value);
 
-//                               012345
+	//                       012345
 	const char *directive = ".org $800\n";
 	buffer = directive;
 	TEST_ASSERT_EQUAL_INT(4, lex(buffer, tk, instr));
@@ -820,7 +820,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_LITERAL, tk->type);
 	TEST_ASSERT_EQUAL_INT(0x800, tk->value);
 
-//                                01234567890123 4
+	//                        01234567890123 4
 	const char *directive2 = "ARRAY .EQU $10\n";
 	buffer = directive2;
 	TEST_ASSERT_EQUAL_INT(5, lex(buffer, tk, instr));
@@ -831,7 +831,7 @@ void test_lex(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_EQU_DIRECTIVE, tk->type);
 	TEST_ASSERT_EQUAL_STRING(".EQU", tk->str);
 
-//                          0 123456 7 8
+	//                  0 123456 7 8
 	const char *acc = "\t\tLSR A\t\t; comment\n";
 	buffer = acc + 6;
 	TEST_ASSERT_EQUAL_INT(1, lex(buffer, tk, instr));
@@ -857,7 +857,7 @@ void test_lex_line(void)
 	// lex_line() resets the lexer and instr for us, so we will not need to
 	// call the resets ourselves
 
-//                                 012345 6 7890 12345678
+	//                         012345 6 7890 12345678
 	const char *source_line = "SEARCH\t\tLDA\tBOARD,X\n";
 	buffer = source_line;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
@@ -889,7 +889,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_STRING("SEARCH", lexer->sequence[0]->str);
 	TEST_ASSERT_EQUAL_STRING("BOARD", lexer->sequence[2]->str);
 
-//                               0 1234 5678 901234
+	//                       0 1234 5678 901234
 	const char *bad_line = "\t\tADC\tBCC\t; lol\n";
 	buffer = bad_line;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
@@ -922,7 +922,7 @@ void test_lex_line(void)
 
 	TEST_ASSERT_EQUAL_INT(TOKEN_X_REGISTER, lexer->sequence[7]->type);
 
-//                                        01234 5 6789 01234
+	//                                01234 5 6789 01234
 	const char *y_register_example = "ELOOP\t\tCMP\tBK,Y\n";
 	buffer = y_register_example;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
@@ -947,7 +947,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
 
-//                              0123456 78 901234 5
+	//                      0123456 78 901234 5
 	const char *constant = "address\t=\t$1234\n";
 	buffer = constant;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
@@ -1035,7 +1035,7 @@ void test_lex_line(void)
 		free(eof_test);
 	}
 
-//                               0123456 78901 23456 7
+	//                       0123456 78901 23456 7
 	const char *directive = "PATTERN\t.EQU\t$2000\n";
 	buffer = directive;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
@@ -1060,7 +1060,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_STRING("PATTERN", lexer->sequence[0]->str);
 	TEST_ASSERT_EQUAL_INT(0x2000, lexer->sequence[2]->value);
 
-//                           0 123456
+	//                   0 123456
 	const char *base = "\t\t* = $1000\t; comment\n";
 	buffer = base;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
@@ -1084,7 +1084,7 @@ void test_lex_line(void)
 
 	TEST_ASSERT_EQUAL_INT(0x1000, lexer->sequence[2]->value);
 
-//                          0 123456
+	//                  0 123456
 	const char *acc = "\t\tlsr a\t\t\t; this routine calculates it as:\n";
 	buffer = acc;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
@@ -1105,7 +1105,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[6]->type);
 	TEST_ASSERT_EQUAL_INT(TOKEN_NULL, lexer->sequence[7]->type);
 
-//                           012345678 901234567890
+	//                   012345678 901234567890
 	const char *colon = "STREQULP:\tLDA ($FC),Y\n";
 	buffer = colon;
 	TEST_ASSERT_EQUAL_INT(LEXER_SUCCESS, lex_line(buffer, lexer, tk, instr, line_num));
@@ -1144,7 +1144,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_PTR(&(buffer[5]), tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[4]), tk->buffer_location);
 
-//                                  0 1234 56789012 3
+	//                          0 1234 56789012 3
 	const char *bad_literal = "\t\tJMP\t$LABELLOL\t";
 	buffer = bad_literal;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));
@@ -1167,7 +1167,7 @@ void test_lex_line(void)
 		free(eof_bad_literal);
 	}
 
-//                                          012345678901234567890123456789012345
+	//                                  012345678901234567890123456789012345
 	const char *totally_illegal_char = "        EOR     @WTF    ; comment       \n\n\n\n\n";
 	// add lots of spaces/newlines to test how print_error() strips trailing whitespace
 	buffer = totally_illegal_char;
@@ -1177,7 +1177,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&(buffer[16]), tk->buffer_location);
 
-//                                    0 1234567890 12345
+	//                            0 1234567890 12345
 	const char *bad_directive = "\t\tSOMETHING\t.WTF\t$1234\n";
 	buffer = bad_directive;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_DIRECTIVE, lex_line(buffer, lexer, tk, instr, line_num));
@@ -1186,7 +1186,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_PTR(&bad_directive[12], tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&bad_directive[12], tk->buffer_location);
 
-//                                    012345678901234567890
+	//                            012345678901234567890
 	const char *bad_directive2 = "VALUE .EQUBADCHAR%%% $800\n";
 	buffer = bad_directive2;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));
@@ -1195,7 +1195,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_PTR(&bad_directive2[17], tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&bad_directive2[6], tk->buffer_location);
 
-//                                0 1234 567890123
+	//                        0 1234 567890123
 	const char *bad_colon = "\t\tLDA\tSETW:,X\n";
 	buffer = bad_colon;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));
@@ -1204,7 +1204,7 @@ void test_lex_line(void)
 	TEST_ASSERT_EQUAL_PTR(&bad_colon[10], tk->error_char);
 	TEST_ASSERT_EQUAL_PTR(&bad_colon[6], tk->buffer_location);
 
-//                          0123 4567890123
+	//                  0123 4567890123
 	const char *wtf = "\t   \t **=:=LDA\n";
 	buffer = wtf;
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(buffer, lexer, tk, instr, line_num));

@@ -22,7 +22,7 @@ void test_print_error(void)
 	// pretend
 	print_error(NULL, ERROR_MEMORY_ALLOCATION_FAIL, NULL, lexer->file_name, -1);
 
-//                           0123 4567890123
+	//                   0123 4567890123
 	const char *line = "\tLDA\t$800!!!!!!SDJGHJSDHFSDKVNSFULM\n";
 	TEST_ASSERT_EQUAL_INT(ERROR_ILLEGAL_CHAR, lex_line(line, lexer, tk, instr, line_num));
 	line_num++;
@@ -35,7 +35,7 @@ void test_print_error(void)
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_BIG_LITERAL, lex_line(line, lexer, tk, instr, line_num));
 	line_num++;
 
-//               0 1234 56
+	//       0 1234 56
 	line = "\t\tJMP\ta2345678b2345678c2345678d2345678e2345678f2345678g2345678h2345678\n";
 	TEST_ASSERT_EQUAL_INT(ERROR_TOO_LONG_LABEL, lex_line(line, lexer, tk, instr, line_num));
 	line_num++;
@@ -88,7 +88,7 @@ void test_print_error(void)
 	TEST_ASSERT_EQUAL_INT(0, instr->addr_bitflag);
 	line_num++;
 
-//              01234
+	//      01234
 	line = "BCC BACK\n";
 	// test_generator.c already knows that the error code and error_tk will be set correctly
 	// too lazy to repeat that here
